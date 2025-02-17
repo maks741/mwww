@@ -5,7 +5,7 @@ import javafx.scene.layout.HBox;
 import org.maks.musicplayer.components.SongInfo;
 import org.maks.musicplayer.model.SongPlayer;
 import org.maks.musicplayer.model.Song;
-import org.maks.musicplayer.utils.SongUtils;
+import org.maks.musicplayer.utils.PlaylistUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public class Playlist {
     private HBox musicListHBox;
 
     public void load(Widget widgetController) {
-        List<Song> songList = SongUtils.musicList();
+        List<Song> songList = PlaylistUtils.playlist();
 
         for (int i = 0; i < songList.size(); i++) {
             Song song = songList.get(i);
@@ -48,7 +48,7 @@ public class Playlist {
         musicListHBox.getChildren().add(songIndex, songInfo);
 
         Song song = new Song(songInfo, songPlayer);
-        SongUtils.musicList().add(songIndex, song);
+        PlaylistUtils.playlist().add(songIndex, song);
     }
 
     private int calculateSongIndex(String targetSongFolderName) {

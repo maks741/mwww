@@ -24,7 +24,7 @@ import org.maks.musicplayer.model.Song;
 import org.maks.musicplayer.model.SongIndex;
 import org.maks.musicplayer.service.DownloadService;
 import org.maks.musicplayer.utils.IconUtils;
-import org.maks.musicplayer.utils.SongUtils;
+import org.maks.musicplayer.utils.PlaylistUtils;
 import org.maks.musicplayer.service.WidgetFXMLLoader;
 
 import java.net.URL;
@@ -190,7 +190,7 @@ public class Widget implements Initializable {
         if (currentMediaContainer.get() == null) return;
 
         SongPlayer songPlayer = currentMediaContainer.get();
-        songPlayer.dispose();
+        songPlayer.refresh();
         currentMediaContainer.set(null);
     }
 
@@ -217,7 +217,7 @@ public class Widget implements Initializable {
     }
 
     private Song currentMusic() {
-        List<Song> songList = SongUtils.musicList();
+        List<Song> songList = PlaylistUtils.playlist();
         int amountOfMusic = songList.size();
 
         int index = currentSongIndex.get() % amountOfMusic;
