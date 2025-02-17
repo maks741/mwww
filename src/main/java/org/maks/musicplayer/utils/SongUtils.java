@@ -40,7 +40,7 @@ public class SongUtils {
         return Arrays.stream(files)
                 .filter(predicate)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Necessary files not found"));
+                .orElseThrow(() -> new RuntimeException("Necessary files not found in: " + songFolder.getName()));
     }
 
     private Pair<String, String> songNameAndSongAuthor(File file) {
