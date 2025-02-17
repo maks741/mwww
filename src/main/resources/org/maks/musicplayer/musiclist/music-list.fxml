@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.Pane?>
+<Pane xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.maks.musicplayer.controller.MusicList"
+      prefWidth="475" prefHeight="125">
+    <ScrollPane prefViewportHeight="120" prefViewportWidth="475">
+
+        <stylesheets>
+            <URL value="@music-list.css" />
+        </stylesheets>
+        <HBox fx:id="musicListHBox" styleClass="music-list" minWidth="475">
+            <padding>
+                <Insets left="15" right="15" top="10" />
+            </padding>
+        </HBox>
+
+    </ScrollPane>
+</Pane>

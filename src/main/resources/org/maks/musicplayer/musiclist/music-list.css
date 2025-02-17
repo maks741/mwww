@@ -1,0 +1,25 @@
+.music-list {
+    -fx-background-color: transparent;
+    -fx-spacing: 10;
+    -fx-background-radius: 0 0 20 20;
+}
+
+.music-list-component {
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+}
+
+.music-list-component:hover {
+    -fx-background-color: rgba(180, 180, 180, 0.5);
+    -fx-cursor: hand;
+}
+
+.scroll-pane {
+    -fx-vbar-policy: never;
+    -fx-hbar-policy: never;
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 0 0 20 20;
+}

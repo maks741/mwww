@@ -1,0 +1,23 @@
+.status-bar {
+    -fx-background-color: #171717;
+    -fx-background-radius: 20;
+    -fx-alignment: center-left;
+}
+
+.status-bar-container {
+    -fx-background-color: transparent;
+}
+
+#showHideWidgetButton {
+    -fx-alignment: center;
+}
+
+#showHideWidgetButton:hover {
+    -fx-background-color: rgb(60, 60, 60);
+    -fx-background-radius: 180;
+    -fx-cursor: hand;
+}
+
+.clickable {
+    -fx-cursor: hand;
+}

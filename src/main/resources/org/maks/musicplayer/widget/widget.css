@@ -1,0 +1,34 @@
+.root {
+    -fx-background-color: transparent;
+}
+
+.body {
+    -fx-background-color: rgba(23, 23, 23, 0.5);
+    -fx-background-radius: 20 20 20 20;
+}
+
+.toolbar {
+    -fx-alignment: center;
+}
+
+.clickable {
+    -fx-cursor: hand;
+}
+
+#duration-slider .track {
+    -fx-background-color: transparent;
+}
+
+#duration-slider .thumb {
+    -fx-background-color: rgb(235, 235, 235);
+}
+
+#duration-slider .thumb:hover {
+    -fx-cursor: hand;
+}
+
+.shutdown-button-container:hover {
+    -fx-background-radius: 10;
+    -fx-background-color: rgba(200, 200, 200, 0.6);
+    -fx-cursor: hand;
+}

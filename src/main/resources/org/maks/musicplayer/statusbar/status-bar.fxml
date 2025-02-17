@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import org.maks.musicplayer.components.PauseToggle?>
+<?import java.net.URL?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="body" prefWidth="475" prefHeight="42"
+      styleClass="status-bar-container">
+    <stylesheets>
+        <URL value="@status-bar.css" />
+    </stylesheets>
+    <HBox spacing="10" VBox.vgrow="ALWAYS" maxHeight="42" styleClass="status-bar">
+        <padding>
+            <Insets left="20" right="25" />
+        </padding>
+        <VBox minWidth="36" maxHeight="36" onMouseClicked="#showHideWidget" id="showHideWidgetButton">
+            <ImageView fitWidth="24" fitHeight="24" preserveRatio="true">
+                <Image url="@../../../../icons/status-bar.png" />
+            </ImageView>
+        </VBox>
+        <Label fx:id="songName" textFill="rgb(230, 230, 230)">
+            <font>
+                <Font name="Verdana" size="17" />
+            </font>
+        </Label>
+        <Pane HBox.hgrow="ALWAYS" />
+        <HBox spacing="15">
+            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#previous">
+                <padding>
+                    <Insets right="2.5" />
+                </padding>
+                <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
+                    <Image url="@../../../../icons/previous.png" />
+                </ImageView>
+            </VBox>
+            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#playOrPause">
+                <PauseToggle fx:id="pauseToggle" fitWidth="22" fitHeight="22" preserveRatio="true">
+                    <Image url="@../../../../icons/play.png" />
+                </PauseToggle>
+            </VBox>
+            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#next">
+                <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
+                    <Image url="@../../../../icons/next.png" />
+                </ImageView>
+            </VBox>
+        </HBox>
+
+    </HBox>
+</VBox>
