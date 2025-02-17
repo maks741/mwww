@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-public class MediaPlayerContainer {
+public class SongPlayer {
 
     private final File songFolder;
     private MediaPlayer mediaPlayer;
@@ -17,7 +17,7 @@ public class MediaPlayerContainer {
     private final String songAuthor;
     private final Image songAvatar;
 
-    public MediaPlayerContainer(File songFolder) {
+    public SongPlayer(File songFolder) {
         this.songFolder = songFolder;
         File songFile = findFirst(songFolder, this::wavFile);
 

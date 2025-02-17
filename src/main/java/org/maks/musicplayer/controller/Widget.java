@@ -14,17 +14,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.musicplayer.components.DurationSlider;
-import org.maks.musicplayer.components.MusicInfo;
+import org.maks.musicplayer.components.SongInfo;
 import org.maks.musicplayer.components.PauseToggle;
 import org.maks.musicplayer.components.RepeatSongToggle;
 import org.maks.musicplayer.enumeration.FXMLPath;
 import org.maks.musicplayer.enumeration.IconName;
-import org.maks.musicplayer.model.MediaPlayerContainer;
-import org.maks.musicplayer.model.Music;
+import org.maks.musicplayer.model.SongPlayer;
+import org.maks.musicplayer.model.Song;
 import org.maks.musicplayer.model.SongIndex;
 import org.maks.musicplayer.service.DownloadService;
 import org.maks.musicplayer.utils.IconUtils;
-import org.maks.musicplayer.utils.MusicUtils;
+import org.maks.musicplayer.utils.SongUtils;
 import org.maks.musicplayer.service.WidgetFXMLLoader;
 
 import java.net.URL;
@@ -40,7 +40,7 @@ public class Widget implements Initializable {
     private VBox container;
 
     @FXML
-    private MusicInfo musicInfo;
+    private SongInfo songInfo;
 
     @FXML
     private DurationSlider durationSlider;
@@ -54,19 +54,19 @@ public class Widget implements Initializable {
     @FXML
     private ImageView addIcon;
 
-    private final AtomicReference<MediaPlayerContainer> currentMediaContainer = new AtomicReference<>();
+    private final AtomicReference<SongPlayer> currentMediaContainer = new AtomicReference<>();
     private final SongIndex currentSongIndex = new SongIndex();
     private final BooleanProperty songPlayingProperty = new SimpleBooleanProperty(false);
-    private final ObjectProperty<MediaPlayerContainer> mediaPlayerContainerProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<SongPlayer> mediaPlayerContainerProperty = new SimpleObjectProperty<>();
 
-    private MusicList musicList;
+    private Playlist playlist;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         durationSlider.bindSliderValue(currentMediaContainer);
         pauseToggle.bind(songPlayingProperty);
-        musicInfo.bind(mediaPlayerContainerProperty);
-        musicList = listMusic();
+        songInfo.bind(mediaPlayerContainerProperty);
+        playlist = listMusic();
     }
 
     public void loadFirstSong() {
@@ -89,25 +89,25 @@ public class Widget implements Initializable {
 
     public MediaPlayer play() {
         if (currentMediaContainer.get() == null) {
-            currentMediaContainer.set(currentMusic().mediaPlayerContainer());
+            currentMediaContainer.set(currentMusic().songPlayer());
         }
 
-        MediaPlayerContainer mediaPlayerContainer = currentMediaContainer.get();
-        mediaPlayerContainerProperty.set(mediaPlayerContainer);
+        SongPlayer songPlayer = currentMediaContainer.get();
+        mediaPlayerContainerProperty.set(songPlayer);
 
-        MediaPlayer mediaPlayer = mediaPlayerContainer.mediaPlayer();
+        MediaPlayer mediaPlayer = songPlayer.mediaPlayer();
 
         boolean mediaNotPlayerReady = mediaPlayer.getCycleDuration() == Duration.UNKNOWN;
         if (mediaNotPlayerReady) {
-            mediaPlayer.setOnReady(() -> play(mediaPlayer, mediaPlayerContainer));
+            mediaPlayer.setOnReady(() -> play(mediaPlayer, songPlayer));
         } else {
-            play(mediaPlayer, mediaPlayerContainer);
+            play(mediaPlayer, songPlayer);
         }
 
         return mediaPlayer;
     }
 
-    private void play(MediaPlayer mediaPlayer, MediaPlayerContainer mediaPlayerContainer) {
+    private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer) {
         Duration duration = mediaPlayer.getCycleDuration();
 
         mediaPlayer.currentTimeProperty().addListener((
@@ -124,7 +124,7 @@ public class Widget implements Initializable {
 
         mediaPlayer.setVolume(0.05);
         mediaPlayer.setOnEndOfMedia(this::skipToNextSong);
-        mediaPlayerContainer.play();
+        songPlayer.play();
 
         pauseToggle.onMusicPlayed();
         songPlayingProperty.set(true);
@@ -135,8 +135,8 @@ public class Widget implements Initializable {
     }
 
     public void pause() {
-        MediaPlayerContainer mediaPlayerContainer = currentMediaContainer.get();
-        mediaPlayerContainer.pause();
+        SongPlayer songPlayer = currentMediaContainer.get();
+        songPlayer.pause();
 
         pauseToggle.onMusicPaused();
         songPlayingProperty.set(false);
@@ -163,7 +163,7 @@ public class Widget implements Initializable {
                 return;
             }
 
-            Platform.runLater(() -> musicList.add(
+            Platform.runLater(() -> playlist.add(
                     this,
                     downloadedSongDirectory
             ));
@@ -189,21 +189,21 @@ public class Widget implements Initializable {
     private void dispose() {
         if (currentMediaContainer.get() == null) return;
 
-        MediaPlayerContainer mediaPlayerContainer = currentMediaContainer.get();
-        mediaPlayerContainer.dispose();
+        SongPlayer songPlayer = currentMediaContainer.get();
+        songPlayer.dispose();
         currentMediaContainer.set(null);
     }
 
-    private MusicList listMusic() {
+    private Playlist listMusic() {
         WidgetFXMLLoader widgetFXMLLoader = new WidgetFXMLLoader(FXMLPath.MUSIC_LIST);
 
         Parent musicList = widgetFXMLLoader.parent();
-        MusicList musicListController = widgetFXMLLoader.fxmlLoader().getController();
-        musicListController.load(this);
+        Playlist playlistController = widgetFXMLLoader.fxmlLoader().getController();
+        playlistController.load(this);
 
         container.getChildren().add(musicList);
 
-        return musicListController;
+        return playlistController;
     }
 
     @FXML
@@ -216,9 +216,9 @@ public class Widget implements Initializable {
         System.exit(0);
     }
 
-    private Music currentMusic() {
-        List<Music> musicList = MusicUtils.musicList();
-        int amountOfMusic = musicList.size();
+    private Song currentMusic() {
+        List<Song> songList = SongUtils.musicList();
+        int amountOfMusic = songList.size();
 
         int index = currentSongIndex.get() % amountOfMusic;
 
@@ -226,10 +226,10 @@ public class Widget implements Initializable {
             index = amountOfMusic + index;
         }
 
-        return musicList.get(index);
+        return songList.get(index);
     }
 
-    public ObjectProperty<MediaPlayerContainer> mediaPlayerContainerProperty() {
+    public ObjectProperty<SongPlayer> mediaPlayerContainerProperty() {
         return mediaPlayerContainerProperty;
     }
 

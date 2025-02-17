@@ -7,12 +7,12 @@
 <?import javafx.scene.layout.Pane?>
 <Pane xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.maks.musicplayer.controller.MusicList"
+      fx:controller="org.maks.musicplayer.controller.Playlist"
       prefWidth="475" prefHeight="125">
     <ScrollPane prefViewportHeight="120" prefViewportWidth="475">
 
         <stylesheets>
-            <URL value="@music-list.css" />
+            <URL value="@playlist.css" />
         </stylesheets>
         <HBox fx:id="musicListHBox" styleClass="music-list" minWidth="475">
             <padding>

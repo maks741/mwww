@@ -2,53 +2,53 @@ package org.maks.musicplayer.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
-import org.maks.musicplayer.components.MusicInfo;
-import org.maks.musicplayer.model.MediaPlayerContainer;
-import org.maks.musicplayer.model.Music;
-import org.maks.musicplayer.utils.MusicUtils;
+import org.maks.musicplayer.components.SongInfo;
+import org.maks.musicplayer.model.SongPlayer;
+import org.maks.musicplayer.model.Song;
+import org.maks.musicplayer.utils.SongUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public class MusicList {
+public class Playlist {
 
     @FXML
     private HBox musicListHBox;
 
     public void load(Widget widgetController) {
-        List<Music> musicList = MusicUtils.musicList();
+        List<Song> songList = SongUtils.musicList();
 
-        for (int i = 0; i < musicList.size(); i++) {
-            Music music = musicList.get(i);
-            MusicInfo musicInfo = music.musicInfo();
+        for (int i = 0; i < songList.size(); i++) {
+            Song song = songList.get(i);
+            SongInfo songInfo = song.songInfo();
 
             final int songIndex = i;
-            musicInfo.setOnMouseClicked(_ ->
+            songInfo.setOnMouseClicked(_ ->
                 widgetController.play(songIndex)
             );
 
-            musicListHBox.getChildren().add(musicInfo);
+            musicListHBox.getChildren().add(songInfo);
         }
     }
 
     public void add(Widget widgetController, String songFolderName) {
         File songFolder = new File("./songs/" + songFolderName);
-        MediaPlayerContainer mediaPlayerContainer = new MediaPlayerContainer(songFolder);
-        MusicInfo musicInfo = new MusicInfo();
-        musicInfo.load(mediaPlayerContainer);
+        SongPlayer songPlayer = new SongPlayer(songFolder);
+        SongInfo songInfo = new SongInfo();
+        songInfo.load(songPlayer);
 
         int songIndex = calculateSongIndex(songFolderName);
 
-        musicInfo.setOnMouseClicked(_ ->
+        songInfo.setOnMouseClicked(_ ->
                 widgetController.play(songIndex)
         );
 
-        musicListHBox.getChildren().add(songIndex, musicInfo);
+        musicListHBox.getChildren().add(songIndex, songInfo);
 
-        Music music = new Music(musicInfo, mediaPlayerContainer);
-        MusicUtils.musicList().add(songIndex, music);
+        Song song = new Song(songInfo, songPlayer);
+        SongUtils.musicList().add(songIndex, song);
     }
 
     private int calculateSongIndex(String targetSongFolderName) {

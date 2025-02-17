@@ -6,7 +6,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import org.maks.musicplayer.model.MediaPlayerContainer;
+import org.maks.musicplayer.model.SongPlayer;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,7 +36,7 @@ public class DurationSlider extends StackPane {
         getChildren().addAll(progressRec, slider);
     }
 
-    public void bindSliderValue(AtomicReference<MediaPlayerContainer> currentMediaContainer) {
+    public void bindSliderValue(AtomicReference<SongPlayer> currentMediaContainer) {
         slider.setOnMousePressed(_ -> {
             if (currentMediaContainer.get() == null) {
                 return;
@@ -51,9 +51,9 @@ public class DurationSlider extends StackPane {
             }
 
             double percentage = slider.getValue();
-            MediaPlayerContainer mediaPlayerContainer = currentMediaContainer.get();
+            SongPlayer songPlayer = currentMediaContainer.get();
 
-            MediaPlayer mediaPlayer = mediaPlayerContainer.mediaPlayer();
+            MediaPlayer mediaPlayer = songPlayer.mediaPlayer();
             Duration duration = mediaPlayer.getCycleDuration();
 
             Duration percentageDuration = duration.multiply((percentage / 100));

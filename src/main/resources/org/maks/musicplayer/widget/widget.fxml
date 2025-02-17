@@ -4,7 +4,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import org.maks.musicplayer.components.DurationSlider?>
-<?import org.maks.musicplayer.components.MusicInfo?>
+<?import org.maks.musicplayer.components.SongInfo?>
 <?import org.maks.musicplayer.components.PauseToggle?>
 <?import org.maks.musicplayer.components.RepeatSongToggle?>
 <?import java.net.URL?>
@@ -21,7 +21,7 @@
                 <Insets top="20" right="40" left="40" />
             </padding>
 
-            <MusicInfo fx:id="musicInfo" />
+            <SongInfo fx:id="songInfo" />
 
             <DurationSlider fx:id="durationSlider" />
 
