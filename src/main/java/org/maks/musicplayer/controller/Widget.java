@@ -70,12 +70,9 @@ public class Widget implements Initializable {
     }
 
     public void loadFirstSong() {
-        MediaPlayer mediaPlayer = play();
-        mediaPlayer.setOnPlaying(() -> {
-            mediaPlayer.setOnPlaying(null);
-            pause();
-            mediaPlayer.seek(Duration.ZERO);
-        });
+        SongPlayer songPlayer = currentMusic().songPlayer();
+        currentMediaContainer.set(songPlayer);
+        mediaPlayerContainerProperty.set(songPlayer);
     }
 
     @FXML
@@ -87,7 +84,7 @@ public class Widget implements Initializable {
         }
     }
 
-    public MediaPlayer play() {
+    public void play() {
         if (currentMediaContainer.get() == null) {
             currentMediaContainer.set(currentMusic().songPlayer());
         }
@@ -103,8 +100,6 @@ public class Widget implements Initializable {
         } else {
             play(mediaPlayer, songPlayer);
         }
-
-        return mediaPlayer;
     }
 
     private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer) {
