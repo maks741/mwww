@@ -7,6 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import org.maks.musicplayer.model.SongInfoDto;
 import org.maks.musicplayer.model.SongPlayer;
 
 public class SongInfo extends HBox {
@@ -23,19 +24,19 @@ public class SongInfo extends HBox {
         mediaPlayerContainerProperty.addListener((
                 _,
                 _,
-                mediaPlayerContainer) ->
-                load(mediaPlayerContainer)
-        );
+                songPlayer) -> {
+            if (songPlayer == null) {
+                return;
+            }
+
+            load(songPlayer.songInfoDto());
+        });
     }
 
-    public void load(SongPlayer songPlayer) {
-        if (songPlayer == null) {
-            return;
-        }
-
-        songAvatar.setImage(songPlayer.songAvatar());
-        songName.setText(songPlayer.songName());
-        songAuthor.setText(songPlayer.songAuthor());
+    public void load(SongInfoDto songInfoDto) {
+        songAvatar.setImage(songInfoDto.songThumbnail());
+        songName.setText(songInfoDto.songName());
+        songAuthor.setText(songInfoDto.songAuthor());
     }
 
     private void load() {

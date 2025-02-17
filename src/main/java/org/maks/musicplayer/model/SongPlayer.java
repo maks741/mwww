@@ -1,6 +1,5 @@
 package org.maks.musicplayer.model;
 
-import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import org.maks.musicplayer.utils.SongUtils;
@@ -10,18 +9,13 @@ import java.io.File;
 public class SongPlayer {
 
     private MediaPlayer mediaPlayer;
-    private final String songName;
-    private final String songAuthor;
-    private final Image songThumbnail;
+    private final SongInfoDto songInfoDto;
 
     public SongPlayer(File songFolder) {
         SongUtils songUtils = new SongUtils();
-        SongDetails songDetails = songUtils.songDetails(songFolder);
-
-        this.songName = songDetails.name();
-        this.songAuthor = songDetails.author();
-        this.songThumbnail = songDetails.thumbnail();
-        this.mediaPlayer = new MediaPlayer(songDetails.media());
+        SongDto songDto = songUtils.songDto(songFolder);
+        this.mediaPlayer = new MediaPlayer(songDto.media());
+        this.songInfoDto = songDto.songInfoDto();
     }
 
     public void play() {
@@ -45,16 +39,8 @@ public class SongPlayer {
         return mediaPlayer;
     }
 
-    public Image songAvatar() {
-        return songThumbnail;
-    }
-
-    public String songName() {
-        return songName;
-    }
-
-    public String songAuthor() {
-        return songAuthor;
+    public SongInfoDto songInfoDto() {
+        return songInfoDto;
     }
 
 }

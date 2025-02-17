@@ -2,6 +2,7 @@ package org.maks.musicplayer.utils;
 
 import org.maks.musicplayer.components.SongInfo;
 import org.maks.musicplayer.model.Song;
+import org.maks.musicplayer.model.SongInfoDto;
 import org.maks.musicplayer.model.SongPlayer;
 
 import java.io.File;
@@ -18,6 +19,43 @@ public class PlaylistUtils {
     }
 
     private static void loadPlaylist() {
+        File[] songFolders = songFolders();
+
+        playlist.addAll(Arrays.stream(songFolders)
+                .filter(File::isDirectory)
+                .map(songFolder -> {
+                    SongPlayer songPlayer = new SongPlayer(songFolder);
+                    SongInfo songInfo = new SongInfo();
+                    songInfo.load(songPlayer.songInfoDto());
+
+                    return new Song(songInfo, songPlayer);
+                })
+                .toList());
+    }
+
+    public static List<SongInfo> songInfoList() {
+        File[] songFolders = songFolders();
+        SongUtils songUtils = new SongUtils();
+
+        return Arrays.stream(songFolders)
+                .filter(File::isDirectory)
+                .map(songFolder -> {
+                    SongInfoDto songInfoDto = songUtils.songInfoDto(songFolder);
+
+                    SongInfo songInfo = new SongInfo();
+                    songInfo.load(songInfoDto);
+
+                    return songInfo;
+                })
+                .toList();
+    }
+
+    public static void refresh() {
+        playlist.clear();
+        loadPlaylist();
+    }
+
+    private static File[] songFolders() {
         File songsFolder = new File("./songs");
         File[] songFolders = songsFolder.listFiles();
 
@@ -25,21 +63,7 @@ public class PlaylistUtils {
             throw new RuntimeException("Songs directory is non-existent");
         }
 
-        playlist.addAll(Arrays.stream(songFolders)
-                .filter(File::isDirectory)
-                .map(songFolder -> {
-                    SongPlayer songPlayer = new SongPlayer(songFolder);
-                    SongInfo songInfo = new SongInfo();
-                    songInfo.load(songPlayer);
-
-                    return new Song(songInfo, songPlayer);
-                })
-                .toList());
-    }
-
-    public static void refresh() {
-        playlist.clear();
-        loadPlaylist();
+        return songFolders;
     }
 
     public static List<Song> playlist() {

@@ -3,7 +3,8 @@ package org.maks.musicplayer.utils;
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.util.Pair;
-import org.maks.musicplayer.model.SongDetails;
+import org.maks.musicplayer.model.SongDto;
+import org.maks.musicplayer.model.SongInfoDto;
 
 import java.io.File;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ import java.util.function.Predicate;
 
 public class SongUtils {
 
-    public SongDetails songDetails(File songFolder) {
+    public SongInfoDto songInfoDto(File songFolder) {
         File songThumbnailFile = findFirst(songFolder, this::image);
         File songMediaFile = findFirst(songFolder, this::media);
 
@@ -19,13 +20,23 @@ public class SongUtils {
         String songName = songNameAndSongAuthor.getKey();
         String songAuthor = songNameAndSongAuthor.getValue();
 
-        Media songMedia = new Media(songMediaFile.toURI().toString());
         Image songThumbnail = new Image(songThumbnailFile.toURI().toString());
 
-        return new SongDetails(
+        return new SongInfoDto(
                 songName,
                 songAuthor,
-                songThumbnail,
+                songThumbnail
+        );
+    }
+
+    public SongDto songDto(File songFolder) {
+        SongInfoDto songInfoDto = songInfoDto(songFolder);
+
+        File songMediaFile = findFirst(songFolder, this::media);
+        Media songMedia = new Media(songMediaFile.toURI().toString());
+
+        return new SongDto(
+                songInfoDto,
                 songMedia
         );
     }

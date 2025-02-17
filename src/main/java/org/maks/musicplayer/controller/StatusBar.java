@@ -52,12 +52,12 @@ public class StatusBar implements Initializable {
         widgetController.songPlayerProperty().addListener((
                 _,
                 _,
-                mediaPlayerContainer) -> {
-            if (mediaPlayerContainer == null) {
+                songPlayer) -> {
+            if (songPlayer == null) {
                 return;
             }
 
-            songName.setText(mediaPlayerContainer.songName());
+            songName.setText(songPlayer.songInfoDto().songName());
         });
     }
 
