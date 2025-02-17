@@ -7,12 +7,26 @@ import os
 base_songs_dir_path = "./songs/"
 
 
+def crop_image(image):
+    width, height = image.size
+    if width == height:
+        return image
+    offset  = int(abs(height-width)/2)
+    if width>height:
+        image = image.crop([offset,0,width-offset,height])
+    else:
+        image = image.crop([0,offset,width,height-offset])
+    image = image.resize((75, 75))
+    return image
+
+
 def webp_to_jpg(dir_name, thumbnail_webp_name):
     thumbnail_dir = base_songs_dir_path + dir_name + "/"
 
     webp = Image.open(thumbnail_dir + thumbnail_webp_name)
-    jpg = webp.convert("RGB")
-    jpg.save(thumbnail_dir + "thumbnail.jpg")
+    jpg = webp.convert("RGBA")
+    jpg = crop_image(jpg)
+    jpg.save(thumbnail_dir + "thumbnail.png")
     os.remove(thumbnail_dir + thumbnail_webp_name)
 
 
