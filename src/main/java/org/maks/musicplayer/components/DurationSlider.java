@@ -9,8 +9,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.maks.musicplayer.model.SongPlayer;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 public class DurationSlider extends StackPane {
 
     private final Slider slider = new Slider();

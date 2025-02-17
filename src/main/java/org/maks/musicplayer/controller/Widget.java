@@ -20,6 +20,7 @@ import org.maks.musicplayer.components.RepeatSongToggle;
 import org.maks.musicplayer.components.SongInfo;
 import org.maks.musicplayer.enumeration.FXMLPath;
 import org.maks.musicplayer.enumeration.Icon;
+import org.maks.musicplayer.exception.SongDirectoryEmptyException;
 import org.maks.musicplayer.model.Song;
 import org.maks.musicplayer.model.SongIndex;
 import org.maks.musicplayer.model.SongPlayer;
@@ -67,8 +68,12 @@ public class Widget implements Initializable {
     }
 
     public void loadFirstSong() {
-        SongPlayer songPlayer = currentMusic().songPlayer();
-        songPlayerProperty.set(songPlayer);
+        try {
+            Song song = currentSong();
+            songPlayerProperty.set(song.songPlayer());
+        } catch (SongDirectoryEmptyException e) {
+            System.err.println("Songs directory is empty");
+        }
     }
 
     @FXML
@@ -82,7 +87,12 @@ public class Widget implements Initializable {
 
     public void play() {
         if (songPlayerProperty.get() == null) {
-            songPlayerProperty.set(currentMusic().songPlayer());
+            try {
+                Song song = currentSong();
+                songPlayerProperty.set(song.songPlayer());
+            } catch (SongDirectoryEmptyException e) {
+                return;
+            }
         }
 
         SongPlayer songPlayer = songPlayerProperty.get();
@@ -201,10 +211,13 @@ public class Widget implements Initializable {
         System.exit(0);
     }
 
-    private Song currentMusic() {
+    private Song currentSong() throws SongDirectoryEmptyException {
         PlaylistUtils playlistUtils = new PlaylistUtils();
-
         int amountOfMusic = playlistUtils.amountOfSongs();
+
+        if (amountOfMusic == 0) {
+            throw new SongDirectoryEmptyException("Songs directory is empty");
+        }
 
         int index = currentSongIndex.get() % amountOfMusic;
 

@@ -45,13 +45,15 @@ public class PlaylistUtils {
 
     private File[] songFolders() {
         File songsFolder = new File("./songs");
-        File[] songFolders = songsFolder.listFiles();
 
-        if (songFolders == null) {
-            throw new RuntimeException("Songs directory is non-existent");
+        if (!songsFolder.exists()) {
+            boolean songsFolderCreated = songsFolder.mkdir();
+            if (!songsFolderCreated) {
+                throw new RuntimeException("Could not create songs directory");
+            }
         }
 
-        return songFolders;
+        return songsFolder.listFiles();
     }
 
 }
