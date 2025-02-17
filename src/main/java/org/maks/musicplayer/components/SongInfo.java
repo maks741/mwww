@@ -3,12 +3,14 @@ package org.maks.musicplayer.components;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.maks.musicplayer.model.SongInfoDto;
 import org.maks.musicplayer.model.SongPlayer;
+import org.maks.musicplayer.utils.ImageUtils;
 
 public class SongInfo extends HBox {
 
@@ -34,7 +36,8 @@ public class SongInfo extends HBox {
     }
 
     public void load(SongInfoDto songInfoDto) {
-        songAvatar.setImage(songInfoDto.songThumbnail());
+        Image croppedThumbnail = ImageUtils.cropToSquare(songInfoDto.songThumbnail());
+        songAvatar.setImage(croppedThumbnail);
         songName.setText(songInfoDto.songName());
         songAuthor.setText(songInfoDto.songAuthor());
     }
