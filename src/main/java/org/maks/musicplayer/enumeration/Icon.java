@@ -1,6 +1,6 @@
 package org.maks.musicplayer.enumeration;
 
-public enum IconName {
+public enum Icon {
     LOADING("loading"),
     NEW_SONG("new-song"),
     NEXT("next"),
@@ -8,12 +8,12 @@ public enum IconName {
     PLAY("play"),
     PREVIOUS("previous"),
     REPEAT("repeat"),
-    REPEAT_SINGLE("repeat_single"),
+    REPEAT_SINGLE("repeat-single"),
     SHUTDOWN("shutdown"),
     STATUS_BAR("status-bar");
 
     private final String iconName;
-    IconName(String iconName) {
+    Icon(String iconName) {
         this.iconName = iconName;
     }
 

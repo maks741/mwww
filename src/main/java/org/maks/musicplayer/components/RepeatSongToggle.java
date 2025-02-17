@@ -2,7 +2,7 @@ package org.maks.musicplayer.components;
 
 import javafx.scene.image.ImageView;
 import org.maks.musicplayer.controller.Widget;
-import org.maks.musicplayer.enumeration.IconName;
+import org.maks.musicplayer.enumeration.Icon;
 import org.maks.musicplayer.utils.IconUtils;
 
 public class RepeatSongToggle extends ImageView {
@@ -12,10 +12,10 @@ public class RepeatSongToggle extends ImageView {
     public void toggleOnRepeat() {
         if (onRepeat) {
             onRepeat = false;
-            setImage(IconUtils.image(IconName.REPEAT));
+            setImage(IconUtils.image(Icon.REPEAT));
         } else {
             onRepeat = true;
-            setImage(IconUtils.image(IconName.REPEAT_SINGLE));
+            setImage(IconUtils.image(Icon.REPEAT_SINGLE));
         }
     }
 

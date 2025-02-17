@@ -18,7 +18,7 @@ import org.maks.musicplayer.components.SongInfo;
 import org.maks.musicplayer.components.PauseToggle;
 import org.maks.musicplayer.components.RepeatSongToggle;
 import org.maks.musicplayer.enumeration.FXMLPath;
-import org.maks.musicplayer.enumeration.IconName;
+import org.maks.musicplayer.enumeration.Icon;
 import org.maks.musicplayer.model.SongPlayer;
 import org.maks.musicplayer.model.Song;
 import org.maks.musicplayer.model.SongIndex;
@@ -150,7 +150,7 @@ public class Widget implements Initializable {
     @FXML
     private void addSong() {
         Image initialImage = addIcon.getImage();
-        ImageView loadingIcon = IconUtils.icon(IconName.LOADING);
+        ImageView loadingIcon = IconUtils.icon(Icon.LOADING);
         addIcon.setImage(loadingIcon.getImage());
 
         DownloadService downloadService = new DownloadService();

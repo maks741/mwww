@@ -2,36 +2,31 @@ package org.maks.musicplayer.utils;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.maks.musicplayer.enumeration.IconName;
+import org.maks.musicplayer.enumeration.Icon;
 
-import java.io.File;
+import java.util.Arrays;
 
 public class IconUtils {
 
-    public static ImageView icon(IconName iconName) {
-        return new ImageView(iconPath(iconName));
+    public static ImageView icon(Icon icon) {
+        return new ImageView(iconPath(icon));
     }
 
-    public static Image image(IconName iconName) {
-        return new Image(iconPath(iconName));
+    public static Image image(Icon icon) {
+        return new Image(iconPath(icon));
     }
 
-    private static String iconPath(IconName iconName) {
-        String iconNameStr = iconName.toString();
+    private static String iconPath(Icon icon) {
+        String iconName = icon.toString();
 
-        File iconFile = null;
-        for (File icon : ResourceUtils.icons()) {
-            if (icon.getName().startsWith(iconNameStr)) {
-                String iconPath = ResourceUtils.iconsFolderPath() + "/" + icon.getName();
-                iconFile = new File(iconPath);
-            }
-        }
-
-        if (iconFile == null) {
-            throw new RuntimeException("Icon not found by name: " + iconNameStr);
-        }
-
-        return iconFile.toURI().toString();
+        return Arrays.stream(ResourceUtils.icons())
+                .filter(file -> {
+                    String fileNameWithoutExtension = file.getName().split("\\.")[0];
+                    return fileNameWithoutExtension.equals(iconName);
+                })
+                .findFirst()
+                .map(file -> file.toURI().toString())
+                .orElseThrow(() -> new RuntimeException("Icon not found by name: " + iconName));
     }
 
 }

@@ -2,7 +2,7 @@ package org.maks.musicplayer.components;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.image.ImageView;
-import org.maks.musicplayer.enumeration.IconName;
+import org.maks.musicplayer.enumeration.Icon;
 import org.maks.musicplayer.utils.IconUtils;
 
 public class PauseToggle extends ImageView {
@@ -18,11 +18,11 @@ public class PauseToggle extends ImageView {
     }
 
     public void onMusicPlayed() {
-        setImage(IconUtils.image(IconName.PAUSE));
+        setImage(IconUtils.image(Icon.PAUSE));
     }
 
     public void onMusicPaused() {
-        setImage(IconUtils.image(IconName.PLAY));
+        setImage(IconUtils.image(Icon.PLAY));
     }
 
 }
