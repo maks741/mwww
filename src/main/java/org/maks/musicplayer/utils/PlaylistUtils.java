@@ -6,6 +6,7 @@ import org.maks.musicplayer.model.SongInfoDto;
 import org.maks.musicplayer.model.SongPlayer;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,7 +45,8 @@ public class PlaylistUtils {
     }
 
     private File[] songFolders() {
-        File songsFolder = new File("./songs");
+        Path songsFolderPath = ResourceUtils.songsFolderPath();
+        File songsFolder = songsFolderPath.toFile();
 
         if (!songsFolder.exists()) {
             boolean songsFolderCreated = songsFolder.mkdir();

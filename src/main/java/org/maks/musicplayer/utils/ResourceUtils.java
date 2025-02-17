@@ -1,6 +1,7 @@
 package org.maks.musicplayer.utils;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ResourceUtils {
@@ -8,8 +9,8 @@ public class ResourceUtils {
     private static final File[] icons = loadIcons();
 
     private static File[] loadIcons() {
-        File iconsFolder = new File(iconsFolderPath());
-
+        Path iconsFolderPath = iconsFolderPath();
+        File iconsFolder = iconsFolderPath.toFile();
         File[] icons = iconsFolder.listFiles();
 
         if (icons == null) {
@@ -19,14 +20,12 @@ public class ResourceUtils {
         return icons;
     }
 
-    public static String iconsFolderPath() {
-        return resourcesFolderPath() + "/icons";
+    public static Path iconsFolderPath() {
+        return Paths.get("src", "main", "resources", "icons");
     }
 
-    private static String resourcesFolderPath() {
-        return Paths.get("./src/main/resources")
-                .toAbsolutePath()
-                .toString();
+    public static Path songsFolderPath() {
+        return Paths.get("songs");
     }
 
     public static File[] icons() {
