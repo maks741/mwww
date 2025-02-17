@@ -50,9 +50,11 @@ public class SongInfo extends HBox {
 
         songName.setTextFill(Color.rgb(230, 230, 230));
         songName.setFont(new Font("Verdana", 17));
+        songName.setMaxWidth(300);
 
         songAuthor.setTextFill(Color.rgb(200, 200, 200));
         songAuthor.setFont(new Font("Verdana", 13));
+        songName.setMaxWidth(300);
 
         VBox labels = new VBox(songName, songAuthor);
         labels.setAlignment(Pos.CENTER_LEFT);
