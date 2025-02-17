@@ -3,13 +3,8 @@ package org.maks.musicplayer.controller;
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
 import org.maks.musicplayer.components.SongInfo;
-import org.maks.musicplayer.model.SongPlayer;
-import org.maks.musicplayer.model.Song;
 import org.maks.musicplayer.utils.PlaylistUtils;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public class Playlist {
@@ -18,11 +13,10 @@ public class Playlist {
     private HBox musicListHBox;
 
     public void load(Widget widget) {
-        List<Song> songList = PlaylistUtils.playlist();
+        List<SongInfo> songInfoList = PlaylistUtils.songInfoList();
 
-        for (int i = 0; i < songList.size(); i++) {
-            Song song = songList.get(i);
-            SongInfo songInfo = song.songInfo();
+        for (int i = 0; i < songInfoList.size(); i++) {
+            SongInfo songInfo = songInfoList.get(i);
 
             final int songIndex = i;
             songInfo.setOnMouseClicked(_ ->
