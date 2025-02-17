@@ -1,6 +1,5 @@
 package org.maks.musicplayer.model;
 
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import org.maks.musicplayer.utils.SongUtils;
 
@@ -8,7 +7,7 @@ import java.io.File;
 
 public class SongPlayer {
 
-    private MediaPlayer mediaPlayer;
+    private final MediaPlayer mediaPlayer;
     private final SongInfoDto songInfoDto;
 
     public SongPlayer(File songFolder) {
@@ -26,13 +25,9 @@ public class SongPlayer {
         mediaPlayer.pause();
     }
 
-    public void refresh() {
-        Media media = mediaPlayer.getMedia();
-
+    public void dispose() {
         mediaPlayer.stop();
         mediaPlayer.dispose();
-
-        mediaPlayer = new MediaPlayer(media);
     }
 
     public MediaPlayer mediaPlayer() {

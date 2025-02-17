@@ -28,7 +28,6 @@ import org.maks.musicplayer.utils.IconUtils;
 import org.maks.musicplayer.utils.PlaylistUtils;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -179,7 +178,7 @@ public class Widget implements Initializable {
         }
 
         SongPlayer songPlayer = songPlayerProperty.get();
-        songPlayer.refresh();
+        songPlayer.dispose();
         songPlayerProperty.set(null);
     }
 
@@ -206,8 +205,7 @@ public class Widget implements Initializable {
     }
 
     private Song currentMusic() {
-        List<Song> songList = PlaylistUtils.playlist();
-        int amountOfMusic = songList.size();
+        int amountOfMusic = PlaylistUtils.amountOfSongs();
 
         int index = currentSongIndex.get() % amountOfMusic;
 
@@ -215,7 +213,7 @@ public class Widget implements Initializable {
             index = amountOfMusic + index;
         }
 
-        return songList.get(index);
+        return PlaylistUtils.songByIndex(index);
     }
 
     public ObjectProperty<SongPlayer> songPlayerProperty() {

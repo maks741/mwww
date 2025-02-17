@@ -12,27 +12,6 @@ import java.util.List;
 
 public class PlaylistUtils {
 
-    private static final List<Song> playlist = new ArrayList<>();
-
-    static {
-        loadPlaylist();
-    }
-
-    private static void loadPlaylist() {
-        File[] songFolders = songFolders();
-
-        playlist.addAll(Arrays.stream(songFolders)
-                .filter(File::isDirectory)
-                .map(songFolder -> {
-                    SongPlayer songPlayer = new SongPlayer(songFolder);
-                    SongInfo songInfo = new SongInfo();
-                    songInfo.load(songPlayer.songInfoDto());
-
-                    return new Song(songInfo, songPlayer);
-                })
-                .toList());
-    }
-
     public static List<SongInfo> songInfoList() {
         File[] songFolders = songFolders();
         SongUtils songUtils = new SongUtils();
@@ -50,9 +29,23 @@ public class PlaylistUtils {
                 .toList();
     }
 
+    public static Song songByIndex(int index) {
+        File[] songFolders = songFolders();
+        File songFolder = songFolders[index];
+
+        SongPlayer songPlayer = new SongPlayer(songFolder);
+        SongInfo songInfo = new SongInfo();
+        songInfo.load(songPlayer.songInfoDto());
+
+        return new Song(songInfo, songPlayer);
+    }
+
     public static void refresh() {
-        playlist.clear();
-        loadPlaylist();
+        // TODO
+    }
+
+    public static int amountOfSongs() {
+        return songFolders().length;
     }
 
     private static File[] songFolders() {
@@ -64,10 +57,6 @@ public class PlaylistUtils {
         }
 
         return songFolders;
-    }
-
-    public static List<Song> playlist() {
-        return playlist;
     }
 
 }
