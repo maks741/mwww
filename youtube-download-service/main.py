@@ -10,7 +10,7 @@ def download_audio(url):
         'extract_audio': True,
         'writethumbnail': True,
         'format': 'bestaudio',
-        'outtmpl': base_songs_dir_path + '%(uploader)s-%(title)s/%(uploader)s-%(title)s',
+        'outtmpl': base_songs_dir_path + '%(uploader)s^%(title)s/%(uploader)s^%(title)s',
         'postprocessors': [
             {
                 'key': 'FFmpegExtractAudio',

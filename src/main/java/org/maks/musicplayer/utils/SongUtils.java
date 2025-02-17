@@ -57,7 +57,7 @@ public class SongUtils {
     private Pair<String, String> songNameAndSongAuthor(File file) {
         String songAuthor;
         String songName;
-        String separator = "-";
+        String separator = "\\^";
 
         String fileNameWithoutExtension = file.getName().split("\\.")[0];
         String[] parts = fileNameWithoutExtension.split(separator);
