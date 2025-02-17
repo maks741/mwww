@@ -13,8 +13,8 @@ import java.util.function.Predicate;
 public class SongUtils {
 
     public SongInfoDto songInfoDto(File songFolder) {
-        File songThumbnailFile = findFirst(songFolder, this::image);
-        File songMediaFile = findFirst(songFolder, this::media);
+        File songThumbnailFile = lookupFolderByPredicate(songFolder, this::image);
+        File songMediaFile = lookupFolderByPredicate(songFolder, this::media);
 
         Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songMediaFile);
         String songName = songNameAndSongAuthor.getKey();
@@ -32,7 +32,7 @@ public class SongUtils {
     public SongDto songDto(File songFolder) {
         SongInfoDto songInfoDto = songInfoDto(songFolder);
 
-        File songMediaFile = findFirst(songFolder, this::media);
+        File songMediaFile = lookupFolderByPredicate(songFolder, this::media);
         Media songMedia = new Media(songMediaFile.toURI().toString());
 
         return new SongDto(
@@ -41,7 +41,7 @@ public class SongUtils {
         );
     }
 
-    private File findFirst(File songFolder, Predicate<File> predicate) {
+    private File lookupFolderByPredicate(File songFolder, Predicate<File> predicate) {
         File[] files = songFolder.listFiles();
 
         if (files == null) {

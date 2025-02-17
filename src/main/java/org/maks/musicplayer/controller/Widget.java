@@ -205,7 +205,9 @@ public class Widget implements Initializable {
     }
 
     private Song currentMusic() {
-        int amountOfMusic = PlaylistUtils.amountOfSongs();
+        PlaylistUtils playlistUtils = new PlaylistUtils();
+
+        int amountOfMusic = playlistUtils.amountOfSongs();
 
         int index = currentSongIndex.get() % amountOfMusic;
 
@@ -213,7 +215,7 @@ public class Widget implements Initializable {
             index = amountOfMusic + index;
         }
 
-        return PlaylistUtils.songByIndex(index);
+        return playlistUtils.songByIndex(index);
     }
 
     public ObjectProperty<SongPlayer> songPlayerProperty() {

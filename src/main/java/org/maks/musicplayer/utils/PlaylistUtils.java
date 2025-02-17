@@ -6,13 +6,12 @@ import org.maks.musicplayer.model.SongInfoDto;
 import org.maks.musicplayer.model.SongPlayer;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class PlaylistUtils {
 
-    public static List<SongInfo> songInfoList() {
+    public List<SongInfo> songInfoList() {
         File[] songFolders = songFolders();
         SongUtils songUtils = new SongUtils();
 
@@ -29,7 +28,7 @@ public class PlaylistUtils {
                 .toList();
     }
 
-    public static Song songByIndex(int index) {
+    public Song songByIndex(int index) {
         File[] songFolders = songFolders();
         File songFolder = songFolders[index];
 
@@ -40,15 +39,11 @@ public class PlaylistUtils {
         return new Song(songInfo, songPlayer);
     }
 
-    public static void refresh() {
-        // TODO
-    }
-
-    public static int amountOfSongs() {
+    public int amountOfSongs() {
         return songFolders().length;
     }
 
-    private static File[] songFolders() {
+    private File[] songFolders() {
         File songsFolder = new File("./songs");
         File[] songFolders = songsFolder.listFiles();
 

@@ -13,7 +13,8 @@ public class Playlist {
     private HBox musicListHBox;
 
     public void load(Widget widget) {
-        List<SongInfo> songInfoList = PlaylistUtils.songInfoList();
+        PlaylistUtils playlistUtils = new PlaylistUtils();
+        List<SongInfo> songInfoList = playlistUtils.songInfoList();
 
         for (int i = 0; i < songInfoList.size(); i++) {
             SongInfo songInfo = songInfoList.get(i);
@@ -33,7 +34,6 @@ public class Playlist {
     }
 
     public void add(Widget widget) {
-        PlaylistUtils.refresh();
         refresh(widget);
     }
 }
