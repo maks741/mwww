@@ -85,4 +85,4 @@ buildNumber.properties
 
 youtube-download-service/.venv
 songs/*
-!songs/.gitkeep
+!songs/coldlie/
