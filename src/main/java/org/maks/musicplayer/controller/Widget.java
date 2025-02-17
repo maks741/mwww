@@ -113,6 +113,8 @@ public class Widget implements Initializable {
 
         mediaPlayer.setVolume(0.05);
         mediaPlayer.setOnEndOfMedia(this::skipToNextSong);
+        // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
+        mediaPlayer.seek(Duration.millis(0));
         songPlayer.play();
 
         pauseToggle.onMusicPlayed();
