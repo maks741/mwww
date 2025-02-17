@@ -29,6 +29,10 @@ public class SongInfo extends HBox {
     }
 
     public void load(SongPlayer songPlayer) {
+        if (songPlayer == null) {
+            return;
+        }
+
         songAvatar.setImage(songPlayer.songAvatar());
         songName.setText(songPlayer.songName());
         songAuthor.setText(songPlayer.songAuthor());

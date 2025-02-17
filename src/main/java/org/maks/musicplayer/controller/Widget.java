@@ -14,24 +14,23 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.musicplayer.components.DurationSlider;
-import org.maks.musicplayer.components.SongInfo;
 import org.maks.musicplayer.components.PauseToggle;
 import org.maks.musicplayer.components.RepeatSongToggle;
+import org.maks.musicplayer.components.SongInfo;
 import org.maks.musicplayer.enumeration.FXMLPath;
 import org.maks.musicplayer.enumeration.Icon;
-import org.maks.musicplayer.model.SongPlayer;
 import org.maks.musicplayer.model.Song;
 import org.maks.musicplayer.model.SongIndex;
+import org.maks.musicplayer.model.SongPlayer;
 import org.maks.musicplayer.service.DownloadService;
+import org.maks.musicplayer.service.WidgetFXMLLoader;
 import org.maks.musicplayer.utils.IconUtils;
 import org.maks.musicplayer.utils.PlaylistUtils;
-import org.maks.musicplayer.service.WidgetFXMLLoader;
 
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class Widget implements Initializable {
@@ -54,25 +53,23 @@ public class Widget implements Initializable {
     @FXML
     private ImageView addIcon;
 
-    private final AtomicReference<SongPlayer> currentMediaContainer = new AtomicReference<>();
     private final SongIndex currentSongIndex = new SongIndex();
     private final BooleanProperty songPlayingProperty = new SimpleBooleanProperty(false);
-    private final ObjectProperty<SongPlayer> mediaPlayerContainerProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<SongPlayer> songPlayerProperty = new SimpleObjectProperty<>();
 
     private Playlist playlist;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        durationSlider.bindSliderValue(currentMediaContainer);
+        durationSlider.bindSliderValue(songPlayerProperty);
         pauseToggle.bind(songPlayingProperty);
-        songInfo.bind(mediaPlayerContainerProperty);
+        songInfo.bind(songPlayerProperty);
         playlist = listMusic();
     }
 
     public void loadFirstSong() {
         SongPlayer songPlayer = currentMusic().songPlayer();
-        currentMediaContainer.set(songPlayer);
-        mediaPlayerContainerProperty.set(songPlayer);
+        songPlayerProperty.set(songPlayer);
     }
 
     @FXML
@@ -85,13 +82,11 @@ public class Widget implements Initializable {
     }
 
     public void play() {
-        if (currentMediaContainer.get() == null) {
-            currentMediaContainer.set(currentMusic().songPlayer());
+        if (songPlayerProperty.get() == null) {
+            songPlayerProperty.set(currentMusic().songPlayer());
         }
 
-        SongPlayer songPlayer = currentMediaContainer.get();
-        mediaPlayerContainerProperty.set(songPlayer);
-
+        SongPlayer songPlayer = songPlayerProperty.get();
         MediaPlayer mediaPlayer = songPlayer.mediaPlayer();
 
         boolean mediaNotPlayerReady = mediaPlayer.getCycleDuration() == Duration.UNKNOWN;
@@ -130,7 +125,7 @@ public class Widget implements Initializable {
     }
 
     public void pause() {
-        SongPlayer songPlayer = currentMediaContainer.get();
+        SongPlayer songPlayer = songPlayerProperty.get();
         songPlayer.pause();
 
         pauseToggle.onMusicPaused();
@@ -179,11 +174,13 @@ public class Widget implements Initializable {
     }
 
     private void dispose() {
-        if (currentMediaContainer.get() == null) return;
+        if (songPlayerProperty.get() == null) {
+            return;
+        }
 
-        SongPlayer songPlayer = currentMediaContainer.get();
+        SongPlayer songPlayer = songPlayerProperty.get();
         songPlayer.refresh();
-        currentMediaContainer.set(null);
+        songPlayerProperty.set(null);
     }
 
     private Playlist listMusic() {
@@ -221,8 +218,8 @@ public class Widget implements Initializable {
         return songList.get(index);
     }
 
-    public ObjectProperty<SongPlayer> mediaPlayerContainerProperty() {
-        return mediaPlayerContainerProperty;
+    public ObjectProperty<SongPlayer> songPlayerProperty() {
+        return songPlayerProperty;
     }
 
     public BooleanProperty songPlayingProperty() {

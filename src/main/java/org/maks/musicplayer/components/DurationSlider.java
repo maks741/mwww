@@ -1,5 +1,6 @@
 package org.maks.musicplayer.components;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
@@ -36,7 +37,7 @@ public class DurationSlider extends StackPane {
         getChildren().addAll(progressRec, slider);
     }
 
-    public void bindSliderValue(AtomicReference<SongPlayer> currentMediaContainer) {
+    public void bindSliderValue(ObjectProperty<SongPlayer> currentMediaContainer) {
         slider.setOnMousePressed(_ -> {
             if (currentMediaContainer.get() == null) {
                 return;

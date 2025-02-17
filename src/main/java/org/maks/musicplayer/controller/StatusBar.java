@@ -49,12 +49,16 @@ public class StatusBar implements Initializable {
     }
 
     private void bindMusicInfo() {
-        widgetController.mediaPlayerContainerProperty().addListener((
+        widgetController.songPlayerProperty().addListener((
                 _,
                 _,
-                mediaPlayerContainer) ->
-                songName.setText(mediaPlayerContainer.songName())
-        );
+                mediaPlayerContainer) -> {
+            if (mediaPlayerContainer == null) {
+                return;
+            }
+
+            songName.setText(mediaPlayerContainer.songName());
+        });
     }
 
     @FXML
