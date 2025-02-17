@@ -28,12 +28,8 @@ public class Playlist {
         }
     }
 
-    private void refresh(Widget widget) {
+    public void refresh(Widget widget) {
         musicListHBox.getChildren().clear();
         load(widget);
-    }
-
-    public void add(Widget widget) {
-        refresh(widget);
     }
 }

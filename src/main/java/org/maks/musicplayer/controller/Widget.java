@@ -5,6 +5,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -29,7 +30,6 @@ import org.maks.musicplayer.utils.PlaylistUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class Widget implements Initializable {
@@ -145,17 +145,12 @@ public class Widget implements Initializable {
         addIcon.setImage(loadingIcon.getImage());
 
         DownloadService downloadService = new DownloadService();
-        CompletableFuture<String> downloadedSongDirectoryFuture = downloadService.downloadSongByUrl();
+        Task<Void> downloadSongTask = downloadService.downloadSongByUrl();
 
-        downloadedSongDirectoryFuture.thenAccept(downloadedSongDirectory -> {
-            Platform.runLater(() -> addIcon.setImage(initialImage));
-
-            if (downloadedSongDirectory.isEmpty()) {
-                return;
-            }
-
-            Platform.runLater(() -> playlist.add(this));
-        });
+        downloadSongTask.setOnSucceeded(_ -> Platform.runLater(() -> {
+            addIcon.setImage(initialImage);
+            playlist.refresh(this);
+        }));
     }
 
     @FXML

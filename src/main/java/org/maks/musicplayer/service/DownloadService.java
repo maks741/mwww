@@ -1,16 +1,15 @@
 package org.maks.musicplayer.service;
 
+import javafx.concurrent.Task;
+
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.concurrent.CompletableFuture;
 
 public class DownloadService {
 
-    public CompletableFuture<String> downloadSongByUrl() {
+    public Task<Void> downloadSongByUrl() {
         String urlFromClipboard;
         try {
             urlFromClipboard = (String) Toolkit
@@ -24,37 +23,19 @@ public class DownloadService {
         return downloadSongByUrl(urlFromClipboard);
     }
 
-    private CompletableFuture<String> downloadSongByUrl(String url) {
-        CompletableFuture<String> completableFuture = new CompletableFuture<>();
-
-        new Thread(() -> {
-            Process downloadScriptProcess = executeDownloadScript(url);
-
-            String newSongFolderName = readDownloadScriptOutput(downloadScriptProcess);
-            completableFuture.complete(newSongFolderName);
-        }).start();
-
-        return completableFuture;
-    }
-
-    private String readDownloadScriptOutput(Process downloadScriptProcess) {
-        String successfulOutputPrefix = "dirname";
-        BufferedReader stdInput = new BufferedReader(
-                new InputStreamReader(downloadScriptProcess.getInputStream())
-        );
-
-        String line;
-        try {
-            while ((line = stdInput.readLine()) != null) {
-                if (line.startsWith(successfulOutputPrefix)) {
-                    return line.split(":")[1];
-                }
+    private Task<Void> downloadSongByUrl(String url) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                Process downloadScriptProcess = executeDownloadScript(url);
+                downloadScriptProcess.waitFor();
+                return null;
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        };
 
-        return "";
+        new Thread(task).start();
+
+        return task;
     }
 
     private Process executeDownloadScript(String url) {
