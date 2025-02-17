@@ -17,7 +17,7 @@ public class Playlist {
     @FXML
     private HBox musicListHBox;
 
-    public void load(Widget widgetController) {
+    public void load(Widget widget) {
         List<Song> songList = PlaylistUtils.playlist();
 
         for (int i = 0; i < songList.size(); i++) {
@@ -26,47 +26,20 @@ public class Playlist {
 
             final int songIndex = i;
             songInfo.setOnMouseClicked(_ ->
-                widgetController.play(songIndex)
+                widget.play(songIndex)
             );
 
             musicListHBox.getChildren().add(songInfo);
         }
     }
 
-    public void add(Widget widgetController, String songFolderName) {
-        File songFolder = new File("./songs/" + songFolderName);
-        SongPlayer songPlayer = new SongPlayer(songFolder);
-        SongInfo songInfo = new SongInfo();
-        songInfo.load(songPlayer);
-
-        int songIndex = calculateSongIndex(songFolderName);
-
-        songInfo.setOnMouseClicked(_ ->
-                widgetController.play(songIndex)
-        );
-
-        musicListHBox.getChildren().add(songIndex, songInfo);
-
-        Song song = new Song(songInfo, songPlayer);
-        PlaylistUtils.playlist().add(songIndex, song);
+    private void refresh(Widget widget) {
+        musicListHBox.getChildren().clear();
+        load(widget);
     }
 
-    private int calculateSongIndex(String targetSongFolderName) {
-        File[] files = new File("./songs").listFiles();
-
-        if (files == null) {
-            throw new RuntimeException("Songs folder does not exist");
-        }
-
-        Arrays.sort(files, Comparator.comparing(File::getName));
-
-        for (int i = 0; i < files.length; i++) {
-            File songFolder = files[i];
-            if (songFolder.getName().equals(targetSongFolderName)) {
-                return i;
-            }
-        }
-
-        return 0;
+    public void add(Widget widget) {
+        PlaylistUtils.refresh();
+        refresh(widget);
     }
 }

@@ -163,10 +163,7 @@ public class Widget implements Initializable {
                 return;
             }
 
-            Platform.runLater(() -> playlist.add(
-                    this,
-                    downloadedSongDirectory
-            ));
+            Platform.runLater(() -> playlist.add(this));
         });
     }
 
