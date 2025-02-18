@@ -100,15 +100,16 @@ public class Widget implements Initializable {
 
         boolean mediaNotPlayerReady = mediaPlayer.getCycleDuration() == Duration.UNKNOWN;
         if (mediaNotPlayerReady) {
-            mediaPlayer.setOnReady(() -> play(mediaPlayer, songPlayer));
+            mediaPlayer.setOnReady(() -> {
+                play(mediaPlayer, songPlayer, mediaNotPlayerReady);
+            });
         } else {
-            play(mediaPlayer, songPlayer);
+            play(mediaPlayer, songPlayer, mediaNotPlayerReady);
         }
     }
 
-    private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer) {
+    private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer, boolean mediaPlayerNotReady) {
         Duration duration = mediaPlayer.getCycleDuration();
-
         mediaPlayer.currentTimeProperty().addListener((
                 _,
                 _,
@@ -122,9 +123,14 @@ public class Widget implements Initializable {
         });
 
         mediaPlayer.setVolume(0.05);
-        mediaPlayer.setOnEndOfMedia(this::skipToNextSong);
+
         // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
-        mediaPlayer.seek(Duration.millis(0));
+        if (mediaPlayerNotReady) {
+            mediaPlayer.seek(Duration.ZERO);
+        }
+
+        mediaPlayer.setOnEndOfMedia(this::skipToNextSong);
+
         songPlayer.play();
 
         songPlayingProperty.set(true);
