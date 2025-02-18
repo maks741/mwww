@@ -127,7 +127,6 @@ public class Widget implements Initializable {
         mediaPlayer.seek(Duration.millis(0));
         songPlayer.play();
 
-        pauseToggle.onMusicPlayed();
         songPlayingProperty.set(true);
     }
 
@@ -139,7 +138,6 @@ public class Widget implements Initializable {
         SongPlayer songPlayer = songPlayerProperty.get();
         songPlayer.pause();
 
-        pauseToggle.onMusicPaused();
         songPlayingProperty.set(false);
     }
 

@@ -17,11 +17,11 @@ public class PauseToggle extends ImageView {
         });
     }
 
-    public void onMusicPlayed() {
+    private void onMusicPlayed() {
         setImage(IconUtils.image(Icon.PAUSE));
     }
 
-    public void onMusicPaused() {
+    private void onMusicPaused() {
         setImage(IconUtils.image(Icon.PLAY));
     }
 
