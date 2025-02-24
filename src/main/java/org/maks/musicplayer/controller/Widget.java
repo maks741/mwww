@@ -9,8 +9,12 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -65,6 +69,30 @@ public class Widget implements Initializable {
         pauseToggle.bind(songPlayingProperty);
         songInfo.bind(songPlayerProperty);
         playlist = listMusic();
+        addKeybindings();
+    }
+
+    private void addKeybindings() {
+        KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
+        KeyCodeCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
+
+        container.sceneProperty().addListener((_, _, scene) -> {
+            if (scene == null) {
+                return;
+            }
+
+            scene.setOnKeyPressed(keyEvent -> {
+                KeyCode keyCode = keyEvent.getCode();
+
+                if (keyCode == KeyCode.SPACE) {
+                    playPause();
+                } else if (next.match(keyEvent)) {
+                    next();
+                } else if (previous.match(keyEvent)) {
+                    previous();
+                }
+            });
+        });
     }
 
     public void loadFirstSong() {
