@@ -76,7 +76,7 @@ public class Widget implements Initializable {
         KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
         KeyCodeCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
 
-        container.sceneProperty().addListener((_, _, scene) -> {
+        container.sceneProperty().addListener((observableValue, oldScene, scene) -> {
             if (scene == null) {
                 return;
             }
@@ -139,8 +139,8 @@ public class Widget implements Initializable {
     private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer, boolean mediaPlayerNotReady) {
         Duration duration = mediaPlayer.getCycleDuration();
         mediaPlayer.currentTimeProperty().addListener((
-                _,
-                _,
+                observableValue,
+                oldDuration,
                 currentDuration) -> {
             if (durationSlider.sliderIsDragged()) {
                 return;
@@ -189,7 +189,7 @@ public class Widget implements Initializable {
         DownloadService downloadService = new DownloadService();
         Task<Void> downloadSongTask = downloadService.downloadSongByUrl();
 
-        downloadSongTask.setOnSucceeded(_ -> Platform.runLater(() -> {
+        downloadSongTask.setOnSucceeded(workerStateEvent -> Platform.runLater(() -> {
             addIcon.setImage(initialImage);
             playlist.refresh(this);
         }));

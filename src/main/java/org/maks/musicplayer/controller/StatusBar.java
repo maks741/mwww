@@ -50,8 +50,8 @@ public class StatusBar implements Initializable {
 
     private void bindMusicInfo() {
         widgetController.songPlayerProperty().addListener((
-                _,
-                _,
+                observableValue,
+                oldSongPlayer,
                 songPlayer) -> {
             if (songPlayer == null) {
                 return;

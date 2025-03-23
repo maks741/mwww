@@ -18,11 +18,11 @@ public class RoundedImageView extends ImageView {
     private void addClip() {
         Rectangle clip = new Rectangle(75, 75);
 
-        fitWidthProperty().addListener((_, _, width) -> {
+        fitWidthProperty().addListener((observableValue, oldWidth, width) -> {
             clip.setWidth(width.doubleValue());
         });
 
-        fitHeightProperty().addListener((_, _, height) -> {
+        fitHeightProperty().addListener((observableValue, oldHeight, height) -> {
             clip.setHeight(height.doubleValue());
         });
 

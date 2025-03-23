@@ -20,7 +20,7 @@ public class Playlist {
             SongInfo songInfo = songInfoList.get(i);
 
             final int songIndex = i;
-            songInfo.setOnMouseClicked(_ ->
+            songInfo.setOnMouseClicked(mouseEvent ->
                 widget.play(songIndex)
             );
 

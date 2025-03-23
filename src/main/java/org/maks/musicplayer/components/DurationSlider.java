@@ -26,7 +26,7 @@ public class DurationSlider extends StackPane {
         progressRec.setArcHeight(9);
         progressRec.setArcWidth(9);
 
-        slider.valueProperty().addListener((_, _, new_val) -> {
+        slider.valueProperty().addListener((observableValue, old_val, new_val) -> {
             String style = String.format("-fx-fill: linear-gradient(to right, rgb(235, 235, 235) %f%%, rgb(100, 100, 100) %f%%);",
                     new_val.doubleValue(), new_val.doubleValue());
             progressRec.setStyle(style);
@@ -36,7 +36,7 @@ public class DurationSlider extends StackPane {
     }
 
     public void bindSliderValue(ObjectProperty<SongPlayer> currentMediaContainer) {
-        slider.setOnMousePressed(_ -> {
+        slider.setOnMousePressed(mouseEvent -> {
             if (currentMediaContainer.get() == null) {
                 return;
             }
@@ -44,7 +44,7 @@ public class DurationSlider extends StackPane {
             sliderIsDragged = true;
         });
 
-        slider.setOnMouseReleased(_ -> {
+        slider.setOnMouseReleased(mouseEvent -> {
             if (currentMediaContainer.get() == null) {
                 return;
             }

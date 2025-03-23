@@ -8,7 +8,7 @@ import org.maks.musicplayer.utils.IconUtils;
 public class PauseToggle extends ImageView {
 
     public void bind(BooleanProperty songPlayingProperty) {
-        songPlayingProperty.addListener((_, _, playing) -> {
+        songPlayingProperty.addListener((observableValue, prev, playing) -> {
             if (playing) {
                 onMusicPlayed();
             } else {

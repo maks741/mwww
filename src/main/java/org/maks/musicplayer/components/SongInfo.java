@@ -24,8 +24,8 @@ public class SongInfo extends HBox {
 
     public void bind(ObjectProperty<SongPlayer> mediaPlayerContainerProperty) {
         mediaPlayerContainerProperty.addListener((
-                _,
-                _,
+                observableValue,
+                oldSongPlayer,
                 songPlayer) -> {
             if (songPlayer == null) {
                 return;
