@@ -1,17 +1,16 @@
 package org.maks.musicplayer.components;
 
-import javafx.scene.image.Image;
+import javafx.beans.NamedArg;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
+import org.maks.musicplayer.utils.SongAvatarRadius;
 
 public class RoundedImageView extends ImageView {
 
-    public RoundedImageView(Image image) {
-        super(image);
-        addClip();
-    }
+    private final SongAvatarRadius radius;
 
-    public RoundedImageView() {
+    public RoundedImageView(@NamedArg("radius") SongAvatarRadius radius) {
+        this.radius = radius;
         addClip();
     }
 
@@ -26,10 +25,8 @@ public class RoundedImageView extends ImageView {
             clip.setHeight(height.doubleValue());
         });
 
-        double arc = 20;
-
-        clip.setArcHeight(arc);
-        clip.setArcWidth(arc);
+        clip.setArcHeight(radius.value());
+        clip.setArcWidth(radius.value());
         setClip(clip);
     }
 

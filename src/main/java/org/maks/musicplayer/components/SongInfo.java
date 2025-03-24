@@ -11,10 +11,11 @@ import javafx.scene.text.Font;
 import org.maks.musicplayer.model.SongInfoDto;
 import org.maks.musicplayer.model.SongPlayer;
 import org.maks.musicplayer.utils.ImageUtils;
+import org.maks.musicplayer.utils.SongAvatarRadius;
 
 public class SongInfo extends HBox {
 
-    private final RoundedImageView songAvatar = new RoundedImageView();
+    private final RoundedImageView songAvatar = new RoundedImageView(SongAvatarRadius.ROUNDED);
     private final Label songName = new Label();
     private final Label songAuthor = new Label();
 

@@ -7,6 +7,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.maks.musicplayer.components.PauseToggle?>
 <?import java.net.URL?>
+<?import org.maks.musicplayer.components.RoundedImageView?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body" prefWidth="475" prefHeight="42"
@@ -19,9 +20,7 @@
             <Insets left="20" right="25" />
         </padding>
         <VBox minWidth="36" maxHeight="36" onMouseClicked="#showHideWidget" id="showHideWidgetButton">
-            <ImageView fitWidth="24" fitHeight="24" preserveRatio="true">
-                <Image url="@../../../../icons/status-bar.png" />
-            </ImageView>
+            <RoundedImageView radius="CIRCLE" fx:id="statusBarIcon" fitWidth="24" fitHeight="24" preserveRatio="true" />
         </VBox>
         <Label fx:id="songName" textFill="rgb(230, 230, 230)">
             <font>
