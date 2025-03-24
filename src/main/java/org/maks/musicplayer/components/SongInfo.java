@@ -37,7 +37,7 @@ public class SongInfo extends HBox {
     }
 
     public void load(SongInfoDto songInfoDto) {
-        Image croppedThumbnail = ImageUtils.cropToSquare(songInfoDto.songThumbnail());
+        Image croppedThumbnail = ImageUtils.cropToSquare(songInfoDto.songThumbnail(), songAvatar);
         songAvatar.setImage(croppedThumbnail);
         songName.setText(songInfoDto.songName());
         songAuthor.setText(songInfoDto.songAuthor());

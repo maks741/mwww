@@ -18,7 +18,7 @@ def download_audio(url):
             },
             {
                 'key': 'FFmpegThumbnailsConvertor',
-                'format': 'jpg',
+                'format': 'png',
             }
         ],
         'quiet': True

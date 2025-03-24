@@ -65,7 +65,7 @@ public class StatusBar implements Initializable {
             }
 
             SongInfoDto songInfoDto = songPlayer.songInfoDto();
-            Image croppedSongThumbnail = ImageUtils.cropToSquare(songInfoDto.songThumbnail());
+            Image croppedSongThumbnail = ImageUtils.cropToSquare(songInfoDto.songThumbnail(), statusBarIcon);
             statusBarIcon.setImage(croppedSongThumbnail);
             songName.setText(songInfoDto.songName());
         });

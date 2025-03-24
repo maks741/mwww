@@ -3,7 +3,8 @@ module org.maks.musicplayer {
     requires javafx.fxml;
     requires javafx.media;
     requires java.sql;
-    requires java.desktop;
+    requires imgscalr.lib;
+    requires javafx.swing;
 
 
     exports org.maks.musicplayer.main;
