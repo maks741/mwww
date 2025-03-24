@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.maks.musicplayer.components.PauseToggle;
@@ -12,6 +13,7 @@ import org.maks.musicplayer.components.RoundedImageView;
 import org.maks.musicplayer.enumeration.FXMLPath;
 import org.maks.musicplayer.model.SongInfoDto;
 import org.maks.musicplayer.service.WidgetFXMLLoader;
+import org.maks.musicplayer.utils.ImageUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -63,7 +65,8 @@ public class StatusBar implements Initializable {
             }
 
             SongInfoDto songInfoDto = songPlayer.songInfoDto();
-            statusBarIcon.setImage(songInfoDto.songThumbnail());
+            Image croppedSongThumbnail = ImageUtils.cropToSquare(songInfoDto.songThumbnail());
+            statusBarIcon.setImage(croppedSongThumbnail);
             songName.setText(songInfoDto.songName());
         });
     }

@@ -20,7 +20,7 @@
             <Insets left="20" right="25" />
         </padding>
         <VBox minWidth="36" maxHeight="36" onMouseClicked="#showHideWidget" id="showHideWidgetButton">
-            <RoundedImageView radius="CIRCLE" fx:id="statusBarIcon" fitWidth="24" fitHeight="24" preserveRatio="true" />
+            <RoundedImageView radius="CIRCLE" fx:id="statusBarIcon" fitWidth="30" fitHeight="30" preserveRatio="true" />
         </VBox>
         <Label fx:id="songName" textFill="rgb(230, 230, 230)">
             <font>
