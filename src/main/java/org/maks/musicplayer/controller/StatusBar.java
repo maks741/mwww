@@ -6,12 +6,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.maks.musicplayer.components.PauseToggle;
 import org.maks.musicplayer.components.RoundedImageView;
 import org.maks.musicplayer.enumeration.FXMLPath;
 import org.maks.musicplayer.model.SongInfoDto;
+import org.maks.musicplayer.service.StatusBarStyleService;
 import org.maks.musicplayer.service.WidgetFXMLLoader;
 import org.maks.musicplayer.utils.ImageUtils;
 
@@ -26,6 +28,9 @@ public class StatusBar implements Initializable {
 
     @FXML
     private VBox body;
+
+    @FXML
+    private HBox statusBar;
 
     @FXML
     private RoundedImageView statusBarIcon;
@@ -65,9 +70,21 @@ public class StatusBar implements Initializable {
             }
 
             SongInfoDto songInfoDto = songPlayer.songInfoDto();
-            Image croppedSongThumbnail = ImageUtils.cropToSquare(songInfoDto.songThumbnail(), statusBarIcon);
+            Image songThumbnail = songInfoDto.songThumbnail();
+            Image croppedSongThumbnail = ImageUtils.cropToSquare(songThumbnail, statusBarIcon);
             statusBarIcon.setImage(croppedSongThumbnail);
             songName.setText(songInfoDto.songName());
+
+            StatusBarStyleService statusBarStyleService = new StatusBarStyleService();
+            String backgroundStyle = statusBarStyleService.generateGradientBackground(songThumbnail);
+
+            statusBar.setStyle(
+                    """
+                        %s;
+                        -fx-background-radius: 20;
+                        -fx-alignment: center-left;
+                    """.formatted(backgroundStyle)
+            );
         });
     }
 

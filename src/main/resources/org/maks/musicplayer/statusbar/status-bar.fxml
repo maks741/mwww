@@ -15,7 +15,7 @@
     <stylesheets>
         <URL value="@status-bar.css" />
     </stylesheets>
-    <HBox spacing="10" VBox.vgrow="ALWAYS" maxHeight="42" styleClass="status-bar">
+    <HBox fx:id="statusBar" spacing="10" VBox.vgrow="ALWAYS" maxHeight="42" styleClass="status-bar">
         <padding>
             <Insets left="20" right="25" />
         </padding>

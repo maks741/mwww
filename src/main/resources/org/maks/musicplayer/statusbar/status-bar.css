@@ -1,11 +1,11 @@
+.status-bar-container {
+    -fx-background-color: transparent;
+}
+
 .status-bar {
     -fx-background-color: #171717;
     -fx-background-radius: 20;
     -fx-alignment: center-left;
-}
-
-.status-bar-container {
-    -fx-background-color: transparent;
 }
 
 #showHideWidgetButton {
