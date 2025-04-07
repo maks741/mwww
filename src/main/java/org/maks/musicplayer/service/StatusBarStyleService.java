@@ -10,17 +10,23 @@ import java.util.Map;
 public class StatusBarStyleService {
 
     public String generateGradientBackground(Image thumbnail) {
-        Color vibrantColor = extractVibrantColor(thumbnail);
+        Color color = extractPrioritizedColor(thumbnail);
+        Color littleBrighter = color.brighter();
+        Color littleDarker = color.darker();
+        Color darker = littleDarker.darker();
 
-        String colorHex = String.format("#%02X%02X%02X",
-                (int)(vibrantColor.getRed() * 255),
-                (int)(vibrantColor.getGreen() * 255),
-                (int)(vibrantColor.getBlue() * 255));
-
-        return String.format("-fx-background-color: linear-gradient(to bottom, %s, #000000);", colorHex);
+        return """
+                -fx-background-color: linear-gradient(to right,
+                        black,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                );
+                """.formatted(toRgb(darker), toRgb(littleDarker), toRgb(color), toRgb(littleBrighter));
     }
 
-    private Color extractVibrantColor(Image image) {
+    private Color extractPrioritizedColor(Image image) {
         int width = (int) image.getWidth();
         int height = (int) image.getHeight();
         PixelReader pixelReader = image.getPixelReader();
@@ -54,7 +60,7 @@ public class StatusBarStyleService {
     }
 
     private boolean unwantedColor(Color color) {
-        Color[] unwantedColors = {Color.BLACK, Color.WHITE, Color.YELLOW};
+        Color[] unwantedColors = {Color.BLACK, Color.WHITE, Color.YELLOW, Color.RED};
         double similarityDelta = 0.4;
 
         for (Color unwantedColor : unwantedColors) {
@@ -68,5 +74,9 @@ public class StatusBarStyleService {
         }
 
         return false;
+    }
+
+    private String toRgb(Color color) {
+        return "rgb(%s, %s, %s)".formatted(color.getRed() * 255, color.getGreen() * 255, color.getBlue() * 255);
     }
 }
