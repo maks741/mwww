@@ -4,15 +4,16 @@ import javafx.scene.media.MediaPlayer;
 import org.maks.musicplayer.utils.SongUtils;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public class SongPlayer {
 
     private final MediaPlayer mediaPlayer;
     private final SongInfoDto songInfoDto;
 
-    public SongPlayer(File songFolder) {
+    public SongPlayer(Path songFolderPath) {
         SongUtils songUtils = new SongUtils();
-        SongDto songDto = songUtils.songDto(songFolder);
+        SongDto songDto = songUtils.songDto(songFolderPath);
         this.mediaPlayer = new MediaPlayer(songDto.media());
         this.songInfoDto = songDto.songInfoDto();
     }
@@ -37,5 +38,4 @@ public class SongPlayer {
     public SongInfoDto songInfoDto() {
         return songInfoDto;
     }
-
 }

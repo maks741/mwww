@@ -6,21 +6,22 @@ import javafx.util.Pair;
 import org.maks.musicplayer.model.SongDto;
 import org.maks.musicplayer.model.SongInfoDto;
 
-import java.io.File;
-import java.util.Arrays;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Predicate;
 
 public class SongUtils {
 
-    public SongInfoDto songInfoDto(File songFolder) {
-        File songThumbnailFile = lookupFolderByPredicate(songFolder, this::image);
-        File songMediaFile = lookupFolderByPredicate(songFolder, this::media);
+    public SongInfoDto songInfoDto(Path songFolderPath) {
+        Path songThumbnailPath = findByPredicate(songFolderPath, this::image);
+        Path songMediaPath = findByPredicate(songFolderPath, this::media);
 
-        Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songMediaFile);
+        Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songMediaPath);
         String songName = songNameAndSongAuthor.getKey();
         String songAuthor = songNameAndSongAuthor.getValue();
 
-        Image songThumbnail = new Image(songThumbnailFile.toURI().toString());
+        Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
 
         return new SongInfoDto(
                 songName,
@@ -29,11 +30,11 @@ public class SongUtils {
         );
     }
 
-    public SongDto songDto(File songFolder) {
+    public SongDto songDto(Path songFolder) {
         SongInfoDto songInfoDto = songInfoDto(songFolder);
 
-        File songMediaFile = lookupFolderByPredicate(songFolder, this::media);
-        Media songMedia = new Media(songMediaFile.toURI().toString());
+        Path songMediaFile = findByPredicate(songFolder, this::media);
+        Media songMedia = new Media(songMediaFile.toUri().toString());
 
         return new SongDto(
                 songInfoDto,
@@ -41,25 +42,22 @@ public class SongUtils {
         );
     }
 
-    private File lookupFolderByPredicate(File songFolder, Predicate<File> predicate) {
-        File[] files = songFolder.listFiles();
-
-        if (files == null) {
+    private Path findByPredicate(Path folderPath, Predicate<Path> predicate) {
+        try (var stream = Files.walk(folderPath)) {
+            return stream.filter(predicate)
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Necessary files not found in: " + folderPath.getFileName()));
+        } catch (IOException e) {
             throw new RuntimeException("Song folder is empty");
         }
-
-        return Arrays.stream(files)
-                .filter(predicate)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Necessary files not found in: " + songFolder.getName()));
     }
 
-    private Pair<String, String> songNameAndSongAuthor(File file) {
+    private Pair<String, String> songNameAndSongAuthor(Path path) {
         String songAuthor;
         String songName;
         String separator = "\\^";
 
-        String fileNameWithoutExtension = file.getName().split("\\.")[0];
+        String fileNameWithoutExtension = path.getFileName().toString().split("\\.")[0];
         String[] parts = fileNameWithoutExtension.split(separator);
         if (parts.length >= 2) {
             songAuthor = parts[0];
@@ -75,13 +73,12 @@ public class SongUtils {
         return new Pair<>(songName, songAuthor);
     }
 
-    private boolean image(File file) {
-        String fileName = file.getName();
-        return fileName.endsWith(".png") || fileName.endsWith(".jpg");
+    private boolean image(Path path) {
+        String pathStr = path.toString();
+        return pathStr.endsWith(".png") || pathStr.endsWith(".jpg");
     }
 
-    private boolean media(File file) {
-        return file.getName().endsWith(".wav");
+    private boolean media(Path path) {
+        return path.toString().endsWith(".wav");
     }
-
 }

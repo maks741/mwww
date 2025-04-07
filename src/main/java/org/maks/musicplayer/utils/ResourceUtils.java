@@ -24,7 +24,7 @@ public class ResourceUtils {
         return Paths.get("src", "main", "resources", "icons");
     }
 
-    public static Path songsFolderPath() {
+    public static Path songsFoldersRoot() {
         return Paths.get("songs");
     }
 

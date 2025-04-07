@@ -126,12 +126,11 @@ public class Widget implements Initializable {
         MediaPlayer mediaPlayer = songPlayer.mediaPlayer();
 
         boolean mediaNotPlayerReady = mediaPlayer.getCycleDuration() == Duration.UNKNOWN;
+        Runnable play = () -> play(mediaPlayer, songPlayer, mediaNotPlayerReady);
         if (mediaNotPlayerReady) {
-            mediaPlayer.setOnReady(() -> {
-                play(mediaPlayer, songPlayer, mediaNotPlayerReady);
-            });
+            mediaPlayer.setOnReady(play);
         } else {
-            play(mediaPlayer, songPlayer, mediaNotPlayerReady);
+            play.run();
         }
     }
 

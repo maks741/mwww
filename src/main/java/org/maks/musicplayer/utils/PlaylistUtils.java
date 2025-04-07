@@ -5,21 +5,21 @@ import org.maks.musicplayer.model.Song;
 import org.maks.musicplayer.model.SongInfoDto;
 import org.maks.musicplayer.model.SongPlayer;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class PlaylistUtils {
 
     public List<SongInfo> songInfoList() {
-        File[] songFolders = songFolders();
         SongUtils songUtils = new SongUtils();
 
-        return Arrays.stream(songFolders)
-                .filter(File::isDirectory)
-                .map(songFolder -> {
-                    SongInfoDto songInfoDto = songUtils.songInfoDto(songFolder);
+        return listSongFolderPaths()
+                .filter(Files::isDirectory)
+                .map(songFolderPath -> {
+                    SongInfoDto songInfoDto = songUtils.songInfoDto(songFolderPath);
 
                     SongInfo songInfo = new SongInfo();
                     songInfo.load(songInfoDto);
@@ -30,10 +30,12 @@ public class PlaylistUtils {
     }
 
     public Song songByIndex(int index) {
-        File[] songFolders = songFolders();
-        File songFolder = songFolders[index];
+        Path songFolderPath = listSongFolderPaths()
+                .skip(index)
+                .findFirst()
+                .orElseThrow();
 
-        SongPlayer songPlayer = new SongPlayer(songFolder);
+        SongPlayer songPlayer = new SongPlayer(songFolderPath);
         SongInfo songInfo = new SongInfo();
         songInfo.load(songPlayer.songInfoDto());
 
@@ -41,21 +43,17 @@ public class PlaylistUtils {
     }
 
     public int amountOfSongs() {
-        return songFolders().length;
+        return (int) listSongFolderPaths().count();
     }
 
-    private File[] songFolders() {
-        Path songsFolderPath = ResourceUtils.songsFolderPath();
-        File songsFolder = songsFolderPath.toFile();
+    private Stream<Path> listSongFolderPaths() {
+        Path root = ResourceUtils.songsFoldersRoot();
 
-        if (!songsFolder.exists()) {
-            boolean songsFolderCreated = songsFolder.mkdir();
-            if (!songsFolderCreated) {
-                throw new RuntimeException("Could not create songs directory");
-            }
+        try {
+            return Files.list(root);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        return songsFolder.listFiles();
     }
 
 }
