@@ -13,22 +13,6 @@ import java.util.stream.Stream;
 
 public class PlaylistUtils {
 
-    public List<SongInfo> songInfoList() {
-        SongUtils songUtils = new SongUtils();
-
-        return listSongFolderPaths()
-                .filter(Files::isDirectory)
-                .map(songFolderPath -> {
-                    SongInfoDto songInfoDto = songUtils.songInfoDto(songFolderPath);
-
-                    SongInfo songInfo = new SongInfo();
-                    songInfo.load(songInfoDto);
-
-                    return songInfo;
-                })
-                .toList();
-    }
-
     public Song songByIndex(int index) {
         Path songFolderPath = listSongFolderPaths()
                 .skip(index)

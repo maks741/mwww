@@ -28,8 +28,7 @@ public class Start extends Application {
         gui.setX(600);
         gui.setY(12);
 
-        StatusBar statusBar = new StatusBar(gui);
-        WidgetFXMLLoader widgetFXMLLoader = new WidgetFXMLLoader(FXMLPath.STATUS_BAR, statusBar);
+        WidgetFXMLLoader widgetFXMLLoader = new WidgetFXMLLoader(FXMLPath.STATUS_BAR);
         Scene scene = new Scene(widgetFXMLLoader.parent());
         scene.setFill(Color.TRANSPARENT);
 

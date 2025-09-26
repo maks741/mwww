@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class DownloadService {
 
-    public Task<Void> downloadSongByUrl() {
+    public Task<Void> downloadSong() {
         String urlFromClipboard;
         try {
             urlFromClipboard = (String) Toolkit

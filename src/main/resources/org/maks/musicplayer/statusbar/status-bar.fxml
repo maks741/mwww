@@ -5,21 +5,22 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<?import org.maks.musicplayer.components.PauseToggle?>
 <?import java.net.URL?>
 <?import org.maks.musicplayer.components.RoundedImageView?>
+<?import org.maks.musicplayer.components.RepeatSongToggle?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body" prefWidth="475" prefHeight="42"
+      fx:controller="org.maks.musicplayer.controller.StatusBar"
       styleClass="status-bar-container">
     <stylesheets>
         <URL value="@status-bar.css" />
     </stylesheets>
-    <HBox fx:id="statusBar" spacing="10" VBox.vgrow="ALWAYS" maxHeight="42" styleClass="status-bar">
+    <HBox spacing="10" VBox.vgrow="ALWAYS" maxHeight="42" styleClass="status-bar">
         <padding>
             <Insets left="20" right="25" />
         </padding>
-        <VBox minWidth="36" maxHeight="36" onMouseClicked="#showHideWidget" id="showHideWidgetButton">
+        <VBox minWidth="36" maxHeight="36" id="showHideWidgetButton">
             <RoundedImageView radius="CIRCLE" fx:id="statusBarIcon" fitWidth="30" fitHeight="30" preserveRatio="true" />
         </VBox>
         <Label fx:id="songName" textFill="rgb(230, 230, 230)">
@@ -29,25 +30,16 @@
         </Label>
         <Pane HBox.hgrow="ALWAYS" />
         <HBox spacing="15">
-            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#previous">
-                <padding>
-                    <Insets right="2.5" />
-                </padding>
-                <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
-                    <Image url="@../../../../icons/previous.png" />
-                </ImageView>
+            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#toggleOnRepeat">
+                <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
+                    <Image url="@../../../../icons/repeat.png" />
+                </RepeatSongToggle>
             </VBox>
-            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#playOrPause">
-                <PauseToggle fx:id="pauseToggle" fitWidth="22" fitHeight="22" preserveRatio="true">
-                    <Image url="@../../../../icons/play.png" />
-                </PauseToggle>
-            </VBox>
-            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#next">
-                <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
-                    <Image url="@../../../../icons/next.png" />
+            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#addSong">
+                <ImageView fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true">
+                    <Image url="@../../../../icons/new-song.png" />
                 </ImageView>
             </VBox>
         </HBox>
-
     </HBox>
 </VBox>

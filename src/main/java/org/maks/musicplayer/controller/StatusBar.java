@@ -1,36 +1,40 @@
 package org.maks.musicplayer.controller;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import org.maks.musicplayer.components.PauseToggle;
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
+import org.maks.musicplayer.components.RepeatSongToggle;
 import org.maks.musicplayer.components.RoundedImageView;
-import org.maks.musicplayer.enumeration.FXMLPath;
+import org.maks.musicplayer.enumeration.Icon;
+import org.maks.musicplayer.exception.SongDirectoryEmptyException;
+import org.maks.musicplayer.model.Song;
+import org.maks.musicplayer.model.SongIndex;
 import org.maks.musicplayer.model.SongInfoDto;
-import org.maks.musicplayer.service.StatusBarStyleService;
-import org.maks.musicplayer.service.WidgetFXMLLoader;
+import org.maks.musicplayer.model.SongPlayer;
+import org.maks.musicplayer.service.DownloadService;
+import org.maks.musicplayer.utils.IconUtils;
 import org.maks.musicplayer.utils.ImageUtils;
+import org.maks.musicplayer.utils.PlaylistUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class StatusBar implements Initializable {
 
-    private final Stage stage;
-    private final Parent widget;
-    private final Widget widgetController;
-
     @FXML
     private VBox body;
-
-    @FXML
-    private HBox statusBar;
 
     @FXML
     private RoundedImageView statusBarIcon;
@@ -39,29 +43,24 @@ public class StatusBar implements Initializable {
     private Label songName;
 
     @FXML
-    private PauseToggle pauseToggle;
+    private RepeatSongToggle repeatSongToggle;
 
-    public StatusBar(Stage stage) {
-        this.stage = stage;
+    @FXML
+    private ImageView addIcon;
 
-        WidgetFXMLLoader widgetFXMLLoader = new WidgetFXMLLoader(FXMLPath.WIDGET);
-
-        widget = widgetFXMLLoader.parent();
-        widgetController = widgetFXMLLoader.fxmlLoader().getController();
-    }
+    private final SongIndex currentSongIndex = new SongIndex();
+    private boolean isSongPlaying = false;
+    private final ObjectProperty<SongPlayer> songPlayerProperty = new SimpleObjectProperty<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        body.getChildren().add(widget);
-        pauseToggle.bind(widgetController.songPlayingProperty());
         bindMusicInfo();
-        showHideWidget();
-
-        widgetController.loadFirstSong();
+        addKeybindings();
+        loadFirstSong();
     }
 
     private void bindMusicInfo() {
-        widgetController.songPlayerProperty().addListener((
+        songPlayerProperty.addListener((
                 observableValue,
                 oldSongPlayer,
                 songPlayer) -> {
@@ -74,52 +73,151 @@ public class StatusBar implements Initializable {
             Image croppedSongThumbnail = ImageUtils.cropToSquare(songThumbnail, statusBarIcon);
             statusBarIcon.setImage(croppedSongThumbnail);
             songName.setText(songInfoDto.songName());
-
-            StatusBarStyleService statusBarStyleService = new StatusBarStyleService();
-            String backgroundStyle = statusBarStyleService.generateGradientBackground(songThumbnail);
-
-            statusBar.setStyle(
-                    """
-                        %s;
-                        -fx-background-radius: 20;
-                        -fx-alignment: center-left;
-                    """.formatted(backgroundStyle)
-            );
         });
     }
 
-    @FXML
-    private void playOrPause() {
-        widgetController.playPause();
+    private void addKeybindings() {
+        KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.META_DOWN, KeyCombination.ALT_DOWN);
+        KeyCodeCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.META_DOWN, KeyCombination.ALT_DOWN);
+
+        body.sceneProperty().addListener((v, o, scene) ->
+            scene.setOnKeyPressed(keyEvent -> {
+                KeyCode keyCode = keyEvent.getCode();
+
+                if (keyCode == KeyCode.SPACE) {
+                    playPause();
+                } else if (next.match(keyEvent)) {
+                    next();
+                } else if (previous.match(keyEvent)) {
+                    previous();
+                }
+            })
+        );
+    }
+
+    private void loadFirstSong() {
+        Song song = currentSong();
+        songPlayerProperty.set(song.songPlayer());
     }
 
     @FXML
-    private void previous() {
-        widgetController.previous();
+    private void addSong() {
+        Image initialImage = addIcon.getImage();
+        ImageView loadingIcon = IconUtils.icon(Icon.LOADING);
+        addIcon.setImage(loadingIcon.getImage());
+
+        DownloadService downloadService = new DownloadService();
+        downloadService.downloadSong().setOnSucceeded(event ->
+                Platform.runLater(() ->
+                        addIcon.setImage(initialImage)
+                )
+        );
     }
 
-    @FXML
-    private void next() {
-        widgetController.next();
-    }
+    private Song currentSong() throws SongDirectoryEmptyException {
+        PlaylistUtils playlistUtils = new PlaylistUtils();
+        int amountOfMusic = playlistUtils.amountOfSongs();
 
-    @FXML
-    private void showHideWidget() {
-        double widgetHeight = widget.prefHeight(-1);
-        double statusBarHeight = body.prefHeight(-1);
-        double heightWithWidget = widgetHeight + statusBarHeight;
-
-        if (body.getChildren().contains(widget)) {
-            stage.setHeight(statusBarHeight);
-            body.getChildren().remove(widget);
-        } else {
-            stage.setHeight(heightWithWidget);
-            body.getChildren().add(widget);
+        if (amountOfMusic == 0) {
+            throw new SongDirectoryEmptyException("Songs directory is empty");
         }
 
-        Platform.runLater(() -> {
-            stage.hide();
-            stage.show();
-        });
+        int index = currentSongIndex.get() % amountOfMusic;
+
+        if (index < 0) {
+            index = amountOfMusic + index;
+        }
+
+        return playlistUtils.songByIndex(index);
+    }
+
+    private void playPause() {
+        if (isSongPlaying) {
+            pause();
+        } else {
+            play();
+        }
+    }
+
+    public void play() {
+        if (songPlayerProperty.get() == null) {
+            Song song = currentSong();
+            songPlayerProperty.set(song.songPlayer());
+        }
+
+        SongPlayer songPlayer = songPlayerProperty.get();
+        MediaPlayer mediaPlayer = songPlayer.mediaPlayer();
+
+        boolean mediaNotPlayerReady = mediaPlayer.getCycleDuration() == Duration.UNKNOWN;
+        Runnable play = () -> play(mediaPlayer, songPlayer, mediaNotPlayerReady);
+        if (mediaNotPlayerReady) {
+            mediaPlayer.setOnReady(play);
+        } else {
+            play.run();
+        }
+    }
+
+    private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer, boolean mediaPlayerNotReady) {
+        mediaPlayer.setVolume(0.05);
+
+        // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
+        if (mediaPlayerNotReady) {
+            mediaPlayer.seek(Duration.ZERO);
+        }
+
+        mediaPlayer.setOnEndOfMedia(this::skipToNextSong);
+
+        songPlayer.play();
+
+        isSongPlaying = true;
+    }
+
+    public void play(int songIndexValue) {
+        playSongByNewIndex(songIndex -> songIndex.set(songIndexValue));
+    }
+
+    public void pause() {
+        SongPlayer songPlayer = songPlayerProperty.get();
+        songPlayer.pause();
+
+        isSongPlaying = false;
+    }
+
+    private void skipToNextSong() {
+        dispose();
+        repeatSongToggle.nextSong(this);
+    }
+
+    public void next() {
+        playSongByNewIndex(SongIndex::next);
+    }
+
+    private void previous() {
+        playSongByNewIndex(SongIndex::previous);
+    }
+
+    private void playSongByNewIndex(Consumer<SongIndex> consumer) {
+        dispose();
+        consumer.accept(currentSongIndex);
+        play();
+    }
+
+    private void dispose() {
+        if (songPlayerProperty.get() == null) {
+            return;
+        }
+
+        SongPlayer songPlayer = songPlayerProperty.get();
+        songPlayer.dispose();
+        songPlayerProperty.set(null);
+    }
+
+    @FXML
+    private void toggleOnRepeat() {
+        repeatSongToggle.toggleOnRepeat();
+    }
+
+    private void shutdown() {
+        System.exit(0);
     }
 }

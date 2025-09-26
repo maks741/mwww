@@ -1,7 +1,7 @@
 package org.maks.musicplayer.components;
 
 import javafx.scene.image.ImageView;
-import org.maks.musicplayer.controller.Widget;
+import org.maks.musicplayer.controller.StatusBar;
 import org.maks.musicplayer.enumeration.Icon;
 import org.maks.musicplayer.utils.IconUtils;
 
@@ -19,13 +19,11 @@ public class RepeatSongToggle extends ImageView {
         }
     }
 
-    public void nextSong(Widget widgetController) {
+    public void nextSong(StatusBar statusBar) {
         if (onRepeat) {
-            widgetController.play();
+            statusBar.play();
         } else {
-            widgetController.next();
+            statusBar.next();
         }
     }
-
-
 }
