@@ -18,9 +18,7 @@ import org.maks.musicplayer.components.RepeatSongToggle;
 import org.maks.musicplayer.components.RoundedImageView;
 import org.maks.musicplayer.enumeration.Icon;
 import org.maks.musicplayer.exception.SongDirectoryEmptyException;
-import org.maks.musicplayer.model.Song;
-import org.maks.musicplayer.model.SongIndex;
-import org.maks.musicplayer.model.SongInfoDto;
+import org.maks.musicplayer.model.SongInfo;
 import org.maks.musicplayer.model.SongPlayer;
 import org.maks.musicplayer.service.DownloadService;
 import org.maks.musicplayer.utils.IconUtils;
@@ -29,7 +27,6 @@ import org.maks.musicplayer.utils.PlaylistUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 
 public class StatusBar implements Initializable {
 
@@ -48,32 +45,26 @@ public class StatusBar implements Initializable {
     @FXML
     private ImageView addIcon;
 
-    private final SongIndex currentSongIndex = new SongIndex();
+    private int currentSongIndex = 0;
     private boolean isSongPlaying = false;
     private final ObjectProperty<SongPlayer> songPlayerProperty = new SimpleObjectProperty<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        bindMusicInfo();
-        addKeybindings();
         loadFirstSong();
+        addKeybindings();
     }
 
-    private void bindMusicInfo() {
-        songPlayerProperty.addListener((
-                observableValue,
-                oldSongPlayer,
-                songPlayer) -> {
-            if (songPlayer == null) {
-                return;
-            }
+    private void loadFirstSong() {
+        SongInfo song = songByIndex(currentSongIndex);
+        updateSongInfo(song);
+    }
 
-            SongInfoDto songInfoDto = songPlayer.songInfoDto();
-            Image songThumbnail = songInfoDto.songThumbnail();
-            Image croppedSongThumbnail = ImageUtils.cropToSquare(songThumbnail, statusBarIcon);
-            statusBarIcon.setImage(croppedSongThumbnail);
-            songName.setText(songInfoDto.songName());
-        });
+    private void updateSongInfo(SongInfo songInfo) {
+        Image songThumbnail = songInfo.songThumbnail();
+        Image croppedSongThumbnail = ImageUtils.cropToSquare(songThumbnail, statusBarIcon);
+        statusBarIcon.setImage(croppedSongThumbnail);
+        songName.setText(songInfo.songName());
     }
 
     private void addKeybindings() {
@@ -102,15 +93,10 @@ public class StatusBar implements Initializable {
         );
     }
 
-    private void loadFirstSong() {
-        Song song = currentSong();
-        songPlayerProperty.set(song.songPlayer());
-    }
-
     private void addSong() {
         Image initialImage = addIcon.getImage();
-        ImageView loadingIcon = IconUtils.icon(Icon.LOADING);
-        addIcon.setImage(loadingIcon.getImage());
+        Image loadingGif = IconUtils.image(Icon.LOADING);
+        addIcon.setImage(loadingGif);
 
         DownloadService downloadService = new DownloadService();
         downloadService.downloadSong().setOnSucceeded(event ->
@@ -120,7 +106,7 @@ public class StatusBar implements Initializable {
         );
     }
 
-    private Song currentSong() throws SongDirectoryEmptyException {
+    private SongInfo songByIndex(int songIndex) throws SongDirectoryEmptyException {
         PlaylistUtils playlistUtils = new PlaylistUtils();
         int amountOfMusic = playlistUtils.amountOfSongs();
 
@@ -128,13 +114,13 @@ public class StatusBar implements Initializable {
             throw new SongDirectoryEmptyException("Songs directory is empty");
         }
 
-        int index = currentSongIndex.get() % amountOfMusic;
+        int index = songIndex % amountOfMusic;
 
         if (index < 0) {
             index = amountOfMusic + index;
         }
 
-        return playlistUtils.songByIndex(index);
+        return playlistUtils.songInfo(index);
     }
 
     private void playPause() {
@@ -146,7 +132,7 @@ public class StatusBar implements Initializable {
     }
 
     public void play() {
-        if (songPlayerProperty.get() == null) {
+        /*if (songPlayerProperty.get() == null) {
             Song song = currentSong();
             songPlayerProperty.set(song.songPlayer());
         }
@@ -160,7 +146,7 @@ public class StatusBar implements Initializable {
             mediaPlayer.setOnReady(play);
         } else {
             play.run();
-        }
+        }*/
     }
 
     private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer, boolean mediaPlayerNotReady) {
@@ -178,10 +164,6 @@ public class StatusBar implements Initializable {
         isSongPlaying = true;
     }
 
-    public void play(int songIndexValue) {
-        playSongByNewIndex(songIndex -> songIndex.set(songIndexValue));
-    }
-
     public void pause() {
         SongPlayer songPlayer = songPlayerProperty.get();
         songPlayer.pause();
@@ -191,21 +173,26 @@ public class StatusBar implements Initializable {
 
     private void skipToNextSong() {
         dispose();
-        repeatSongToggle.nextSong(this);
+
+        if (repeatSongToggle.onRepeat()) {
+            play();
+        } else {
+            next();
+        }
     }
 
     public void next() {
-        playSongByNewIndex(SongIndex::next);
+        switchSong(currentSongIndex++);
     }
 
     private void previous() {
-        playSongByNewIndex(SongIndex::previous);
+        switchSong(currentSongIndex--);
     }
 
-    private void playSongByNewIndex(Consumer<SongIndex> consumer) {
+    private void switchSong(int songIndex) {
         dispose();
-        consumer.accept(currentSongIndex);
-        play();
+        SongInfo song = songByIndex(songIndex);
+        updateSongInfo(song);
     }
 
     private void dispose() {

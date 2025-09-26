@@ -2,7 +2,6 @@ package org.maks.musicplayer.utils;
 
 public enum SongAvatarRadius {
 
-    ROUNDED(20),
     CIRCLE(180);
 
     private final int radius;

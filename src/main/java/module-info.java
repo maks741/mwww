@@ -5,6 +5,7 @@ module org.maks.musicplayer {
     requires java.sql;
     requires imgscalr.lib;
     requires javafx.swing;
+    requires javafx.base;
 
 
     exports org.maks.musicplayer.main;

@@ -29,5 +29,4 @@ public class RoundedImageView extends ImageView {
         clip.setArcWidth(radius.value());
         setClip(clip);
     }
-
 }

@@ -3,8 +3,7 @@ package org.maks.musicplayer.utils;
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.util.Pair;
-import org.maks.musicplayer.model.SongDto;
-import org.maks.musicplayer.model.SongInfoDto;
+import org.maks.musicplayer.model.SongInfo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +12,7 @@ import java.util.function.Predicate;
 
 public class SongUtils {
 
-    public SongInfoDto songInfoDto(Path songFolderPath) {
+    public SongInfo songInfo(Path songFolderPath) {
         Path songThumbnailPath = findByPredicate(songFolderPath, this::image);
         Path songMediaPath = findByPredicate(songFolderPath, this::media);
 
@@ -23,23 +22,16 @@ public class SongUtils {
 
         Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
 
-        return new SongInfoDto(
+        return new SongInfo(
                 songName,
                 songAuthor,
                 songThumbnail
         );
     }
 
-    public SongDto songDto(Path songFolder) {
-        SongInfoDto songInfoDto = songInfoDto(songFolder);
-
+    public Media audio(Path songFolder) {
         Path songMediaFile = findByPredicate(songFolder, this::media);
-        Media songMedia = new Media(songMediaFile.toUri().toString());
-
-        return new SongDto(
-                songInfoDto,
-                songMedia
-        );
+        return new Media(songMediaFile.toUri().toString());
     }
 
     private Path findByPredicate(Path folderPath, Predicate<Path> predicate) {
@@ -48,7 +40,7 @@ public class SongUtils {
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Necessary files not found in: " + folderPath.getFileName()));
         } catch (IOException e) {
-            throw new RuntimeException("Song folder is empty");
+            throw new RuntimeException(e);
         }
     }
 
