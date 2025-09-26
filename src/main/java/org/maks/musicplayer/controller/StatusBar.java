@@ -77,19 +77,26 @@ public class StatusBar implements Initializable {
     }
 
     private void addKeybindings() {
-        KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.META_DOWN, KeyCombination.ALT_DOWN);
-        KeyCodeCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.META_DOWN, KeyCombination.ALT_DOWN);
+        KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN);
+        KeyCombination newSong = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.META_DOWN);
 
         body.sceneProperty().addListener((v, o, scene) ->
             scene.setOnKeyPressed(keyEvent -> {
                 KeyCode keyCode = keyEvent.getCode();
 
-                if (keyCode == KeyCode.SPACE) {
-                    playPause();
-                } else if (next.match(keyEvent)) {
-                    next();
-                } else if (previous.match(keyEvent)) {
-                    previous();
+                if (exit.match(keyEvent)) {
+                    shutdown();
+                }
+
+                if (newSong.match(keyEvent)) {
+                    addSong();
+                }
+
+                switch (keyCode) {
+                    case SPACE -> playPause();
+                    case RIGHT -> next();
+                    case LEFT -> previous();
+                    case R -> repeatSongToggle.toggleOnRepeat();
                 }
             })
         );
@@ -100,7 +107,6 @@ public class StatusBar implements Initializable {
         songPlayerProperty.set(song.songPlayer());
     }
 
-    @FXML
     private void addSong() {
         Image initialImage = addIcon.getImage();
         ImageView loadingIcon = IconUtils.icon(Icon.LOADING);
@@ -210,11 +216,6 @@ public class StatusBar implements Initializable {
         SongPlayer songPlayer = songPlayerProperty.get();
         songPlayer.dispose();
         songPlayerProperty.set(null);
-    }
-
-    @FXML
-    private void toggleOnRepeat() {
-        repeatSongToggle.toggleOnRepeat();
     }
 
     private void shutdown() {

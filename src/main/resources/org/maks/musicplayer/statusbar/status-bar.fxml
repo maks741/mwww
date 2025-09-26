@@ -30,12 +30,12 @@
         </Label>
         <Pane HBox.hgrow="ALWAYS" />
         <HBox spacing="15">
-            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#toggleOnRepeat">
+            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable">
                 <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
                     <Image url="@../../../../icons/repeat.png" />
                 </RepeatSongToggle>
             </VBox>
-            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable" onMouseClicked="#addSong">
+            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable">
                 <ImageView fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true">
                     <Image url="@../../../../icons/new-song.png" />
                 </ImageView>
