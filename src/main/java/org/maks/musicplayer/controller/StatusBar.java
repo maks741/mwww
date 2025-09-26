@@ -15,14 +15,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.musicplayer.components.RepeatSongToggle;
-import org.maks.musicplayer.components.RoundedImageView;
 import org.maks.musicplayer.enumeration.Icon;
 import org.maks.musicplayer.exception.SongDirectoryEmptyException;
 import org.maks.musicplayer.model.SongInfo;
 import org.maks.musicplayer.model.SongPlayer;
 import org.maks.musicplayer.service.DownloadService;
 import org.maks.musicplayer.utils.IconUtils;
-import org.maks.musicplayer.utils.ImageUtils;
 import org.maks.musicplayer.utils.PlaylistUtils;
 
 import java.net.URL;
@@ -34,7 +32,7 @@ public class StatusBar implements Initializable {
     private VBox body;
 
     @FXML
-    private RoundedImageView statusBarIcon;
+    private ImageView statusBarIcon;
 
     @FXML
     private Label songName;
@@ -61,9 +59,7 @@ public class StatusBar implements Initializable {
     }
 
     private void updateSongInfo(SongInfo songInfo) {
-        Image songThumbnail = songInfo.songThumbnail();
-        Image croppedSongThumbnail = ImageUtils.cropToSquare(songThumbnail, statusBarIcon);
-        statusBarIcon.setImage(croppedSongThumbnail);
+        statusBarIcon.setImage(songInfo.songThumbnail());
         songName.setText(songInfo.songName());
     }
 
