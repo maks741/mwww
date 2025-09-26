@@ -10,7 +10,7 @@ public class SongPlayer {
 
     public SongPlayer(Path songFolderPath) {
         SongUtils songUtils = new SongUtils();
-        this.mediaPlayer = new MediaPlayer(songUtils.audio(songFolderPath));
+        this.mediaPlayer = new MediaPlayer(songUtils.media(songFolderPath));
     }
 
     public void play() {
