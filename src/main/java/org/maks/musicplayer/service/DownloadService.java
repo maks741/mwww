@@ -1,25 +1,20 @@
 package org.maks.musicplayer.service;
 
 import javafx.concurrent.Task;
+import javafx.scene.input.Clipboard;
 
-import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 public class DownloadService {
 
     public Task<Void> downloadSong() {
-        String urlFromClipboard;
-        try {
-            urlFromClipboard = (String) Toolkit
-                    .getDefaultToolkit()
-                    .getSystemClipboard()
-                    .getData(DataFlavor.stringFlavor);
-        } catch (UnsupportedFlavorException | IOException e) {
-            throw new RuntimeException(e);
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+
+        if (!clipboard.hasString()) {
+            throw new RuntimeException("Clipboard has no content");
         }
 
+        String urlFromClipboard = clipboard.getString();
         return downloadSongByUrl(urlFromClipboard);
     }
 

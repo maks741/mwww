@@ -65,28 +65,34 @@ public class StatusBar implements Initializable {
 
     private void addKeybindings() {
         KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN);
+        KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
+        KeyCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
         KeyCombination newSong = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.META_DOWN);
 
-        body.sceneProperty().addListener((v, o, scene) ->
+        body.sceneProperty().addListener((v, o, scene) -> {
             scene.setOnKeyPressed(keyEvent -> {
-                KeyCode keyCode = keyEvent.getCode();
-
-                if (exit.match(keyEvent)) {
+                if (next.match(keyEvent)) {
+                    next();
+                } else if (previous.match(keyEvent)) {
+                    previous();
+                } else if (exit.match(keyEvent)) {
                     shutdown();
-                }
-
-                if (newSong.match(keyEvent)) {
+                } else if (newSong.match(keyEvent)) {
                     addSong();
+                } else {
+                    switch (keyEvent.getCode()) {
+                        case SPACE -> playPause();
+                        case R -> repeatSongToggle.toggleOnRepeat();
+                    }
                 }
+            });
 
-                switch (keyCode) {
-                    case SPACE -> playPause();
-                    case RIGHT -> next();
-                    case LEFT -> previous();
-                    case R -> repeatSongToggle.toggleOnRepeat();
+            scene.setOnKeyReleased(keyEvent -> {
+                if (KeyCode.ALT == keyEvent.getCode()) {
+                    play();
                 }
-            })
-        );
+            });
+        });
     }
 
     private void addSong() {
@@ -128,9 +134,9 @@ public class StatusBar implements Initializable {
     }
 
     public void play() {
-        /*if (songPlayerProperty.get() == null) {
-            Song song = currentSong();
-            songPlayerProperty.set(song.songPlayer());
+        if (songPlayerProperty.get() == null) {
+            SongPlayer songPlayer = new PlaylistUtils().songPlayer(currentSongIndex);
+            songPlayerProperty.set(songPlayer);
         }
 
         SongPlayer songPlayer = songPlayerProperty.get();
@@ -142,7 +148,7 @@ public class StatusBar implements Initializable {
             mediaPlayer.setOnReady(play);
         } else {
             play.run();
-        }*/
+        }
     }
 
     private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer, boolean mediaPlayerNotReady) {
@@ -178,7 +184,7 @@ public class StatusBar implements Initializable {
     }
 
     public void next() {
-        switchSong(currentSongIndex++);
+        switchSong(++currentSongIndex);
     }
 
     private void previous() {

@@ -26,4 +26,8 @@ public class SongPlayer {
         mediaPlayer.stop();
         mediaPlayer.dispose();
     }
+
+    public MediaPlayer mediaPlayer() {
+        return mediaPlayer;
+    }
 }

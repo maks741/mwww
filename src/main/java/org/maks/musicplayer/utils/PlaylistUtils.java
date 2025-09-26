@@ -38,7 +38,7 @@ public class PlaylistUtils {
         }
     }
 
-    public SongPlayer audio(int index) {
+    public SongPlayer songPlayer(int index) {
         try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
             Path songFolderPath = songDirs
                     .skip(index)
