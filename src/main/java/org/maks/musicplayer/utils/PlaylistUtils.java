@@ -1,5 +1,7 @@
 package org.maks.musicplayer.utils;
 
+import javafx.scene.image.Image;
+import javafx.util.Pair;
 import org.maks.musicplayer.model.SongInfo;
 import org.maks.musicplayer.model.SongPlayer;
 
@@ -18,7 +20,19 @@ public class PlaylistUtils {
                     .findFirst()
                     .orElseThrow();
 
-            return new SongUtils().songInfo(songFolderPath);
+            Path songThumbnailPath = songFolderPath.resolve("img.png");
+
+            Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songFolderPath);
+            String songName = songNameAndSongAuthor.getKey();
+            String songAuthor = songNameAndSongAuthor.getValue();
+
+            Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
+
+            return new SongInfo(
+                    songName,
+                    songAuthor,
+                    songThumbnail
+            );
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -43,5 +57,26 @@ public class PlaylistUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Pair<String, String> songNameAndSongAuthor(Path songDirPath) {
+        String songAuthor;
+        String songName;
+        String separator = "\\^";
+
+        String fileNameWithoutExtension = songDirPath.getFileName().toString();
+        String[] parts = fileNameWithoutExtension.split(separator);
+        if (parts.length >= 2) {
+            songAuthor = parts[0];
+            songName = parts[1];
+        } else if (parts.length == 1) {
+            songAuthor = "Unknown";
+            songName = parts[0];
+        } else {
+            songAuthor = "Unknown";
+            songName = "Unknown";
+        }
+
+        return new Pair<>(songName, songAuthor);
     }
 }
