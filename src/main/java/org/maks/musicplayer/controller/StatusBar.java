@@ -1,8 +1,6 @@
 package org.maks.musicplayer.controller;
 
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -18,7 +16,6 @@ import org.maks.musicplayer.components.RepeatSongToggle;
 import org.maks.musicplayer.enumeration.Icon;
 import org.maks.musicplayer.exception.SongDirectoryEmptyException;
 import org.maks.musicplayer.model.SongInfo;
-import org.maks.musicplayer.model.SongPlayer;
 import org.maks.musicplayer.service.DownloadService;
 import org.maks.musicplayer.utils.IconUtils;
 import org.maks.musicplayer.utils.PlaylistUtils;
@@ -44,8 +41,8 @@ public class StatusBar implements Initializable {
     private ImageView addIcon;
 
     private int currentSongIndex = 0;
+    private MediaPlayer currentPlayer = null;
     private boolean isSongPlaying = false;
-    private final ObjectProperty<SongPlayer> songPlayerProperty = new SimpleObjectProperty<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -133,47 +130,40 @@ public class StatusBar implements Initializable {
         }
     }
 
-    public void play() {
-        if (songPlayerProperty.get() != null) {
+    private void play() {
+        if (currentPlayer != null) {
             return;
         }
 
-        SongPlayer songPlayer = new PlaylistUtils().songPlayer(currentSongIndex);
-        MediaPlayer mediaPlayer = songPlayer.mediaPlayer();
-        songPlayerProperty.set(songPlayer);
+        currentPlayer = new PlaylistUtils().player(currentSongIndex);
 
-        mediaPlayer.setOnReady(() -> {
+        currentPlayer.setOnReady(() -> {
             // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
-            mediaPlayer.seek(Duration.ZERO);
+            currentPlayer.seek(Duration.ZERO);
 
-            mediaPlayer.setVolume(0.05);
-            mediaPlayer.setOnEndOfMedia(this::skipToNextSong);
+            currentPlayer.setVolume(0.05);
+            currentPlayer.setOnEndOfMedia(this::skipToNextSong);
 
-            songPlayer.play();
-
+            currentPlayer.play();
             isSongPlaying = true;
         });
     }
 
-    public void unpause() {
-        if (songPlayerProperty.get() == null) {
+    private void unpause() {
+        if (currentPlayer == null) {
             return;
         }
 
-        SongPlayer songPlayer = songPlayerProperty.get();
-        songPlayer.play();
-
+        currentPlayer.play();
         isSongPlaying = true;
     }
 
-    public void pause() {
-        if (songPlayerProperty.get() == null) {
+    private void pause() {
+        if (currentPlayer == null) {
             return;
         }
 
-        SongPlayer songPlayer = songPlayerProperty.get();
-        songPlayer.pause();
-
+        currentPlayer.pause();
         isSongPlaying = false;
     }
 
@@ -187,7 +177,7 @@ public class StatusBar implements Initializable {
         }
     }
 
-    public void next() {
+    private void next() {
         switchSong(++currentSongIndex);
     }
 
@@ -202,13 +192,12 @@ public class StatusBar implements Initializable {
     }
 
     private void dispose() {
-        if (songPlayerProperty.get() == null) {
+        if (currentPlayer == null) {
             return;
         }
 
-        SongPlayer songPlayer = songPlayerProperty.get();
-        songPlayer.dispose();
-        songPlayerProperty.set(null);
+        currentPlayer.dispose();
+        currentPlayer = null;
     }
 
     private void shutdown() {

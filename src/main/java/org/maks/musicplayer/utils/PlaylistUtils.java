@@ -1,9 +1,10 @@
 package org.maks.musicplayer.utils;
 
 import javafx.scene.image.Image;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Pair;
 import org.maks.musicplayer.model.SongInfo;
-import org.maks.musicplayer.model.SongPlayer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,14 +39,16 @@ public class PlaylistUtils {
         }
     }
 
-    public SongPlayer songPlayer(int index) {
+    public MediaPlayer player(int index) {
         try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
-            Path songFolderPath = songDirs
+            Path songDirPath = songDirs
                     .skip(index)
                     .findFirst()
                     .orElseThrow();
 
-            return new SongPlayer(songFolderPath);
+            Path songMediaFile = songDirPath.resolve("media.wav");
+            Media media = new Media(songMediaFile.toUri().toString());
+            return new MediaPlayer(media);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
