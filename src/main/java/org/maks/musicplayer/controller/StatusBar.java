@@ -129,44 +129,48 @@ public class StatusBar implements Initializable {
         if (isSongPlaying) {
             pause();
         } else {
-            play();
+            unpause();
         }
     }
 
     public void play() {
+        if (songPlayerProperty.get() != null) {
+            return;
+        }
+
+        SongPlayer songPlayer = new PlaylistUtils().songPlayer(currentSongIndex);
+        MediaPlayer mediaPlayer = songPlayer.mediaPlayer();
+        songPlayerProperty.set(songPlayer);
+
+        mediaPlayer.setOnReady(() -> {
+            // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
+            mediaPlayer.seek(Duration.ZERO);
+
+            mediaPlayer.setVolume(0.05);
+            mediaPlayer.setOnEndOfMedia(this::skipToNextSong);
+
+            songPlayer.play();
+
+            isSongPlaying = true;
+        });
+    }
+
+    public void unpause() {
         if (songPlayerProperty.get() == null) {
-            SongPlayer songPlayer = new PlaylistUtils().songPlayer(currentSongIndex);
-            songPlayerProperty.set(songPlayer);
+            return;
         }
 
         SongPlayer songPlayer = songPlayerProperty.get();
-        MediaPlayer mediaPlayer = songPlayer.mediaPlayer();
-
-        boolean mediaNotPlayerReady = mediaPlayer.getCycleDuration() == Duration.UNKNOWN;
-        Runnable play = () -> play(mediaPlayer, songPlayer, mediaNotPlayerReady);
-        if (mediaNotPlayerReady) {
-            mediaPlayer.setOnReady(play);
-        } else {
-            play.run();
-        }
-    }
-
-    private void play(MediaPlayer mediaPlayer, SongPlayer songPlayer, boolean mediaPlayerNotReady) {
-        mediaPlayer.setVolume(0.05);
-
-        // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
-        if (mediaPlayerNotReady) {
-            mediaPlayer.seek(Duration.ZERO);
-        }
-
-        mediaPlayer.setOnEndOfMedia(this::skipToNextSong);
-
         songPlayer.play();
 
         isSongPlaying = true;
     }
 
     public void pause() {
+        if (songPlayerProperty.get() == null) {
+            return;
+        }
+
         SongPlayer songPlayer = songPlayerProperty.get();
         songPlayer.pause();
 
