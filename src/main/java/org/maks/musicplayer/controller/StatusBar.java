@@ -107,19 +107,7 @@ public class StatusBar implements Initializable {
 
     private SongInfo songByIndex(int songIndex) throws SongDirectoryEmptyException {
         PlaylistUtils playlistUtils = new PlaylistUtils();
-        int amountOfMusic = playlistUtils.amountOfSongs();
-
-        if (amountOfMusic == 0) {
-            throw new SongDirectoryEmptyException("Songs directory is empty");
-        }
-
-        int index = songIndex % amountOfMusic;
-
-        if (index < 0) {
-            index = amountOfMusic + index;
-        }
-
-        return playlistUtils.songInfo(index);
+        return playlistUtils.songInfo(songIndex);
     }
 
     private void playPause() {
@@ -135,7 +123,8 @@ public class StatusBar implements Initializable {
             return;
         }
 
-        currentPlayer = new PlaylistUtils().player(currentSongIndex);
+        PlaylistUtils playlistUtils = new PlaylistUtils();
+        currentPlayer = playlistUtils.player(currentSongIndex);
 
         currentPlayer.setOnReady(() -> {
             // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
@@ -182,7 +171,7 @@ public class StatusBar implements Initializable {
     }
 
     private void previous() {
-        switchSong(currentSongIndex--);
+        switchSong(--currentSongIndex);
     }
 
     private void switchSong(int songIndex) {

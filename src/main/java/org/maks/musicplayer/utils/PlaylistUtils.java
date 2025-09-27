@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Pair;
+import org.maks.musicplayer.exception.SongDirectoryEmptyException;
 import org.maks.musicplayer.model.SongInfo;
 
 import java.io.IOException;
@@ -15,9 +16,11 @@ import java.util.stream.Stream;
 public class PlaylistUtils {
 
     public SongInfo songInfo(int index) {
+        int normalizedIndex = normalizeIndex(index);
+
         try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
             Path songFolderPath = songDirs
-                    .skip(index)
+                    .skip(normalizedIndex)
                     .findFirst()
                     .orElseThrow();
 
@@ -40,9 +43,11 @@ public class PlaylistUtils {
     }
 
     public MediaPlayer player(int index) {
+        int normalizedIndex = normalizeIndex(index);
+
         try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
             Path songDirPath = songDirs
-                    .skip(index)
+                    .skip(normalizedIndex)
                     .findFirst()
                     .orElseThrow();
 
@@ -54,9 +59,21 @@ public class PlaylistUtils {
         }
     }
 
-    public int amountOfSongs() {
+    private int normalizeIndex(int index) {
         try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
-            return (int) songDirs.count();
+            int amountOfSongs = (int) songDirs.count();
+
+            if (amountOfSongs == 0) {
+                throw new SongDirectoryEmptyException("Songs directory is empty");
+            }
+
+            int normalizedIndex = index % amountOfSongs;
+
+            if (normalizedIndex < 0) {
+                normalizedIndex = amountOfSongs + normalizedIndex;
+            }
+
+            return normalizedIndex;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
