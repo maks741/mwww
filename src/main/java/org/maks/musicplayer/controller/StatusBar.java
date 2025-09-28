@@ -66,7 +66,7 @@ public class StatusBar implements Initializable {
         KeyCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
         KeyCombination newSong = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.META_DOWN);
 
-        body.sceneProperty().addListener((v, o, scene) -> {
+        body.sceneProperty().addListener((_, _, scene) -> {
             scene.setOnKeyPressed(keyEvent -> {
                 if (next.match(keyEvent)) {
                     next();
@@ -98,7 +98,7 @@ public class StatusBar implements Initializable {
         addIcon.setImage(loadingGif);
 
         DownloadService downloadService = new DownloadService();
-        downloadService.downloadSong().setOnSucceeded(event ->
+        downloadService.downloadSong().setOnSucceeded(_ ->
                 Platform.runLater(() ->
                         addIcon.setImage(initialImage)
                 )

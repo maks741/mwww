@@ -16,13 +16,6 @@ public class WidgetFXMLLoader {
         parent = load();
     }
 
-    public WidgetFXMLLoader(FXMLPath fxmlPath, Object controller) {
-        fxmlLoader = new FXMLLoader();
-        fxmlLoader.setController(controller);
-        fxmlLoader.setLocation(getClass().getResource(fxmlPath.toString()));
-        parent = load();
-    }
-
     private Parent load() {
         try {
             return fxmlLoader.load();
@@ -33,9 +26,5 @@ public class WidgetFXMLLoader {
 
     public Parent parent() {
         return parent;
-    }
-
-    public FXMLLoader fxmlLoader() {
-        return fxmlLoader;
     }
 }
