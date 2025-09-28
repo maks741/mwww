@@ -17,18 +17,21 @@ public class StyleService {
 
     public void applyCustomStyles(Scene scene) {
         Path customCss = Paths.get(System.getProperty("user.home"), ".config", "mwww", "style.css");
-        if (Files.exists(customCss)) {
-            scene.getStylesheets().clear();
-            scene.getStylesheets().add(customCss.toUri().toString());
-            scene.getRoot().applyCss();
-
-            Pane root = (Pane) scene.getRoot();
-            double newWidth = root.prefWidth(-1);
-            double newHeight = root.prefHeight(-1);
-
-            Stage stage = (Stage) scene.getWindow();
-            stage.setWidth(newWidth);
-            stage.setHeight(newHeight);
+        if (!Files.exists(customCss)) {
+            return;
         }
+
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(customCss.toUri().toString());
+
+        Pane root = (Pane) scene.getRoot();
+        root.applyCss();
+
+        double newWidth = root.prefWidth(-1);
+        double newHeight = root.prefHeight(-1);
+
+        Stage stage = (Stage) scene.getWindow();
+        stage.setWidth(newWidth);
+        stage.setHeight(newHeight);
     }
 }
