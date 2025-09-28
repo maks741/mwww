@@ -8,16 +8,16 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body"
-      fx:controller="org.maks.musicplayer.controller.StatusBar"
-      styleClass="status-bar-container">
+      fx:controller="org.maks.musicplayer.controller.Widget"
+      styleClass="widget-container">
     <stylesheets>
-        <URL value="@status-bar.css" />
+        <URL value="@widget.css" />
     </stylesheets>
-    <HBox VBox.vgrow="ALWAYS" styleClass="status-bar">
-        <VBox id="showHideWidgetButton">
+    <HBox VBox.vgrow="ALWAYS" styleClass="widget">
+        <VBox styleClass="song-avatar">
             <ImageView fx:id="statusBarIcon" fitWidth="30" fitHeight="30" />
         </VBox>
-        <Label fx:id="songName" />
+        <Label fx:id="songName" styleClass="song-name" />
         <Pane HBox.hgrow="ALWAYS" />
         <HBox styleClass="toolbar">
             <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">

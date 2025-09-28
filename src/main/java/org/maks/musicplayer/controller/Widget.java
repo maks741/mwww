@@ -23,7 +23,7 @@ import org.maks.musicplayer.utils.PlaylistUtils;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class StatusBar implements Initializable {
+public class Widget implements Initializable {
 
     @FXML
     private VBox body;

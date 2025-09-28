@@ -18,7 +18,7 @@ public class Start extends Application {
         stage.setX(600);
         stage.setY(12);
 
-        WidgetFXMLLoader widgetFXMLLoader = new WidgetFXMLLoader(FXMLPath.STATUS_BAR);
+        WidgetFXMLLoader widgetFXMLLoader = new WidgetFXMLLoader(FXMLPath.WIDGET);
         Scene scene = new Scene(widgetFXMLLoader.parent());
         scene.setFill(Color.TRANSPARENT);
 

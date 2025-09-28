@@ -1,7 +1,7 @@
 package org.maks.musicplayer.enumeration;
 
 public enum FXMLPath {
-    STATUS_BAR(basePath() + "statusbar/status-bar.fxml");
+    WIDGET(basePath() + "widget/widget.fxml");
 
     private final String path;
 
