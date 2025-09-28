@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.maks.musicplayer.enumeration.FXMLPath;
+import org.maks.musicplayer.service.StyleService;
 import org.maks.musicplayer.service.WidgetFXMLLoader;
 
 import java.io.IOException;
@@ -21,6 +22,9 @@ public class Start extends Application {
         WidgetFXMLLoader widgetFXMLLoader = new WidgetFXMLLoader(FXMLPath.WIDGET);
         Scene scene = new Scene(widgetFXMLLoader.parent());
         scene.setFill(Color.TRANSPARENT);
+
+        StyleService styleService = new StyleService();
+        styleService.applyDefaultStyles(scene);
 
         stage.setScene(scene);
         stage.show();

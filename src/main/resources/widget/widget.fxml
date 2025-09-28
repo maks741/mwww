@@ -3,16 +3,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import java.net.URL?>
 <?import org.maks.musicplayer.components.RepeatSongToggle?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body"
       fx:controller="org.maks.musicplayer.controller.Widget"
       styleClass="widget-container">
-    <stylesheets>
-        <URL value="@widget.css" />
-    </stylesheets>
     <HBox VBox.vgrow="ALWAYS" styleClass="widget">
         <VBox styleClass="song-avatar">
             <ImageView fx:id="statusBarIcon" fitWidth="30" fitHeight="30" />
@@ -21,10 +17,10 @@
         <Pane HBox.hgrow="ALWAYS" />
         <HBox styleClass="toolbar">
             <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
-                <Image url="@../../../../icons/repeat.png" />
+                <Image url="@../icons/repeat.png" />
             </RepeatSongToggle>
             <ImageView fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true">
-                <Image url="@../../../../icons/new-song.png" />
+                <Image url="@../icons/new-song.png" />
             </ImageView>
         </HBox>
     </HBox>
