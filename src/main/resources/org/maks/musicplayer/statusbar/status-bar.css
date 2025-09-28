@@ -1,15 +1,25 @@
 .status-bar-container {
     -fx-background-color: transparent;
+    -fx-pref-width: 475px;
+    -fx-pref-height: 42px;
 }
 
 .status-bar {
     -fx-background-color: #171717;
     -fx-background-radius: 20;
     -fx-alignment: center-left;
+    -fx-spacing: 10px;
+    -fx-padding: 0 25px 0 20px;
 }
 
 #showHideWidgetButton {
     -fx-alignment: center;
+    -fx-min-width: 36px;
+    -fx-pref-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-max-height: 36px;
 }
 
 #showHideWidgetButton:hover {
@@ -18,6 +28,13 @@
     -fx-cursor: hand;
 }
 
-.clickable {
-    -fx-cursor: hand;
+#songName {
+    -fx-text-fill: rgb(230, 230, 230);
+    -fx-font-family: Verdana;
+    -fx-font-size: 17px;
+}
+
+.toolbar {
+    -fx-spacing: 15px;
+    -fx-alignment: center-left;
 }

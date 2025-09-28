@@ -1,44 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 <?import java.net.URL?>
 <?import org.maks.musicplayer.components.RepeatSongToggle?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:id="body" prefWidth="475" prefHeight="42"
+      fx:id="body"
       fx:controller="org.maks.musicplayer.controller.StatusBar"
       styleClass="status-bar-container">
     <stylesheets>
         <URL value="@status-bar.css" />
     </stylesheets>
-    <HBox spacing="10" VBox.vgrow="ALWAYS" maxHeight="42" styleClass="status-bar">
-        <padding>
-            <Insets left="20" right="25" />
-        </padding>
-        <VBox minWidth="36" maxHeight="36" id="showHideWidgetButton">
-            <ImageView fx:id="statusBarIcon" fitWidth="30" fitHeight="30" preserveRatio="true" />
+    <HBox VBox.vgrow="ALWAYS" styleClass="status-bar">
+        <VBox id="showHideWidgetButton">
+            <ImageView fx:id="statusBarIcon" fitWidth="30" fitHeight="30" />
         </VBox>
-        <Label fx:id="songName" textFill="rgb(230, 230, 230)">
-            <font>
-                <Font name="Verdana" size="17" />
-            </font>
-        </Label>
+        <Label fx:id="songName" />
         <Pane HBox.hgrow="ALWAYS" />
-        <HBox spacing="15">
-            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable">
-                <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
-                    <Image url="@../../../../icons/repeat.png" />
-                </RepeatSongToggle>
-            </VBox>
-            <VBox HBox.hgrow="NEVER" alignment="CENTER" styleClass="clickable">
-                <ImageView fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true">
-                    <Image url="@../../../../icons/new-song.png" />
-                </ImageView>
-            </VBox>
+        <HBox styleClass="toolbar">
+            <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
+                <Image url="@../../../../icons/repeat.png" />
+            </RepeatSongToggle>
+            <ImageView fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true">
+                <Image url="@../../../../icons/new-song.png" />
+            </ImageView>
         </HBox>
     </HBox>
 </VBox>
