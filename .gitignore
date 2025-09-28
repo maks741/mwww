@@ -87,3 +87,4 @@ youtube-download-service/.venv
 songs/*
 !songs/coldlie/
 /*.jar
+/*.fifo

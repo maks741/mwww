@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.maks.musicplayer.enumeration.FXMLPath;
+import org.maks.musicplayer.service.FifoService;
 import org.maks.musicplayer.service.StyleService;
 import org.maks.musicplayer.service.WidgetFXMLLoader;
 
@@ -28,6 +29,8 @@ public class Start extends Application {
 
         stage.setScene(scene);
         stage.show();
+
+        new FifoService().read();
     }
 
     public static void main(String[] args) {
