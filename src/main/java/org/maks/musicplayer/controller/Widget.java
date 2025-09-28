@@ -14,7 +14,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.musicplayer.components.RepeatSongToggle;
 import org.maks.musicplayer.enumeration.Icon;
-import org.maks.musicplayer.exception.SongDirectoryEmptyException;
 import org.maks.musicplayer.model.SongInfo;
 import org.maks.musicplayer.service.DownloadService;
 import org.maks.musicplayer.utils.IconUtils;
@@ -51,13 +50,14 @@ public class Widget implements Initializable {
     }
 
     private void loadFirstSong() {
-        SongInfo song = songByIndex(currentSongIndex);
+        SongInfo song = lookupSong(currentSongIndex);
         updateSongInfo(song);
     }
 
     private void updateSongInfo(SongInfo songInfo) {
         statusBarIcon.setImage(songInfo.songThumbnail());
         songName.setText(songInfo.songName());
+        currentSongIndex = songInfo.songIndex();
     }
 
     private void addKeybindings() {
@@ -78,7 +78,7 @@ public class Widget implements Initializable {
                     addSong();
                 } else {
                     switch (keyEvent.getCode()) {
-                        case SPACE -> playPause();
+                        case SPACE -> togglePause();
                         case R -> repeatSongToggle.toggleOnRepeat();
                     }
                 }
@@ -105,17 +105,28 @@ public class Widget implements Initializable {
         );
     }
 
-    private SongInfo songByIndex(int songIndex) throws SongDirectoryEmptyException {
+    private SongInfo lookupSong(int songIndex) {
         PlaylistUtils playlistUtils = new PlaylistUtils();
         return playlistUtils.songInfo(songIndex);
     }
 
-    private void playPause() {
-        if (isSongPlaying) {
-            pause();
-        } else {
-            unpause();
+    private SongInfo lookupSong(String songName) {
+        PlaylistUtils playlistUtils = new PlaylistUtils();
+        return playlistUtils.songInfo(songName);
+    }
+
+    private void togglePause() {
+        if (currentPlayer == null) {
+            return;
         }
+
+        if (isSongPlaying) {
+            currentPlayer.pause();
+        } else {
+            currentPlayer.play();
+        }
+
+        isSongPlaying = !isSongPlaying;
     }
 
     private void play() {
@@ -138,24 +149,6 @@ public class Widget implements Initializable {
         });
     }
 
-    private void unpause() {
-        if (currentPlayer == null) {
-            return;
-        }
-
-        currentPlayer.play();
-        isSongPlaying = true;
-    }
-
-    private void pause() {
-        if (currentPlayer == null) {
-            return;
-        }
-
-        currentPlayer.pause();
-        isSongPlaying = false;
-    }
-
     private void skipToNextSong() {
         dispose();
 
@@ -175,9 +168,16 @@ public class Widget implements Initializable {
     }
 
     private void switchSong(int songIndex) {
+        switchSong(lookupSong(songIndex));
+    }
+
+    public void switchSong(String songName) {
+        switchSong(lookupSong(songName));
+    }
+
+    private void switchSong(SongInfo songInfo) {
         dispose();
-        SongInfo song = songByIndex(songIndex);
-        updateSongInfo(song);
+        updateSongInfo(songInfo);
     }
 
     private void dispose() {

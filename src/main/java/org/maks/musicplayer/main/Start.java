@@ -1,10 +1,12 @@
 package org.maks.musicplayer.main;
 
 import javafx.application.Application;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.maks.musicplayer.controller.Widget;
 import org.maks.musicplayer.enumeration.FXMLPath;
 import org.maks.musicplayer.service.FifoService;
 import org.maks.musicplayer.service.StyleService;
@@ -20,8 +22,10 @@ public class Start extends Application {
         stage.setX(600);
         stage.setY(12);
 
-        WidgetFXMLLoader widgetFXMLLoader = new WidgetFXMLLoader(FXMLPath.WIDGET);
-        Scene scene = new Scene(widgetFXMLLoader.parent());
+        WidgetFXMLLoader<Widget> widgetFXMLLoader = new WidgetFXMLLoader<>(FXMLPath.WIDGET);
+        Widget widget = widgetFXMLLoader.controller();
+        Parent root = widgetFXMLLoader.parent();
+        Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
 
         StyleService styleService = new StyleService();
@@ -30,7 +34,10 @@ public class Start extends Application {
         stage.setScene(scene);
         stage.show();
 
-        new FifoService().read();
+        new FifoService().read(
+                () -> styleService.applyCustomStyles(scene),
+                widget::switchSong
+        );
     }
 
     public static void main(String[] args) {

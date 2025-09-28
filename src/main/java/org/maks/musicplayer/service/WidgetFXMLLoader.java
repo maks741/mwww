@@ -6,14 +6,16 @@ import org.maks.musicplayer.enumeration.FXMLPath;
 
 import java.io.IOException;
 
-public class WidgetFXMLLoader {
+public class WidgetFXMLLoader<T> {
 
     private final FXMLLoader fxmlLoader;
     private final Parent parent;
+    private final T controller;
 
     public WidgetFXMLLoader(FXMLPath fxmlPath) {
-        fxmlLoader = new FXMLLoader(getClass().getResource(fxmlPath.toString()));
-        parent = load();
+        this.fxmlLoader = new FXMLLoader(getClass().getResource(fxmlPath.toString()));
+        this.parent = load();
+        this.controller = fxmlLoader.getController();
     }
 
     private Parent load() {
@@ -26,5 +28,9 @@ public class WidgetFXMLLoader {
 
     public Parent parent() {
         return parent;
+    }
+
+    public T controller() {
+        return controller;
     }
 }
