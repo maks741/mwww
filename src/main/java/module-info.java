@@ -19,4 +19,6 @@ module org.maks.musicplayer {
     exports org.maks.musicplayer.enumeration;
     exports org.maks.musicplayer.service;
     opens org.maks.musicplayer.service to javafx.fxml;
+    exports org.maks.musicplayer.fifo;
+    opens org.maks.musicplayer.fifo to javafx.fxml;
 }

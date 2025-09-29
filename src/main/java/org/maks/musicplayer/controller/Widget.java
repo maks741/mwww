@@ -13,7 +13,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.musicplayer.components.RepeatSongToggle;
+import org.maks.musicplayer.enumeration.FifoCommand;
 import org.maks.musicplayer.enumeration.Icon;
+import org.maks.musicplayer.fifo.FifoCommandSubscriber;
 import org.maks.musicplayer.model.SongInfo;
 import org.maks.musicplayer.service.DownloadService;
 import org.maks.musicplayer.utils.IconUtils;
@@ -23,7 +25,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.BiFunction;
 
-public class Widget implements Initializable {
+public class Widget implements Initializable, FifoCommandSubscriber {
 
     @FXML
     private VBox body;
@@ -48,6 +50,13 @@ public class Widget implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadFirstSong();
         addKeybindings();
+    }
+
+    @Override
+    public void accept(FifoCommand command) {
+        if (FifoCommand.SET_SONG == command) {
+            switchSong(command.getValue());
+        }
     }
 
     private void loadFirstSong() {
@@ -197,7 +206,7 @@ public class Widget implements Initializable {
         switchSong(lookupSong(songIndex));
     }
 
-    public void switchSong(String songName) {
+    private void switchSong(String songName) {
         switchSong(lookupSong(songName));
     }
 

@@ -3,19 +3,34 @@ package org.maks.musicplayer.service;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.maks.musicplayer.enumeration.FifoCommand;
+import org.maks.musicplayer.fifo.FifoCommandSubscriber;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-public class StyleService {
+public class StyleService implements FifoCommandSubscriber {
 
-    public void applyDefaultStyles(Scene scene) {
+    private final Scene scene;
+
+    public StyleService(Scene scene) {
+        this.scene = scene;
+    }
+
+    @Override
+    public void accept(FifoCommand command) {
+        if (FifoCommand.RELOAD_STYLE == command) {
+            applyCustomStyles();
+        }
+    }
+
+    public void applyDefaultStyles() {
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/widget/style.css")).toExternalForm());
     }
 
-    public void applyCustomStyles(Scene scene) {
+    private void applyCustomStyles() {
         Path customCss = Paths.get(System.getProperty("user.home"), ".config", "mwww", "style.css");
         if (!Files.exists(customCss)) {
             return;

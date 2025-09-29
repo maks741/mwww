@@ -8,7 +8,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.maks.musicplayer.controller.Widget;
 import org.maks.musicplayer.enumeration.FXMLPath;
-import org.maks.musicplayer.service.FifoService;
+import org.maks.musicplayer.fifo.FifoCommandQueue;
+import org.maks.musicplayer.fifo.FifoService;
 import org.maks.musicplayer.service.StyleService;
 import org.maks.musicplayer.service.WidgetFXMLLoader;
 
@@ -28,16 +29,17 @@ public class Start extends Application {
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
 
-        StyleService styleService = new StyleService();
-        styleService.applyDefaultStyles(scene);
+        StyleService styleService = new StyleService(scene);
+        styleService.applyDefaultStyles();
 
         stage.setScene(scene);
         stage.show();
 
-        new FifoService().read(
-                () -> styleService.applyCustomStyles(scene),
-                widget::switchSong
-        );
+        FifoCommandQueue fifoCommandQueue = new FifoCommandQueue();
+        fifoCommandQueue.subscribe(widget);
+        fifoCommandQueue.subscribe(styleService);
+
+        new FifoService().read(fifoCommandQueue);
     }
 
     public static void main(String[] args) {
