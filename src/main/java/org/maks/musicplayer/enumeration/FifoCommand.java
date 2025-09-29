@@ -6,27 +6,33 @@ public enum FifoCommand {
     SET_SONG("set");
 
     private final String commandName;
+    private String commandValue;
 
     FifoCommand(String commandName) {
         this.commandName = commandName;
     }
 
-    public String getValue(String s) {
-        if (!s.contains(":")) {
-            throw new IllegalStateException("Command does not have a value");
-        }
-
-        int index = s.indexOf(":");
-        return s.substring(index + 1);
-    }
-
-    public static FifoCommand fromString(String s) {
+    public static FifoCommand fromString(String commandStr) {
         for (FifoCommand command : values()) {
-            if (s.startsWith(command.commandName)) {
+            if (commandStr.startsWith(command.commandName)) {
+                command.commandValue = getValue(commandStr);
                 return command;
             }
         }
 
-        throw new IllegalArgumentException("FifoCommand not supported: " + s);
+        throw new IllegalArgumentException("FifoCommand not supported: " + commandStr);
+    }
+
+    private static String getValue(String commandStr) {
+        if (!commandStr.contains(":")) {
+            return "";
+        }
+
+        int index = commandStr.indexOf(":");
+        return commandStr.substring(index + 1);
+    }
+
+    public String getValue() {
+        return commandValue;
     }
 }

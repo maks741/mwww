@@ -20,56 +20,30 @@ public class PlaylistUtils {
         int normalizedIndex = normalizeIndex(index);
 
         try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
-            Path songFolderPath = songDirs
+            Path songDirPath = songDirs
                     .skip(normalizedIndex)
                     .findFirst()
                     .orElseThrow();
 
-            Path songThumbnailPath = songFolderPath.resolve("img.png");
-
-            Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songFolderPath);
-            String songName = songNameAndSongAuthor.getKey();
-            String songAuthor = songNameAndSongAuthor.getValue();
-
-            Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
-
-            return new SongInfo(
-                    songName,
-                    songAuthor,
-                    songThumbnail,
-                    normalizedIndex
-            );
+            return songInfo(songDirPath, normalizedIndex);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public SongInfo songInfo(String targetSongName) {
-        AtomicInteger counter = new AtomicInteger(0);
+        AtomicInteger songIndexCounter = new AtomicInteger(0);
 
         try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
-            Path songFolderPath = songDirs
+            Path songDirPath = songDirs
                     .filter(path -> {
-                        counter.getAndIncrement();
+                        songIndexCounter.getAndIncrement();
                         return path.getFileName().toString().contains(targetSongName);
                     })
                     .findFirst()
                     .orElseThrow();
 
-            Path songThumbnailPath = songFolderPath.resolve("img.png");
-
-            Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songFolderPath);
-            String songName = songNameAndSongAuthor.getKey();
-            String songAuthor = songNameAndSongAuthor.getValue();
-
-            Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
-
-            return new SongInfo(
-                    songName,
-                    songAuthor,
-                    songThumbnail,
-                    counter.decrementAndGet()
-            );
+            return songInfo(songDirPath, songIndexCounter.decrementAndGet());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -92,27 +66,22 @@ public class PlaylistUtils {
         }
     }
 
-    /*private SongInfo songInfo(Function<Stream<Path>, Path> function) {
-        try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
-            Path songFolderPath = function.apply(songDirs);
+    private SongInfo songInfo(Path songDirPath, int songIndex) {
+        Path songThumbnailPath = songDirPath.resolve("img.png");
 
-            Path songThumbnailPath = songFolderPath.resolve("img.png");
+        Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songDirPath);
+        String songName = songNameAndSongAuthor.getKey();
+        String songAuthor = songNameAndSongAuthor.getValue();
 
-            Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songFolderPath);
-            String songName = songNameAndSongAuthor.getKey();
-            String songAuthor = songNameAndSongAuthor.getValue();
+        Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
 
-            Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
-
-            return new SongInfo(
-                    songName,
-                    songAuthor,
-                    songThumbnail
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
+        return new SongInfo(
+                songName,
+                songAuthor,
+                songThumbnail,
+                songIndex
+        );
+    }
 
     private int normalizeIndex(int index) {
         try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {

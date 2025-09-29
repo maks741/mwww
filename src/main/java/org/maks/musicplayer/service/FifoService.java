@@ -1,7 +1,6 @@
 package org.maks.musicplayer.service;
 
 import javafx.application.Platform;
-import org.maks.musicplayer.controller.Widget;
 import org.maks.musicplayer.enumeration.FifoCommand;
 
 import java.io.BufferedReader;
@@ -27,11 +26,10 @@ public class FifoService {
                 String commandStr;
                 while ((commandStr = bufferedReader.readLine()) != null) {
                     FifoCommand command = FifoCommand.fromString(commandStr);
-                    final String finalCommand = commandStr;
 
                     Runnable toRun = switch (command) {
                         case RELOAD_STYLE -> onReloadStyles;
-                        case SET_SONG -> () -> onSetSong.accept(command.getValue(finalCommand));
+                        case SET_SONG -> () -> onSetSong.accept(command.getValue());
                     };
 
                     Platform.runLater(toRun);
