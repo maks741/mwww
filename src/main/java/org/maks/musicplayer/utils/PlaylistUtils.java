@@ -10,7 +10,6 @@ import org.maks.musicplayer.model.SongInfo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -19,7 +18,7 @@ public class PlaylistUtils {
     public SongInfo songInfo(int index) {
         int normalizedIndex = normalizeIndex(index);
 
-        try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
+        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             Path songDirPath = songDirs
                     .skip(normalizedIndex)
                     .findFirst()
@@ -34,7 +33,7 @@ public class PlaylistUtils {
     public SongInfo songInfo(String targetSongName) {
         AtomicInteger songIndexCounter = new AtomicInteger(0);
 
-        try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
+        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             Path songDirPath = songDirs
                     .filter(path -> {
                         songIndexCounter.getAndIncrement();
@@ -52,7 +51,7 @@ public class PlaylistUtils {
     public MediaPlayer player(int index) {
         int normalizedIndex = normalizeIndex(index);
 
-        try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
+        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             Path songDirPath = songDirs
                     .skip(normalizedIndex)
                     .findFirst()
@@ -84,7 +83,7 @@ public class PlaylistUtils {
     }
 
     private int normalizeIndex(int index) {
-        try (Stream<Path> songDirs = Files.list(Paths.get("songs"))) {
+        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             int amountOfSongs = (int) songDirs.count();
 
             if (amountOfSongs == 0) {

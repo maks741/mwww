@@ -1,6 +1,7 @@
 package org.maks.musicplayer.fifo;
 
 import org.maks.musicplayer.enumeration.FifoCommand;
+import org.maks.musicplayer.utils.ResourceUtils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -8,12 +9,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Paths;
 
 public class FifoService {
     public void read(FifoCommandQueue fifoCommandQueue) {
-        String fifoFileName = "commands.fifo";
-        String fifoPathStr = Paths.get(fifoFileName).toString();
+        String fifoFileName = ResourceUtils.commandsFifoFileName();
+        String fifoPathStr = ResourceUtils.commandsFifoPath().toString();
 
         new Thread(() -> {
             try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fifoPathStr));
@@ -27,7 +27,7 @@ public class FifoService {
                     fifoCommandQueue.push(command);
                 }
             } catch (FileNotFoundException e) {
-                throw new RuntimeException(fifoFileName + " not found. Run 'mkfifo " + fifoFileName + "' in the root project dir");
+                throw new RuntimeException(fifoFileName + " not found. Run 'mkfifo " + fifoPathStr + "'");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

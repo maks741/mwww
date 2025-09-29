@@ -5,6 +5,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.maks.musicplayer.enumeration.FifoCommand;
 import org.maks.musicplayer.fifo.FifoCommandSubscriber;
+import org.maks.musicplayer.utils.ResourceUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +32,7 @@ public class StyleService implements FifoCommandSubscriber {
     }
 
     private void applyCustomStyles() {
-        Path customCss = Paths.get(System.getProperty("user.home"), ".config", "mwww", "style.css");
+        Path customCss = ResourceUtils.customCssPath();
         if (!Files.exists(customCss)) {
             return;
         }
