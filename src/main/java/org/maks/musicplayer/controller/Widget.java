@@ -61,9 +61,11 @@ public class Widget implements Initializable {
     }
 
     private void addKeybindings() {
-        KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN);
         KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
         KeyCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
+        KeyCombination toggleRepeat = new KeyCodeCombination(KeyCode.R);
+        KeyCombination togglePause = new KeyCodeCombination(KeyCode.P);
+        KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN);
         KeyCombination newSong = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.META_DOWN);
 
         body.sceneProperty().addListener((_, _, scene) -> {
@@ -72,15 +74,14 @@ public class Widget implements Initializable {
                     next();
                 } else if (previous.match(keyEvent)) {
                     previous();
+                } else if (toggleRepeat.match(keyEvent)) {
+                    repeatSongToggle.toggleOnRepeat();
+                } else if (togglePause.match(keyEvent)) {
+                    togglePause();
                 } else if (exit.match(keyEvent)) {
                     shutdown();
                 } else if (newSong.match(keyEvent)) {
                     addSong();
-                } else {
-                    switch (keyEvent.getCode()) {
-                        case SPACE -> togglePause();
-                        case R -> repeatSongToggle.toggleOnRepeat();
-                    }
                 }
             });
 
