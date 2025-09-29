@@ -21,6 +21,7 @@ import org.maks.musicplayer.utils.PlaylistUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.BiFunction;
 
 public class Widget implements Initializable {
 
@@ -63,6 +64,8 @@ public class Widget implements Initializable {
     private void addKeybindings() {
         KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
         KeyCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
+        KeyCombination skipForward10 = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN, KeyCombination.SHIFT_DOWN);
+        KeyCombination skipBackward10 = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN, KeyCombination.SHIFT_DOWN);
         KeyCombination toggleRepeat = new KeyCodeCombination(KeyCode.R);
         KeyCombination togglePause = new KeyCodeCombination(KeyCode.P);
         KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN);
@@ -74,6 +77,10 @@ public class Widget implements Initializable {
                     next();
                 } else if (previous.match(keyEvent)) {
                     previous();
+                } else if (skipForward10.match(keyEvent)) {
+                    skipForward10();
+                } else if (skipBackward10.match(keyEvent)) {
+                    skipBackward10();
                 } else if (toggleRepeat.match(keyEvent)) {
                     repeatSongToggle.toggleOnRepeat();
                 } else if (togglePause.match(keyEvent)) {
@@ -166,6 +173,24 @@ public class Widget implements Initializable {
 
     private void previous() {
         switchSong(--currentSongIndex);
+    }
+
+    private void skipForward10() {
+        skipCurrent(Duration::add);
+    }
+
+    private void skipBackward10() {
+        skipCurrent(Duration::subtract);
+    }
+
+    private void skipCurrent(BiFunction<Duration, Duration, Duration> operation) {
+        if (currentPlayer == null) {
+            return;
+        }
+
+        Duration currentDuration = currentPlayer.getCurrentTime();
+        Duration newDuration = operation.apply(currentDuration, Duration.seconds(10));
+        currentPlayer.seek(newDuration);
     }
 
     private void switchSong(int songIndex) {
