@@ -160,11 +160,11 @@ public class Widget implements Initializable {
     private void skipToNextSong() {
         dispose();
 
-        if (repeatSongToggle.onRepeat()) {
-            play();
-        } else {
+        if (!repeatSongToggle.onRepeat()) {
             next();
         }
+
+        play();
     }
 
     private void next() {
