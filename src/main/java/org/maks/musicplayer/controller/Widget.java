@@ -78,7 +78,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         KeyCombination toggleRepeat = new KeyCodeCombination(KeyCode.R);
         KeyCombination togglePause = new KeyCodeCombination(KeyCode.P);
         KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN);
-        KeyCombination newSong = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.META_DOWN);
+        KeyCombination newSong = new KeyCodeCombination(KeyCode.N, KeyCombination.ALT_DOWN);
 
         body.sceneProperty().addListener((_, _, scene) -> {
             scene.setOnKeyPressed(keyEvent -> {

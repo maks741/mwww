@@ -23,7 +23,12 @@ public class DownloadService {
             @Override
             protected Void call() throws Exception {
                 Process downloadScriptProcess = executeDownloadScript(url);
-                downloadScriptProcess.waitFor();
+                int exitStatus = downloadScriptProcess.waitFor();
+
+                if (exitStatus != 0) {
+                    throw new RuntimeException("Could not download by URL: " + url);
+                }
+
                 return null;
             }
         };
@@ -34,19 +39,18 @@ public class DownloadService {
     }
 
     private Process executeDownloadScript(String url) {
-        String youtubeDownloadServiceBasePath = "./youtube-download-service/";
         String[] commands = {
-                youtubeDownloadServiceBasePath + ".venv/bin/python",
-                youtubeDownloadServiceBasePath + "main.py",
+                "mwww-youtube-download",
                 url
         };
+
         Process process;
         try {
             process = Runtime.getRuntime().exec(commands);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         return process;
     }
-
 }
