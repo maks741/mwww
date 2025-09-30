@@ -73,12 +73,12 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private void addKeybindings() {
         KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
         KeyCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN);
-        KeyCombination skipForward = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN, KeyCombination.SHIFT_DOWN);
-        KeyCombination skipBackward = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.ALT_DOWN, KeyCombination.SHIFT_DOWN);
+        KeyCombination skipForward = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_DOWN);
+        KeyCombination skipBackward = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_DOWN);
         KeyCombination toggleRepeat = new KeyCodeCombination(KeyCode.R);
         KeyCombination togglePause = new KeyCodeCombination(KeyCode.P);
         KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN);
-        KeyCombination newSong = new KeyCodeCombination(KeyCode.N, KeyCombination.ALT_DOWN);
+        KeyCombination newSong = new KeyCodeCombination(KeyCode.N, KeyCombination.META_DOWN);
 
         body.sceneProperty().addListener((_, _, scene) -> {
             scene.setOnKeyPressed(keyEvent -> {
