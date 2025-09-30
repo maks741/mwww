@@ -8,8 +8,11 @@ import org.maks.musicplayer.exception.SongDirectoryEmptyException;
 import org.maks.musicplayer.model.SongInfo;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -60,6 +63,33 @@ public class PlaylistUtils {
             Path songMediaFile = songDirPath.resolve("media.wav");
             Media media = new Media(songMediaFile.toUri().toString());
             return new MediaPlayer(media);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteSong(int index) {
+        int normalizedIndex = normalizeIndex(index);
+
+        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
+            Path songDirPath = songDirs
+                    .skip(normalizedIndex)
+                    .findFirst()
+                    .orElseThrow();
+
+            Files.walkFileTree(songDirPath, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

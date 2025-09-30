@@ -77,8 +77,9 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         KeyCombination skipBackward = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_DOWN);
         KeyCombination toggleRepeat = new KeyCodeCombination(KeyCode.R);
         KeyCombination togglePause = new KeyCodeCombination(KeyCode.P);
-        KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN);
-        KeyCombination newSong = new KeyCodeCombination(KeyCode.N, KeyCombination.META_DOWN);
+        KeyCombination newSong = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+        KeyCombination deleteSong = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+        KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN, KeyCombination.CONTROL_DOWN);
 
         body.sceneProperty().addListener((_, _, scene) -> {
             scene.setOnKeyPressed(keyEvent -> {
@@ -94,10 +95,12 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                     repeatSongToggle.toggleOnRepeat();
                 } else if (togglePause.match(keyEvent)) {
                     togglePause();
-                } else if (exit.match(keyEvent)) {
-                    shutdown();
                 } else if (newSong.match(keyEvent)) {
                     addSong();
+                } else if (deleteSong.match(keyEvent)) {
+                    deleteSong();
+                } else if (exit.match(keyEvent)) {
+                    shutdown();
                 }
             });
 
@@ -120,6 +123,12 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                         addIcon.setImage(initialImage)
                 )
         );
+    }
+
+    private void deleteSong() {
+        PlaylistUtils playlistUtils = new PlaylistUtils();
+        playlistUtils.deleteSong(currentSongIndex);
+        reloadCurrent();
     }
 
     private SongInfo lookupSong(int songIndex) {
@@ -174,6 +183,10 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         }
 
         play();
+    }
+
+    private void reloadCurrent() {
+        switchSong(currentSongIndex);
     }
 
     private void next() {
