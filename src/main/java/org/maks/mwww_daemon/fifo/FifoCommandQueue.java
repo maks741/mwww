@@ -1,7 +1,7 @@
-package org.maks.musicplayer.fifo;
+package org.maks.mwww_daemon.fifo;
 
 import javafx.application.Platform;
-import org.maks.musicplayer.enumeration.FifoCommand;
+import org.maks.mwww_daemon.enumeration.FifoCommand;
 
 import java.util.ArrayList;
 import java.util.List;

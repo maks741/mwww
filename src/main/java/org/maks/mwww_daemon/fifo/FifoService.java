@@ -1,7 +1,7 @@
-package org.maks.musicplayer.fifo;
+package org.maks.mwww_daemon.fifo;
 
-import org.maks.musicplayer.enumeration.FifoCommand;
-import org.maks.musicplayer.utils.ResourceUtils;
+import org.maks.mwww_daemon.enumeration.FifoCommand;
+import org.maks.mwww_daemon.utils.ResourceUtils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

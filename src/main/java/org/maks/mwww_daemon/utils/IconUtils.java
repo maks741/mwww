@@ -1,7 +1,7 @@
-package org.maks.musicplayer.utils;
+package org.maks.mwww_daemon.utils;
 
 import javafx.scene.image.Image;
-import org.maks.musicplayer.enumeration.Icon;
+import org.maks.mwww_daemon.enumeration.Icon;
 
 import java.io.IOException;
 import java.nio.file.Files;

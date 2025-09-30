@@ -1,8 +1,8 @@
-package org.maks.musicplayer.service;
+package org.maks.mwww_daemon.service;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import org.maks.musicplayer.enumeration.FXMLPath;
+import org.maks.mwww_daemon.enumeration.FXMLPath;
 
 import java.io.IOException;
 

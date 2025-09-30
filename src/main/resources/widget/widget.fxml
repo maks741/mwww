@@ -3,11 +3,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import org.maks.musicplayer.components.RepeatSongToggle?>
+<?import org.maks.mwww_daemon.components.RepeatSongToggle?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body"
-      fx:controller="org.maks.musicplayer.controller.Widget"
+      fx:controller="org.maks.mwww_daemon.controller.Widget"
       styleClass="widget-container">
     <HBox VBox.vgrow="ALWAYS" styleClass="widget">
         <VBox styleClass="song-avatar">

@@ -1,4 +1,4 @@
-package org.maks.musicplayer.service;
+package org.maks.mwww_daemon.service;
 
 import javafx.concurrent.Task;
 import javafx.scene.input.Clipboard;

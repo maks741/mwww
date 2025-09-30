@@ -1,4 +1,4 @@
-package org.maks.musicplayer.utils;
+package org.maks.mwww_daemon.utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,12 +13,12 @@ public class ResourceUtils {
         return basePath().resolve("style.css");
     }
 
-    public static String commandsFifoFileName() {
-        return "commands.fifo";
-    }
-
     public static Path commandsFifoPath() {
         return basePath().resolve(commandsFifoFileName());
+    }
+
+    public static String commandsFifoFileName() {
+        return "commands.fifo";
     }
 
     private static Path basePath() {

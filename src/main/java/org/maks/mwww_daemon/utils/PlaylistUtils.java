@@ -1,11 +1,11 @@
-package org.maks.musicplayer.utils;
+package org.maks.mwww_daemon.utils;
 
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Pair;
-import org.maks.musicplayer.exception.SongDirectoryEmptyException;
-import org.maks.musicplayer.model.SongInfo;
+import org.maks.mwww_daemon.exception.SongDirectoryEmptyException;
+import org.maks.mwww_daemon.model.SongInfo;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

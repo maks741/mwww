@@ -1,6 +1,6 @@
-package org.maks.musicplayer.fifo;
+package org.maks.mwww_daemon.fifo;
 
-import org.maks.musicplayer.enumeration.FifoCommand;
+import org.maks.mwww_daemon.enumeration.FifoCommand;
 
 public interface FifoCommandSubscriber {
 

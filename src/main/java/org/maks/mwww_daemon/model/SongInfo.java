@@ -1,4 +1,4 @@
-package org.maks.musicplayer.model;
+package org.maks.mwww_daemon.model;
 
 import javafx.scene.image.Image;
 

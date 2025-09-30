@@ -1,4 +1,4 @@
-module org.maks.musicplayer {
+module org.maks.mwww_daemon {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.media;
@@ -7,18 +7,18 @@ module org.maks.musicplayer {
     requires javafx.graphics;
 
 
-    exports org.maks.musicplayer.main;
-    opens org.maks.musicplayer.main to javafx.fxml;
-    exports org.maks.musicplayer.components;
-    opens org.maks.musicplayer.components to javafx.fxml;
-    exports org.maks.musicplayer.controller;
-    opens org.maks.musicplayer.controller to javafx.fxml;
-    exports org.maks.musicplayer.utils;
-    opens org.maks.musicplayer.utils to javafx.fxml;
-    exports org.maks.musicplayer.model;
-    exports org.maks.musicplayer.enumeration;
-    exports org.maks.musicplayer.service;
-    opens org.maks.musicplayer.service to javafx.fxml;
-    exports org.maks.musicplayer.fifo;
-    opens org.maks.musicplayer.fifo to javafx.fxml;
+    exports org.maks.mwww_daemon.main;
+    opens org.maks.mwww_daemon.main to javafx.fxml;
+    exports org.maks.mwww_daemon.components;
+    opens org.maks.mwww_daemon.components to javafx.fxml;
+    exports org.maks.mwww_daemon.controller;
+    opens org.maks.mwww_daemon.controller to javafx.fxml;
+    exports org.maks.mwww_daemon.utils;
+    opens org.maks.mwww_daemon.utils to javafx.fxml;
+    exports org.maks.mwww_daemon.model;
+    exports org.maks.mwww_daemon.enumeration;
+    exports org.maks.mwww_daemon.service;
+    opens org.maks.mwww_daemon.service to javafx.fxml;
+    exports org.maks.mwww_daemon.fifo;
+    opens org.maks.mwww_daemon.fifo to javafx.fxml;
 }

@@ -1,8 +1,8 @@
-package org.maks.musicplayer.components;
+package org.maks.mwww_daemon.components;
 
 import javafx.scene.image.ImageView;
-import org.maks.musicplayer.enumeration.Icon;
-import org.maks.musicplayer.utils.IconUtils;
+import org.maks.mwww_daemon.enumeration.Icon;
+import org.maks.mwww_daemon.utils.IconUtils;
 
 public class RepeatSongToggle extends ImageView {
 

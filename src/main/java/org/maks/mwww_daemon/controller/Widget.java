@@ -1,4 +1,4 @@
-package org.maks.musicplayer.controller;
+package org.maks.mwww_daemon.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -12,14 +12,14 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import org.maks.musicplayer.components.RepeatSongToggle;
-import org.maks.musicplayer.enumeration.FifoCommand;
-import org.maks.musicplayer.enumeration.Icon;
-import org.maks.musicplayer.fifo.FifoCommandSubscriber;
-import org.maks.musicplayer.model.SongInfo;
-import org.maks.musicplayer.service.DownloadService;
-import org.maks.musicplayer.utils.IconUtils;
-import org.maks.musicplayer.utils.PlaylistUtils;
+import org.maks.mwww_daemon.components.RepeatSongToggle;
+import org.maks.mwww_daemon.enumeration.FifoCommand;
+import org.maks.mwww_daemon.enumeration.Icon;
+import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
+import org.maks.mwww_daemon.model.SongInfo;
+import org.maks.mwww_daemon.service.DownloadService;
+import org.maks.mwww_daemon.utils.IconUtils;
+import org.maks.mwww_daemon.utils.PlaylistUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;

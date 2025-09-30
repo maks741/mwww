@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.maks</groupId>
-    <artifactId>musicplayer</artifactId>
+    <artifactId>mwww-daemon</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>musicplayer</name>
+    <name>mwww-daemon</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,7 +53,7 @@
           	        <manifest>
             		    <addClasspath>true</addClasspath>
             		    <classpathPrefix>lib/</classpathPrefix>
-            		    <mainClass>org.maks.musicplayer.main.Main</mainClass>
+            		    <mainClass>org.maks.mwww_daemon.main.Main</mainClass>
           		</manifest>
         	    </archive>
       		</configuration>
@@ -67,7 +67,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>org.maks.musicplayer/org.maks.musicplayer.main.Start</mainClass>
+                            <mainClass>org.maks.mwww_daemon/org.maks.mwww_daemon.main.Start</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

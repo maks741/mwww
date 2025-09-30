@@ -1,15 +1,14 @@
-package org.maks.musicplayer.service;
+package org.maks.mwww_daemon.service;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import org.maks.musicplayer.enumeration.FifoCommand;
-import org.maks.musicplayer.fifo.FifoCommandSubscriber;
-import org.maks.musicplayer.utils.ResourceUtils;
+import org.maks.mwww_daemon.enumeration.FifoCommand;
+import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
+import org.maks.mwww_daemon.utils.ResourceUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 
 public class StyleService implements FifoCommandSubscriber {

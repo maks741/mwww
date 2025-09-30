@@ -1,4 +1,4 @@
-package org.maks.musicplayer.enumeration;
+package org.maks.mwww_daemon.enumeration;
 
 public enum FXMLPath {
     WIDGET("/widget/widget.fxml");
