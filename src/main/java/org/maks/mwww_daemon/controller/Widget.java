@@ -60,8 +60,14 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @Override
     public void accept(FifoCommandQueue observable, FifoCommand command) {
         switch (command) {
-            case HIDE -> stageOp(Stage::hide);
-            case SHOW -> stageOp(Stage::show);
+            case HIDE -> {
+                Platform.setImplicitExit(false);
+                stageOp(Stage::hide);
+            }
+            case SHOW -> {
+                stageOp(Stage::show);
+                Platform.setImplicitExit(true);
+            }
             case SET_SONG -> switchSong(command.getValue());
             case SET_SKIP_DURATION -> skipDuration = Duration.seconds(command.getValueAsInt());
         }
