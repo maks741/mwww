@@ -21,6 +21,10 @@ public class ResourceUtils {
         return "commands.fifo";
     }
 
+    public static Path configFilePath() {
+        return basePath().resolve("config.yaml");
+    }
+
     private static Path basePath() {
         return Paths.get(System.getProperty("user.home"), ".config", "mwww");
     }

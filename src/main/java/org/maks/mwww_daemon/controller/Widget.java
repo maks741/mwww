@@ -11,10 +11,12 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.RepeatSongToggle;
 import org.maks.mwww_daemon.enumeration.FifoCommand;
 import org.maks.mwww_daemon.enumeration.Icon;
+import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
 import org.maks.mwww_daemon.model.SongInfo;
 import org.maks.mwww_daemon.service.DownloadService;
@@ -24,6 +26,7 @@ import org.maks.mwww_daemon.utils.PlaylistUtils;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class Widget implements Initializable, FifoCommandSubscriber {
 
@@ -46,6 +49,8 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private MediaPlayer currentPlayer = null;
     private boolean isSongPlaying = false;
 
+    private Duration skipDuration = Duration.seconds(10);
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadFirstSong();
@@ -53,9 +58,12 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     }
 
     @Override
-    public void accept(FifoCommand command) {
-        if (FifoCommand.SET_SONG == command) {
-            switchSong(command.getValue());
+    public void accept(FifoCommandQueue observable, FifoCommand command) {
+        switch (command) {
+            case HIDE -> stageOp(Stage::hide);
+            case SHOW -> stageOp(Stage::show);
+            case SET_SONG -> switchSong(command.getValue());
+            case SET_SKIP_DURATION -> skipDuration = Duration.seconds(command.getValueAsInt());
         }
     }
 
@@ -211,7 +219,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         }
 
         Duration currentDuration = currentPlayer.getCurrentTime();
-        Duration newDuration = operation.apply(currentDuration, Duration.seconds(10));
+        Duration newDuration = operation.apply(currentDuration, skipDuration);
         currentPlayer.seek(newDuration);
     }
 
@@ -235,6 +243,11 @@ public class Widget implements Initializable, FifoCommandSubscriber {
 
         currentPlayer.dispose();
         currentPlayer = null;
+    }
+
+    private void stageOp(Consumer<Stage> op) {
+        Stage stage = (Stage) body.getScene().getWindow();
+        op.accept(stage);
     }
 
     private void shutdown() {

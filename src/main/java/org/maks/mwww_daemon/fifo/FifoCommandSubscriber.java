@@ -4,6 +4,6 @@ import org.maks.mwww_daemon.enumeration.FifoCommand;
 
 public interface FifoCommandSubscriber {
 
-    void accept(FifoCommand fifoCommand);
+    void accept(FifoCommandQueue observable, FifoCommand fifoCommand);
 
 }

@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.maks.mwww_daemon.enumeration.FifoCommand;
+import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
 import org.maks.mwww_daemon.utils.ResourceUtils;
 
@@ -20,7 +21,7 @@ public class StyleService implements FifoCommandSubscriber {
     }
 
     @Override
-    public void accept(FifoCommand command) {
+    public void accept(FifoCommandQueue observable, FifoCommand command) {
         if (FifoCommand.RELOAD_STYLE == command) {
             applyCustomStyles();
         }

@@ -5,7 +5,8 @@ module org.maks.mwww_daemon {
     requires java.sql;
     requires javafx.base;
     requires javafx.graphics;
-
+    requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.dataformat.yaml;
 
     exports org.maks.mwww_daemon.main;
     opens org.maks.mwww_daemon.main to javafx.fxml;
@@ -14,7 +15,7 @@ module org.maks.mwww_daemon {
     exports org.maks.mwww_daemon.controller;
     opens org.maks.mwww_daemon.controller to javafx.fxml;
     exports org.maks.mwww_daemon.utils;
-    opens org.maks.mwww_daemon.utils to javafx.fxml;
+    opens org.maks.mwww_daemon.utils to javafx.fxml, com.fasterxml.jackson.databind;
     exports org.maks.mwww_daemon.model;
     exports org.maks.mwww_daemon.enumeration;
     exports org.maks.mwww_daemon.service;

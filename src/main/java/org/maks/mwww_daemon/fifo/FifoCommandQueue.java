@@ -16,7 +16,7 @@ public class FifoCommandQueue {
 
     public void push(FifoCommand fifoCommand) {
         for (var subscriber : subscribers) {
-            Platform.runLater(() -> subscriber.accept(fifoCommand));
+            Platform.runLater(() -> subscriber.accept(this, fifoCommand));
         }
     }
 }
