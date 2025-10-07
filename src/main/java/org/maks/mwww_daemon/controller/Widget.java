@@ -1,6 +1,7 @@
 package org.maks.mwww_daemon.controller;
 
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -132,7 +133,13 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         addIcon.setImage(loadingGif);
 
         DownloadService downloadService = new DownloadService();
-        downloadService.downloadSong().setOnSucceeded(_ ->
+        Task<Void> task = downloadService.downloadSong();
+        task.setOnSucceeded(_ ->
+                Platform.runLater(() ->
+                        addIcon.setImage(initialImage)
+                )
+        );
+        task.setOnFailed(_ ->
                 Platform.runLater(() ->
                         addIcon.setImage(initialImage)
                 )
