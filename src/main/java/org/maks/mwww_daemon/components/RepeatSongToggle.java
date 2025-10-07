@@ -6,15 +6,16 @@ import org.maks.mwww_daemon.utils.IconUtils;
 
 public class RepeatSongToggle extends ImageView {
 
+    private final IconUtils iconUtils = new IconUtils();
     private boolean onRepeat = false;
 
     public void toggleOnRepeat() {
         if (onRepeat) {
             onRepeat = false;
-            setImage(IconUtils.image(Icon.REPEAT));
+            setImage(iconUtils.image(Icon.REPEAT));
         } else {
             onRepeat = true;
-            setImage(IconUtils.image(Icon.REPEAT_SINGLE));
+            setImage(iconUtils.image(Icon.REPEAT_SINGLE));
         }
     }
 

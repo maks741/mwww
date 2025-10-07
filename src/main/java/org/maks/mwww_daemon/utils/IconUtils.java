@@ -4,31 +4,17 @@ import javafx.scene.image.Image;
 import org.maks.mwww_daemon.enumeration.Icon;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
+import java.io.InputStream;
 
 public class IconUtils {
 
-    public static Image image(Icon icon) {
-        return new Image(iconPath(icon));
-    }
+    public Image image(Icon icon) {
+        try (InputStream inputStream = getClass().getResourceAsStream("/icons/" + icon.toString())) {
+            if (inputStream == null) {
+                throw new RuntimeException("Icon not found: " + icon);
+            }
 
-    private static String iconPath(Icon icon) {
-        Path iconsFolderPath = Paths.get("src", "main", "resources", "icons");
-        String iconName = icon.toString();
-
-        try (Stream<Path> icons = Files.list(iconsFolderPath)) {
-            return icons
-                    .filter(path -> {
-                        String fileName = path.getFileName().toString();
-                        String fileNameWithoutExtension = fileName.split("\\.")[0];
-                        return fileNameWithoutExtension.equals(iconName);
-                    })
-                    .findFirst()
-                    .map(path -> path.toUri().toString())
-                    .orElseThrow(() -> new RuntimeException("Icon not found by name: " + iconName));
+            return new Image(inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
