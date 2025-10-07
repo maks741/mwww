@@ -3,11 +3,13 @@ package org.maks.mwww_daemon.service;
 import javafx.concurrent.Task;
 import javafx.scene.input.Clipboard;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class DownloadService {
 
-    public Task<Void> downloadSong() {
+    public Task<String> downloadSong() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
 
         if (!clipboard.hasString()) {
@@ -18,18 +20,26 @@ public class DownloadService {
         return downloadSongByUrl(urlFromClipboard);
     }
 
-    private Task<Void> downloadSongByUrl(String url) {
-        Task<Void> task = new Task<>() {
+    private Task<String> downloadSongByUrl(String url) {
+        Task<String> task = new Task<>() {
             @Override
-            protected Void call() throws Exception {
+            protected String call() throws Exception {
                 Process downloadScriptProcess = executeDownloadScript(url);
-                int exitStatus = downloadScriptProcess.waitFor();
+                String targetLogPrefix = "Downloaded song name: ";
 
-                if (exitStatus != 0) {
-                    throw new RuntimeException("Could not download by URL: " + url);
+                try (InputStreamReader inputStreamReader = new InputStreamReader(downloadScriptProcess.getInputStream());
+                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        if (!line.startsWith(targetLogPrefix)) {
+                            continue;
+                        }
+
+                        return line.split(targetLogPrefix)[1];
+                    }
                 }
 
-                return null;
+                throw new RuntimeException("Could not download song by url: " + url);
             }
         };
 

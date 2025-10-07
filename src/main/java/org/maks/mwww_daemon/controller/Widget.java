@@ -133,17 +133,13 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         addIcon.setImage(loadingGif);
 
         DownloadService downloadService = new DownloadService();
-        Task<Void> task = downloadService.downloadSong();
-        task.setOnSucceeded(_ ->
-                Platform.runLater(() ->
-                        addIcon.setImage(initialImage)
-                )
-        );
-        task.setOnFailed(_ ->
-                Platform.runLater(() ->
-                        addIcon.setImage(initialImage)
-                )
-        );
+        Task<String> task = downloadService.downloadSong();
+        task.setOnSucceeded(_ -> {
+            String downloadedSongName = task.getValue();
+            switchSong(downloadedSongName);
+            addIcon.setImage(initialImage);
+        });
+        task.setOnFailed(_ -> addIcon.setImage(initialImage));
     }
 
     private void deleteSong() {
