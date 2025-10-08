@@ -128,9 +128,8 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     }
 
     private void addSong() {
-        var iconUtils = new IconUtils();
         Image initialImage = addIcon.getImage();
-        Image loadingGif = iconUtils.image(Icon.LOADING);
+        Image loadingGif = IconUtils.image(Icon.LOADING);
         addIcon.setImage(loadingGif);
 
         DownloadService downloadService = new DownloadService();
