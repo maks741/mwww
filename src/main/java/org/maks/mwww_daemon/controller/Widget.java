@@ -1,7 +1,6 @@
 package org.maks.mwww_daemon.controller;
 
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -26,6 +25,7 @@ import org.maks.mwww_daemon.utils.PlaylistUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -133,13 +133,14 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         addIcon.setImage(loadingGif);
 
         DownloadService downloadService = new DownloadService();
-        Task<String> task = downloadService.downloadSong();
-        task.setOnSucceeded(_ -> {
-            String downloadedSongName = task.getValue();
-            switchSong(downloadedSongName);
+        CompletableFuture<String> task = downloadService.downloadSong();
+        task.whenComplete((downloadedSongName, ex) -> {
+            if (ex == null) {
+                Platform.runLater(() -> switchSong(downloadedSongName));
+            }
+
             addIcon.setImage(initialImage);
         });
-        task.setOnFailed(_ -> addIcon.setImage(initialImage));
     }
 
     private void deleteSong() {

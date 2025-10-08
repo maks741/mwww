@@ -1,15 +1,23 @@
 package org.maks.mwww_daemon.service;
 
-import javafx.concurrent.Task;
 import javafx.scene.input.Clipboard;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DownloadService {
 
-    public Task<String> downloadSong() {
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
+    }
+
+    public CompletableFuture<String> downloadSong() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
 
         if (!clipboard.hasString()) {
@@ -20,32 +28,25 @@ public class DownloadService {
         return downloadSongByUrl(urlFromClipboard);
     }
 
-    private Task<String> downloadSongByUrl(String url) {
-        Task<String> task = new Task<>() {
-            @Override
-            protected String call() throws Exception {
-                Process downloadScriptProcess = executeDownloadScript(url);
-                String targetLogPrefix = "Downloaded song name: ";
+    private CompletableFuture<String> downloadSongByUrl(String url) {
+        return CompletableFuture.supplyAsync(() -> {
+            Process downloadScriptProcess = executeDownloadScript(url);
+            String targetLogPrefix = "Downloaded song name: ";
 
-                try (InputStreamReader inputStreamReader = new InputStreamReader(downloadScriptProcess.getInputStream());
-                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        if (!line.startsWith(targetLogPrefix)) {
-                            continue;
-                        }
-
-                        return line.split(targetLogPrefix)[1];
+            try (InputStreamReader inputStreamReader = new InputStreamReader(downloadScriptProcess.getInputStream());
+                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    if (line.startsWith(targetLogPrefix)) {
+                        return line.substring(targetLogPrefix.length());
                     }
                 }
-
-                throw new RuntimeException("Could not download song by url: " + url);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        };
 
-        new Thread(task).start();
-
-        return task;
+            throw new RuntimeException("Could not download song by url: " + url);
+        }, executorService);
     }
 
     private Process executeDownloadScript(String url) {
