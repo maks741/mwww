@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import org.maks.mwww_daemon.components.RepeatSongToggle?>
+<?import org.maks.mwww_daemon.components.DynamicLabel?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body"
@@ -13,7 +13,7 @@
         <VBox styleClass="song-avatar">
             <ImageView fx:id="statusBarIcon" fitWidth="30" fitHeight="30" />
         </VBox>
-        <Label fx:id="songName" styleClass="song-name" />
+        <DynamicLabel fx:id="dynamicSongName" styleClass="dynamic-label" />
         <Pane HBox.hgrow="ALWAYS" />
         <HBox styleClass="toolbar">
             <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">

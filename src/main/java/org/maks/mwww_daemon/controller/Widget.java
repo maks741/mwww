@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.maks.mwww_daemon.components.DynamicLabel;
 import org.maks.mwww_daemon.components.RepeatSongToggle;
 import org.maks.mwww_daemon.enumeration.FifoCommand;
 import org.maks.mwww_daemon.enumeration.Icon;
@@ -38,7 +39,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private ImageView statusBarIcon;
 
     @FXML
-    private Label songName;
+    private DynamicLabel dynamicSongName;
 
     @FXML
     private RepeatSongToggle repeatSongToggle;
@@ -56,6 +57,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadFirstSong();
         addKeybindings();
+        dynamicSongName.setOnSearchSong(this::switchSong);
     }
 
     @Override
@@ -81,7 +83,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
 
     private void updateSongInfo(SongInfo songInfo) {
         statusBarIcon.setImage(songInfo.songThumbnail());
-        songName.setText(songInfo.songName());
+        dynamicSongName.setText(songInfo.songName());
         currentSongIndex = songInfo.songIndex();
     }
 
@@ -92,6 +94,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         KeyCombination skipBackward = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_DOWN);
         KeyCombination toggleRepeat = new KeyCodeCombination(KeyCode.R);
         KeyCombination togglePause = new KeyCodeCombination(KeyCode.P);
+        KeyCombination find = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
         KeyCombination newSong = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
         KeyCombination deleteSong = new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
         KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN, KeyCombination.CONTROL_DOWN);
@@ -110,6 +113,8 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                     repeatSongToggle.toggleOnRepeat();
                 } else if (togglePause.match(keyEvent)) {
                     togglePause();
+                } else if (find.match(keyEvent)) {
+                    dynamicSongName.switchToTextField();
                 } else if (newSong.match(keyEvent)) {
                     addSong();
                 } else if (deleteSong.match(keyEvent)) {
