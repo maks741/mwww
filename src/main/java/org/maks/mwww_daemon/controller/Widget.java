@@ -18,6 +18,7 @@ import org.maks.mwww_daemon.enumeration.FifoCommand;
 import org.maks.mwww_daemon.enumeration.Icon;
 import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
+import org.maks.mwww_daemon.model.NotFoundSongInfo;
 import org.maks.mwww_daemon.model.SongInfo;
 import org.maks.mwww_daemon.service.DownloadService;
 import org.maks.mwww_daemon.utils.IconUtils;
@@ -160,7 +161,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
 
     private SongInfo lookupSong(String songName) {
         PlaylistUtils playlistUtils = new PlaylistUtils();
-        return playlistUtils.songInfo(songName, currentSongIndex);
+        return playlistUtils.songInfo(songName);
     }
 
     private void togglePause() {
@@ -242,7 +243,13 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     }
 
     private void switchSong(String songName) {
-        switchSong(lookupSong(songName));
+        SongInfo songInfo = lookupSong(songName);
+
+        if (songInfo instanceof NotFoundSongInfo) {
+            return;
+        }
+
+        switchSong(songInfo);
     }
 
     private void switchSong(SongInfo songInfo) {

@@ -5,6 +5,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Pair;
 import org.maks.mwww_daemon.exception.SongDirectoryEmptyException;
+import org.maks.mwww_daemon.model.NotFoundSongInfo;
 import org.maks.mwww_daemon.model.SongInfo;
 
 import java.io.IOException;
@@ -39,23 +40,18 @@ public class PlaylistUtils {
         }
     }
 
-    public SongInfo songInfo(String targetSongName, int currentSongIndex) {
+    public SongInfo songInfo(String targetSongName) {
         AtomicInteger songIndexCounter = new AtomicInteger(0);
 
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            Path songDirPath = songDirs
+            return songDirs
                     .filter(path -> {
                         songIndexCounter.getAndIncrement();
                         return path.getFileName().toString().contains(targetSongName);
                     })
                     .findFirst()
-                    .orElse(null);
-
-            if (songDirPath == null) {
-                return songInfo(currentSongIndex);
-            }
-
-            return songInfo(songDirPath, songIndexCounter.decrementAndGet());
+                    .map(path -> songInfo(path, songIndexCounter.decrementAndGet()))
+                    .orElse(new NotFoundSongInfo());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
