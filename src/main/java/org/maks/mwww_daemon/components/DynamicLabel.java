@@ -37,6 +37,7 @@ public class DynamicLabel extends StackPane {
 
         if (songName.trim().isEmpty()) {
             switchToLabel();
+            return;
         }
 
         onSearchSong.accept(songName);
