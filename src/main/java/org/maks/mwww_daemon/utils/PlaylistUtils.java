@@ -19,7 +19,13 @@ import java.util.stream.Stream;
 public class PlaylistUtils {
 
     public SongInfo songInfo(int index) {
-        int normalizedIndex = normalizeIndex(index);
+        int normalizedIndex;
+
+        try {
+            normalizedIndex = normalizeIndex(index);
+        } catch (SongDirectoryEmptyException e) {
+            return new SongInfo("Use Ctrl + N to add a new song");
+        }
 
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             Path songDirPath = songDirs
@@ -56,7 +62,7 @@ public class PlaylistUtils {
     }
 
     public MediaPlayer player(int index) {
-        int normalizedIndex = normalizeIndex(index);
+        int normalizedIndex = safeNormalizeIndex(index);
 
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             Path songDirPath = songDirs
@@ -73,7 +79,7 @@ public class PlaylistUtils {
     }
 
     public void deleteSong(int index) {
-        int normalizedIndex = normalizeIndex(index);
+        int normalizedIndex = safeNormalizeIndex(index);
 
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             Path songDirPath = songDirs
@@ -116,7 +122,7 @@ public class PlaylistUtils {
         );
     }
 
-    private int normalizeIndex(int index) {
+    private int normalizeIndex(int index) throws SongDirectoryEmptyException {
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             int amountOfSongs = (int) songDirs.count();
 
@@ -132,6 +138,14 @@ public class PlaylistUtils {
 
             return normalizedIndex;
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int safeNormalizeIndex(int index) {
+        try {
+            return normalizeIndex(index);
+        } catch (SongDirectoryEmptyException e) {
             throw new RuntimeException(e);
         }
     }
