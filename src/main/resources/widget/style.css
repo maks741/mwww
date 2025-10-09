@@ -28,9 +28,8 @@
     -fx-cursor: hand;
 }
 
-
 .dynamic-label {
-    -fx-alignment: center;
+    -fx-alignment: center-left;
 }
 
 .dynamic-label Label {

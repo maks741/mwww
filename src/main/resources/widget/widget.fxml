@@ -13,7 +13,7 @@
         <VBox styleClass="song-avatar">
             <ImageView fx:id="statusBarIcon" fitWidth="30" fitHeight="30" />
         </VBox>
-        <DynamicLabel fx:id="dynamicSongName" styleClass="dynamic-label" />
+        <DynamicLabel fx:id="dynamicSongName" HBox.hgrow="ALWAYS" styleClass="dynamic-label" />
         <Pane HBox.hgrow="ALWAYS" />
         <HBox styleClass="toolbar">
             <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">

@@ -21,6 +21,7 @@ public class DynamicLabel extends StackPane {
                 case ENTER -> switchSong();
             }
         });
+        textField.minWidthProperty().bind(widthProperty());
     }
 
     public void switchToTextField() {
