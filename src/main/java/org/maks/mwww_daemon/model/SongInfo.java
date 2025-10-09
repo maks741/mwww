@@ -8,4 +8,7 @@ public record SongInfo(
         Image songThumbnail,
         int songIndex
 ) {
+    public SongInfo(String message, int currentSongIndex) {
+        this(message, "unknown", null, currentSongIndex);
+    }
 }

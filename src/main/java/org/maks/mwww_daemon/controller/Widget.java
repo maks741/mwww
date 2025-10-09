@@ -3,7 +3,6 @@ package org.maks.mwww_daemon.controller;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -161,7 +160,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
 
     private SongInfo lookupSong(String songName) {
         PlaylistUtils playlistUtils = new PlaylistUtils();
-        return playlistUtils.songInfo(songName);
+        return playlistUtils.songInfo(songName, currentSongIndex);
     }
 
     private void togglePause() {

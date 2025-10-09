@@ -33,7 +33,7 @@ public class PlaylistUtils {
         }
     }
 
-    public SongInfo songInfo(String targetSongName) {
+    public SongInfo songInfo(String targetSongName, int currentSongIndex) {
         AtomicInteger songIndexCounter = new AtomicInteger(0);
 
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
@@ -43,7 +43,11 @@ public class PlaylistUtils {
                         return path.getFileName().toString().contains(targetSongName);
                     })
                     .findFirst()
-                    .orElseThrow();
+                    .orElse(null);
+
+            if (songDirPath == null) {
+                return songInfo(currentSongIndex);
+            }
 
             return songInfo(songDirPath, songIndexCounter.decrementAndGet());
         } catch (IOException e) {
