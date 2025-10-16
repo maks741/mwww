@@ -71,7 +71,13 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 stageOp(Stage::show);
                 Platform.setImplicitExit(true);
             }
-            case SET_SONG -> switchSong(command.getValue());
+            case SET_SONG -> {
+                if (isSongPlaying) {
+                    return;
+                }
+
+                switchSong(command.getValue());
+            }
             case SET_SKIP_DURATION -> skipDuration = Duration.seconds(command.getValueAsInt());
         }
     }
