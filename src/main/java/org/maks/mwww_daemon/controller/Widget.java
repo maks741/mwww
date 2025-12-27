@@ -50,6 +50,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private int currentSongIndex = 0;
     private MediaPlayer currentPlayer = null;
     private boolean isSongPlaying = false;
+    private boolean onRepeat = false;
 
     private Duration skipDuration = Duration.seconds(10);
 
@@ -117,6 +118,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                     skipBackward();
                 } else if (toggleRepeat.match(keyEvent)) {
                     repeatSongToggle.toggleOnRepeat();
+                    this.toggleOnRepeat();
                 } else if (togglePause.match(keyEvent)) {
                     togglePause();
                 } else if (find.match(keyEvent)) {
@@ -207,7 +209,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private void skipToNextSong() {
         dispose();
 
-        if (!repeatSongToggle.onRepeat()) {
+        if (!onRepeat) {
             next();
         }
 
@@ -242,6 +244,10 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         Duration currentDuration = currentPlayer.getCurrentTime();
         Duration newDuration = operation.apply(currentDuration, skipDuration);
         currentPlayer.seek(newDuration);
+    }
+
+    private void toggleOnRepeat() {
+        onRepeat = !onRepeat;
     }
 
     private void switchSong(int songIndex) {

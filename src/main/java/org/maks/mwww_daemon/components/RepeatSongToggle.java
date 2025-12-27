@@ -17,8 +17,4 @@ public class RepeatSongToggle extends ImageView {
             setImage(IconUtils.image(Icon.REPEAT_SINGLE));
         }
     }
-
-    public boolean onRepeat() {
-        return onRepeat;
-    }
 }
