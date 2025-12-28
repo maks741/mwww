@@ -3,9 +3,11 @@ package org.maks.mwww_daemon.service.spotify;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.maks.mwww_daemon.enumeration.Icon;
 import org.maks.mwww_daemon.model.BaseSongInfo;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.service.PlayerService;
+import org.maks.mwww_daemon.utils.IconUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,8 +27,8 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
 
     @Override
     public void initialize() {
+        updateSongInfo(new BaseSongInfo(IconUtils.image(Icon.SPOTIFY), "Press Alt to start playing"));
         new PlayerctlMetadataService(this::onPlayerctlMetadataUpdated);
-        // currentSongUri = likedSongUris.getFirst();
     }
 
     @Override
