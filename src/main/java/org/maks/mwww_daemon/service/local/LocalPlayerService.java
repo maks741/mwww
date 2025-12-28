@@ -25,7 +25,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     @Override
-    public void loadFirstSong() {
+    public void initialize() {
         LocalSongInfo song = lookupSong(currentSongIndex);
         updateSongInfo(song);
     }
@@ -109,7 +109,6 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     public void addSong(ImageView addIcon) {
-        // TODO: in spotify impl, you can use addIcon to turn it into a heart for some time and then back to plus
         Image initialImage = addIcon.getImage();
         Image loadingGif = IconUtils.image(Icon.LOADING);
         addIcon.setImage(loadingGif);
@@ -131,10 +130,29 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         playlistUtils.deleteSong(currentSongIndex);
         reloadCurrent();
     }
+
+    @Override
+    public void onSetSongCommand(String commandValue) {
+        if (isPlaying()) {
+            return;
+        }
+
+        switchSong(commandValue);
+    }
     
     @Override
     public boolean isPlaying() {
         return isSongPlaying;
+    }
+
+    private void nextOrRepeat() {
+        onPreSongChanged();
+
+        if (onRepeat) {
+            play();
+        }
+
+        next();
     }
 
     private LocalSongInfo lookupSong(int songIndex) {

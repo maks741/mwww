@@ -12,7 +12,7 @@ public abstract class PlayerService<T extends BaseSongInfo> {
     private final Consumer<T> songUpdatedConsumer;
 
     protected Duration skipDuration = Duration.seconds(10);
-    private boolean onRepeat = false;
+    protected boolean onRepeat = false;
 
     public PlayerService(Consumer<T> songUpdatedConsumer) {
         this.songUpdatedConsumer = songUpdatedConsumer;
@@ -38,16 +38,6 @@ public abstract class PlayerService<T extends BaseSongInfo> {
         updateSongInfo(songInfo);
     }
 
-    protected void nextOrRepeat() {
-        onPreSongChanged();
-
-        if (onRepeat) {
-            play();
-        }
-
-        next();
-    }
-
     public void toggleOnRepeat() {
         onRepeat = !onRepeat;
     }
@@ -56,7 +46,7 @@ public abstract class PlayerService<T extends BaseSongInfo> {
         this.skipDuration = Duration.seconds(skipDuration);
     }
 
-    public abstract void loadFirstSong();
+    public abstract void initialize();
 
     protected abstract void onSongUpdated(T songInfo);
 
@@ -80,6 +70,10 @@ public abstract class PlayerService<T extends BaseSongInfo> {
 
     public abstract void deleteSong();
 
+    public abstract void onSetSongCommand(String commandValue);
+
     public abstract boolean isPlaying();
+
+    public void shutdown() {}
 
 }

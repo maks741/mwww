@@ -15,8 +15,8 @@ import org.maks.mwww_daemon.enumeration.FifoCommand;
 import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
 import org.maks.mwww_daemon.model.BaseSongInfo;
-import org.maks.mwww_daemon.service.local.LocalPlayerService;
 import org.maks.mwww_daemon.service.PlayerService;
+import org.maks.mwww_daemon.service.spotify.SpotifyPlayerService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -39,13 +39,15 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @FXML
     private ImageView addIcon;
 
-    private final PlayerService<?> playerService = new LocalPlayerService(this::onSongUpdated);
+    private final PlayerService<?> playerService = new SpotifyPlayerService(this::onSongUpdated);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        playerService.loadFirstSong();
+        playerService.initialize();
         dynamicSongName.setOnSearchSong(this.playerService::switchSong);
         addKeybindings();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(playerService::shutdown));
     }
 
     @Override
@@ -59,13 +61,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 stageOp(Stage::show);
                 Platform.setImplicitExit(true);
             }
-            case SET_SONG -> {
-                if (playerService.isPlaying()) {
-                    return;
-                }
-
-                playerService.switchSong(command.getValue());
-            }
+            case SET_SONG -> playerService.onSetSongCommand(command.getValue());
             case SET_SKIP_DURATION -> playerService.setSkipDuration(command.getValueAsInt());
         }
     }
