@@ -2,20 +2,20 @@ package org.maks.mwww_daemon.model;
 
 import javafx.scene.image.Image;
 
-public class SongInfo {
+public class LocalSongInfo extends BaseSongInfo {
     private final String songName;
     private final String songAuthor;
-    private final Image songThumbnail;
     private final int songIndex;
 
-    public SongInfo(String songName, String songAuthor, Image songThumbnail, int songIndex) {
+    public LocalSongInfo(String songName, String songAuthor, Image thumbnail, int songIndex) {
+        super(thumbnail, songName);
+
         this.songName = songName;
         this.songIndex = songIndex;
-        this.songThumbnail = songThumbnail;
         this.songAuthor = songAuthor;
     }
 
-    public SongInfo(String message) {
+    public LocalSongInfo(String message) {
         this(message, "unknown", null, -1);
     }
 
@@ -25,10 +25,6 @@ public class SongInfo {
 
     public String songAuthor() {
         return songAuthor;
-    }
-
-    public Image songThumbnail() {
-        return songThumbnail;
     }
 
     public int songIndex() {

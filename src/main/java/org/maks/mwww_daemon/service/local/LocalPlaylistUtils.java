@@ -1,4 +1,4 @@
-package org.maks.mwww_daemon.utils;
+package org.maks.mwww_daemon.service.local;
 
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
@@ -6,7 +6,8 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Pair;
 import org.maks.mwww_daemon.exception.SongDirectoryEmptyException;
 import org.maks.mwww_daemon.model.NotFoundSongInfo;
-import org.maks.mwww_daemon.model.SongInfo;
+import org.maks.mwww_daemon.model.LocalSongInfo;
+import org.maks.mwww_daemon.utils.ResourceUtils;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -17,15 +18,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-public class PlaylistUtils {
+public class LocalPlaylistUtils {
 
-    public SongInfo songInfo(int index) {
+    public LocalSongInfo songInfo(int index) {
         int normalizedIndex;
 
         try {
             normalizedIndex = normalizeIndex(index);
         } catch (SongDirectoryEmptyException e) {
-            return new SongInfo("Use Ctrl + N to add a new song");
+            return new LocalSongInfo("Use Ctrl + N to add a new song");
         }
 
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
@@ -40,7 +41,7 @@ public class PlaylistUtils {
         }
     }
 
-    public SongInfo songInfo(String targetSongName) {
+    public LocalSongInfo songInfo(String targetSongName) {
         AtomicInteger songIndexCounter = new AtomicInteger(0);
 
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
@@ -101,7 +102,7 @@ public class PlaylistUtils {
         }
     }
 
-    private SongInfo songInfo(Path songDirPath, int songIndex) {
+    private LocalSongInfo songInfo(Path songDirPath, int songIndex) {
         Path songThumbnailPath = songDirPath.resolve("img.png");
 
         Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songDirPath);
@@ -110,7 +111,7 @@ public class PlaylistUtils {
 
         Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
 
-        return new SongInfo(
+        return new LocalSongInfo(
                 songName,
                 songAuthor,
                 songThumbnail,

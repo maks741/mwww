@@ -14,7 +14,8 @@ import org.maks.mwww_daemon.components.RepeatSongToggle;
 import org.maks.mwww_daemon.enumeration.FifoCommand;
 import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
-import org.maks.mwww_daemon.service.LocalPlayerService;
+import org.maks.mwww_daemon.model.BaseSongInfo;
+import org.maks.mwww_daemon.service.local.LocalPlayerService;
 import org.maks.mwww_daemon.service.PlayerService;
 
 import java.net.URL;
@@ -38,15 +39,10 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @FXML
     private ImageView addIcon;
 
-    private final PlayerService playerService = new LocalPlayerService();
+    private final PlayerService<?> playerService = new LocalPlayerService(this::onSongUpdated);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        playerService.setOnSongUpdated(songInfo -> {
-            statusBarIcon.setImage(songInfo.thumbnail());
-            dynamicSongName.setText(songInfo.title());
-        });
-
         playerService.loadFirstSong();
         dynamicSongName.setOnSearchSong(this.playerService::switchSong);
         addKeybindings();
@@ -118,6 +114,11 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 }
             });
         });
+    }
+
+    private void onSongUpdated(BaseSongInfo songInfo) {
+        statusBarIcon.setImage(songInfo.thumbnail());
+        dynamicSongName.setText(songInfo.title());
     }
 
     private void stageOp(Consumer<Stage> op) {

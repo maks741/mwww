@@ -1,38 +1,85 @@
 package org.maks.mwww_daemon.service;
 
 import javafx.scene.image.ImageView;
-import org.maks.mwww_daemon.model.TempSongInfo;
+import javafx.util.Duration;
+import org.maks.mwww_daemon.model.BaseSongInfo;
+import org.maks.mwww_daemon.model.NotFoundSongInfo;
 
 import java.util.function.Consumer;
 
-public interface PlayerService {
+public abstract class PlayerService<T extends BaseSongInfo> {
 
-    void loadFirstSong();
+    private final Consumer<T> songUpdatedConsumer;
 
-    void play();
+    protected Duration skipDuration = Duration.seconds(10);
+    private boolean onRepeat = false;
 
-    void switchSong(String songIdentifier);
+    public PlayerService(Consumer<T> songUpdatedConsumer) {
+        this.songUpdatedConsumer = songUpdatedConsumer;
+    }
 
-    void next();
+    protected void updateSongInfo(T songInfo) {
+        songUpdatedConsumer.accept(songInfo);
+        onSongUpdated(songInfo);
+    }
 
-    void previous();
+    public void switchSong(String songName) {
+        T songInfo = lookupSong(songName);
 
-    void skipForward();
+        if (songInfo instanceof NotFoundSongInfo) {
+            return;
+        }
 
-    void skipBackward();
+        switchSong(songInfo);
+    }
 
-    void toggleOnRepeat();
+    protected void switchSong(T songInfo) {
+        onPreSongChanged();
+        updateSongInfo(songInfo);
+    }
 
-    void togglePause();
+    protected void nextOrRepeat() {
+        onPreSongChanged();
 
-    void addSong(ImageView addIcon);
+        if (onRepeat) {
+            play();
+        }
 
-    void deleteSong();
+        next();
+    }
 
-    void setOnSongUpdated(Consumer<TempSongInfo> consumer);
+    public void toggleOnRepeat() {
+        onRepeat = !onRepeat;
+    }
 
-    boolean isPlaying();
+    public void setSkipDuration(int skipDuration) {
+        this.skipDuration = Duration.seconds(skipDuration);
+    }
 
-    void setSkipDuration(int skipDuration);
+    public abstract void loadFirstSong();
+
+    protected abstract void onSongUpdated(T songInfo);
+
+    protected abstract void onPreSongChanged();
+
+    public abstract void play();
+
+    public abstract void next();
+
+    public abstract void previous();
+
+    public abstract void skipForward();
+
+    public abstract void skipBackward();
+
+    public abstract void togglePause();
+
+    protected abstract T lookupSong(String songId);
+
+    public abstract void addSong(ImageView addIcon);
+
+    public abstract void deleteSong();
+
+    public abstract boolean isPlaying();
 
 }
