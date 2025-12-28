@@ -17,6 +17,7 @@ public class PlayerctlMetadataService {
     private final Consumer<PlayerctlMetadata> metadataConsumer;
 
     private static final Pattern METADATA_LINE = Pattern.compile("^spotifyd\\s+(\\S+)\\s+(.*)$");
+    private static final Pattern TRACK_ID_LINE = Pattern.compile("^'/(\\w+)/(\\w+)/(\\w+)'$");
 
     public PlayerctlMetadataService(Consumer<PlayerctlMetadata> metadataConsumer) {
         this.metadataConsumer = metadataConsumer;
@@ -68,7 +69,7 @@ public class PlayerctlMetadataService {
             String value = matcher.group(2);
 
             switch (key) {
-                case "mpris:trackid" -> trackId = stripQuotes(value);
+                case "mpris:trackid" -> trackId = processTrackId(value);
                 case "xesam:title" -> title = value;
                 case "mpris:artUrl" -> artUrl = value;
                 case "xesam:album" -> album = value;
@@ -95,10 +96,13 @@ public class PlayerctlMetadataService {
         );
     }
 
-    private static String stripQuotes(String value) {
-        if (value.length() >= 2 && value.startsWith("'") && value.endsWith("'")) {
-            return value.substring(1, value.length() - 1);
+    private static String processTrackId(String trackId) {
+        Matcher matcher = TRACK_ID_LINE.matcher(trackId);
+        if (!matcher.matches()) {
+            throw new RuntimeException("Unexpected trackid value: " + trackId);
         }
-        return value;
+
+        String separator = ":";
+        return matcher.group(1) + separator + matcher.group(2) + separator + matcher.group(3);
     }
 }

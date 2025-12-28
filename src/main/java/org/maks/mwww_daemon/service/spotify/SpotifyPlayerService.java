@@ -7,6 +7,9 @@ import org.maks.mwww_daemon.model.BaseSongInfo;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.service.PlayerService;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -115,7 +118,31 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
     }
 
     private void onPlayerctlMetadataUpdated(PlayerctlMetadata playerctlMetadata) {
-        Image thumbnail = new Image(playerctlMetadata.artUrl());
+        String outputDir = "/home/maks/.cache/mwww/" + playerctlMetadata.trackId();
+        String outputPathStr = outputDir + "/img.png";
+        Path outputPath = Paths.get(outputPathStr);
+
+        if (!Files.exists(outputPath)) {
+            cmdService.runCmdCommand("mkdir", "-p", outputDir);
+            cmdService.runCmdCommand(
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    playerctlMetadata.artUrl(),
+                    "-vf",
+                    "crop=min(iw\\,ih):min(iw\\,ih),scale=400:400:flags=lanczos,format=rgba,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-200)^2+(Y-200)^2\\,200*200)\\,255\\,0)',scale=30:30:flags=lanczos",
+                    "-update",
+                    "true",
+                    outputPathStr
+            );
+        }
+
+        if (!Files.exists(outputPath)) {
+            throw new RuntimeException("Error transforming thumbnail for " + playerctlMetadata.trackId() + ". Expected to find output file at path: " + outputPath);
+        }
+
+        Image thumbnail = new Image(outputPath.toUri().toString());
+
         String title = String.join(", ", playerctlMetadata.artists()) + " - " + playerctlMetadata.title();
         var songInfo = new BaseSongInfo(thumbnail, title);
         Platform.runLater(() -> updateSongInfo(songInfo));
