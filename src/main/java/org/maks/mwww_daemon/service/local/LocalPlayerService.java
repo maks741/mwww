@@ -136,15 +136,6 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         playlistUtils.deleteSong(currentSongIndex);
         reloadCurrent();
     }
-
-    @Override
-    public void onSetSongCommand(String commandValue) {
-        if (isPlaying()) {
-            return;
-        }
-
-        switchSong(commandValue);
-    }
     
     @Override
     public boolean isPlaying() {

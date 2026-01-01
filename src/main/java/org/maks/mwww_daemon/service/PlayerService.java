@@ -56,6 +56,14 @@ public abstract class PlayerService<T extends BaseSongInfo> {
         onRepeat = !onRepeat;
     }
 
+    public void onSetSongCommand(String commandValue) {
+        if (isPlaying()) {
+            return;
+        }
+
+        switchSong(commandValue);
+    }
+
     public void setSkipDuration(int skipDuration) {
         this.skipDuration = Duration.seconds(skipDuration);
     }
@@ -85,8 +93,6 @@ public abstract class PlayerService<T extends BaseSongInfo> {
     public abstract void addSong(ImageView addIcon);
 
     public abstract void deleteSong();
-
-    public abstract void onSetSongCommand(String commandValue);
 
     public abstract boolean isPlaying();
 

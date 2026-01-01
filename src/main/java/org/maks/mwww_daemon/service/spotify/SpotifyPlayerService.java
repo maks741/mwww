@@ -5,8 +5,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.maks.mwww_daemon.enumeration.Icon;
 import org.maks.mwww_daemon.exception.CmdServiceException;
-import org.maks.mwww_daemon.model.BaseSongInfo;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
+import org.maks.mwww_daemon.model.SpotifySongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
 import org.maks.mwww_daemon.utils.IconUtils;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
+public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private static final Logger LOG = Logger.getLogger(SpotifyPlayerService.class.getName());
 
@@ -27,7 +27,7 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
     private static final double INITIAL_VOLUME = 0.7;
     private boolean playlistLoaded = false;
 
-    public SpotifyPlayerService(Consumer<BaseSongInfo> songInfoConsumer) {
+    public SpotifyPlayerService(Consumer<SpotifySongInfo> songInfoConsumer) {
         super(songInfoConsumer, INITIAL_VOLUME);
     }
 
@@ -36,15 +36,23 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
         this.playlistLoaded = isPlaylistLoaded();
 
         if (!playlistLoaded) {
-            updateSongInfo(new BaseSongInfo(IconUtils.image(Icon.SPOTIFY), "Release Ctrl to start playing"));
+            updateSongInfo(new SpotifySongInfo(IconUtils.image(Icon.SPOTIFY), "Release Ctrl to start playing"));
         }
 
         new PlayerctlMetadataService(this::onPlayerctlMetadataUpdated);
     }
 
     @Override
-    protected void onSongUpdated(BaseSongInfo songInfo) {
-        // TODO
+    protected void onSongUpdated(SpotifySongInfo songInfo) {
+        cmdService.runCmdCommand(
+                "spotatui",
+                "play",
+                "--uri",
+                songInfo.uri(),
+                "--device",
+                "ArchLinux",
+                "--queue"
+        );
     }
 
     @Override
@@ -102,7 +110,8 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
     }
 
     @Override
-    protected BaseSongInfo lookupSong(String songId) {
+    protected SpotifySongInfo lookupSong(String songId) {
+        // TODO
         return null;
     }
 
@@ -114,11 +123,6 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
     @Override
     public void deleteSong() {
         LOG.warning("Not implemented until 'spotatui playback --dislike' starts working");
-    }
-
-    @Override
-    public void onSetSongCommand(String commandValue) {
-        // TODO
     }
 
     @Override
@@ -162,7 +166,7 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
         Image thumbnail = new Image(outputPath.toUri().toString());
 
         String title = String.join(", ", playerctlMetadata.artists()) + " - " + playerctlMetadata.title();
-        var songInfo = new BaseSongInfo(thumbnail, title);
+        var songInfo = new SpotifySongInfo(thumbnail, title, playerctlMetadata.trackId());
         Platform.runLater(() -> updateSongInfo(songInfo));
     }
 
