@@ -16,8 +16,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
+
+    private static final Logger LOG = Logger.getLogger(SpotifyPlayerService.class.getName());
 
     private final CmdService cmdService = new CmdService();
 
@@ -41,12 +44,12 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
 
     @Override
     protected void onSongUpdated(BaseSongInfo songInfo) {
-
+        // TODO
     }
 
     @Override
     protected void onPreSongChanged() {
-
+        // TODO
     }
 
     @Override
@@ -105,14 +108,12 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
 
     @Override
     public void addSong(ImageView addIcon) {
-        // TODO: You can use addIcon to turn it into a heart for some time and then back to plus
-        cmdService.runCmdCommand("spotatui", "playback", "--like");
+        LOG.warning("Not implemented until 'spotatui playback --like' starts working");
     }
 
     @Override
     public void deleteSong() {
-        // TODO: You can use addIcon to turn it into a heart for some time and then back to plus
-        cmdService.runCmdCommand("spotatui", "playback", "--dislike");
+        LOG.warning("Not implemented until 'spotatui playback --dislike' starts working");
     }
 
     @Override
