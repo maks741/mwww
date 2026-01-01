@@ -167,7 +167,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
         String title = String.join(", ", playerctlMetadata.artists()) + " - " + playerctlMetadata.title();
         var songInfo = new SpotifySongInfo(thumbnail, title, playerctlMetadata.trackId());
-        Platform.runLater(() -> updateSongInfo(songInfo));
+        Platform.runLater(() -> updateConsumers(songInfo));
     }
 
     private void skip(String sign) {
