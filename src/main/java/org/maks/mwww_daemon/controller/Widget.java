@@ -69,6 +69,8 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private void addKeybindings() {
         KeyCombination next = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
         KeyCombination previous = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+        KeyCombination volumeUp = new KeyCodeCombination(KeyCode.F3);
+        KeyCombination volumeDown = new KeyCodeCombination(KeyCode.F2);
         KeyCombination skipForward = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_DOWN);
         KeyCombination skipBackward = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_DOWN);
         KeyCombination toggleRepeat = new KeyCodeCombination(KeyCode.R);
@@ -84,6 +86,10 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                     playerService.next();
                 } else if (previous.match(keyEvent)) {
                     playerService.previous();
+                } else if (volumeUp.match(keyEvent)) {
+                    playerService.volumeUp();
+                } else if (volumeDown.match(keyEvent)) {
+                    playerService.volumeDown();
                 } else if (skipForward.match(keyEvent)) {
                     playerService.skipForward();
                 } else if (skipBackward.match(keyEvent)) {

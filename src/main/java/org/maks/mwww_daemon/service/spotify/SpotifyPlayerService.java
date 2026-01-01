@@ -19,10 +19,11 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
 
     private final CmdService cmdService = new CmdService();
 
+    private static final double INITIAL_VOLUME = 0.8;
     private boolean playlistLoaded = false;
 
     public SpotifyPlayerService(Consumer<BaseSongInfo> songInfoConsumer) {
-        super(songInfoConsumer);
+        super(songInfoConsumer, INITIAL_VOLUME);
     }
 
     @Override
@@ -53,6 +54,7 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
                     "--device",
                     "ArchLinux"
             );
+            setVolume(INITIAL_VOLUME);
             playlistLoaded = true;
         } else {
             cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
@@ -67,6 +69,11 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
     @Override
     public void previous() {
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "previous");
+    }
+
+    @Override
+    public void setVolume(double volume) {
+        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "volume", String.valueOf(volume));
     }
 
     @Override

@@ -14,8 +14,12 @@ public abstract class PlayerService<T extends BaseSongInfo> {
     protected Duration skipDuration = Duration.seconds(10);
     protected boolean onRepeat = false;
 
-    public PlayerService(Consumer<T> songUpdatedConsumer) {
+    private static final double VOLUME_DELTA = 0.05;
+    protected double volume;
+
+    public PlayerService(Consumer<T> songUpdatedConsumer, double initialVolume) {
         this.songUpdatedConsumer = songUpdatedConsumer;
+        this.volume = initialVolume;
     }
 
     protected void updateSongInfo(T songInfo) {
@@ -38,6 +42,16 @@ public abstract class PlayerService<T extends BaseSongInfo> {
         updateSongInfo(songInfo);
     }
 
+    public void volumeUp() {
+        volume += VOLUME_DELTA;
+        setVolume(volume);
+    }
+
+    public void volumeDown() {
+        volume -= VOLUME_DELTA;
+        setVolume(volume);
+    }
+
     public void toggleOnRepeat() {
         onRepeat = !onRepeat;
     }
@@ -57,6 +71,8 @@ public abstract class PlayerService<T extends BaseSongInfo> {
     public abstract void next();
 
     public abstract void previous();
+
+    public abstract void setVolume(double volume);
 
     public abstract void skipForward();
 

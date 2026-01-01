@@ -19,9 +19,10 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     private int currentSongIndex = 0;
     private MediaPlayer currentPlayer = null;
     private boolean isSongPlaying = false;
+    private static final double INITIAL_VOLUME = 0.05;
 
     public LocalPlayerService(Consumer<LocalSongInfo> songInfoConsumer) {
-        super(songInfoConsumer);
+        super(songInfoConsumer, INITIAL_VOLUME);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
             // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
             currentPlayer.seek(Duration.ZERO);
 
-            currentPlayer.setVolume(0.05);
+            currentPlayer.setVolume(volume);
             currentPlayer.setOnEndOfMedia(this::nextOrRepeat);
 
             currentPlayer.play();
@@ -74,6 +75,11 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     @Override
     public void previous() {
         switchSong(--currentSongIndex);
+    }
+
+    @Override
+    public void setVolume(double volume) {
+        currentPlayer.setVolume(volume);
     }
 
     @Override
