@@ -47,6 +47,15 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     @Override
+    public void onSetSongCommand(String commandValue) {
+        if (isPlaying()) {
+            return;
+        }
+
+        switchSong(commandValue);
+    }
+
+    @Override
     public void play() {
         if (currentPlayer != null) {
             return;

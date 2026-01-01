@@ -13,40 +13,21 @@ import java.util.regex.Pattern;
 
 public class PlayerctlMetadataService {
 
-    private final CmdService cmdService = new CmdService();
-    private final Consumer<PlayerctlMetadata> metadataConsumer;
+    private static final CmdService cmdService = new CmdService();
+    private static final List<Consumer<PlayerctlMetadata>> metadataConsumers = new ArrayList<>();
 
     private static final Pattern METADATA_LINE = Pattern.compile("^spotifyd\\s+(\\S+)\\s+(.*)$");
     private static final Pattern TRACK_ID_LINE = Pattern.compile("^'/(\\w+)/(\\w+)/(\\w+)'$");
 
-    public PlayerctlMetadataService(Consumer<PlayerctlMetadata> metadataConsumer) {
-        this.metadataConsumer = metadataConsumer;
-        new Thread(this::listenToMetadataUpdates).start();
+    public static void listen() {
+        new Thread(PlayerctlMetadataService::listenToMetadataUpdates).start();
     }
 
-    private void listenToMetadataUpdates() {
-        var processBuilder = new ProcessBuilder("playerctl", "-p", "spotifyd", "metadata", "mpris:trackid", "--follow");
-
-        try {
-            Process process = processBuilder.start();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (line.equals("'/org/mpris/MediaPlayer2/TrackList/NoTrack'")) {
-                        continue;
-                    }
-
-                    // whenever trackid is updated, read full metadata and call accept
-                    metadataConsumer.accept(readFullMetadata());
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static void addConsumer(Consumer<PlayerctlMetadata> consumer) {
+        metadataConsumers.add(consumer);
     }
 
-    private PlayerctlMetadata readFullMetadata() {
+    public static PlayerctlMetadata readFullMetadata() {
         List<String> metadataLines = cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "metadata");
 
         String trackId = null;
@@ -94,6 +75,29 @@ public class PlayerctlMetadataService {
                 List.copyOf(albumArtists),
                 length
         );
+    }
+
+    private static void listenToMetadataUpdates() {
+        var processBuilder = new ProcessBuilder("playerctl", "-p", "spotifyd", "metadata", "mpris:trackid", "--follow");
+
+        try {
+            Process process = processBuilder.start();
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.equals("'/org/mpris/MediaPlayer2/TrackList/NoTrack'")) {
+                        continue;
+                    }
+
+                    // whenever trackid is updated, read full metadata and call accept
+                    PlayerctlMetadata metadata = readFullMetadata();
+                    metadataConsumers.forEach(consumer -> consumer.accept(metadata));
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static String processTrackId(String trackId) {

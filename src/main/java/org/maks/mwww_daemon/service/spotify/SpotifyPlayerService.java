@@ -36,15 +36,17 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         this.playlistLoaded = isPlaylistLoaded();
 
         if (!playlistLoaded) {
-            updateSongInfo(new SpotifySongInfo(IconUtils.image(Icon.SPOTIFY), "Release Ctrl to start playing"));
+            updateConsumers(new SpotifySongInfo(IconUtils.image(Icon.SPOTIFY), "Release Ctrl to start playing"));
         }
 
-        new PlayerctlMetadataService(this::onPlayerctlMetadataUpdated);
+        PlayerctlMetadataService.listen();
+        PlayerctlMetadataService.addConsumer(this::onPlayerctlMetadataUpdated);
     }
 
     @Override
     protected void onSongUpdated(SpotifySongInfo songInfo) {
-        cmdService.runCmdCommand(
+        // TODO
+        /*cmdService.runCmdCommand(
                 "spotatui",
                 "play",
                 "--uri",
@@ -52,7 +54,20 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
                 "--device",
                 "ArchLinux",
                 "--queue"
-        );
+        );*/
+    }
+
+    @Override
+    public void onSetSongCommand(String commandValue) {
+        if (noPlayersFound()) {
+            return;
+        }
+
+        if (isPlaying()) {
+            return;
+        }
+
+        switchSong(commandValue);
     }
 
     @Override
@@ -73,10 +88,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
                     "ArchLinux"
             );
             setVolume(INITIAL_VOLUME);
-            playlistLoaded = true;
         } else {
             cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
         }
+
+        playlistLoaded = true;
     }
 
     @Override
@@ -111,6 +127,15 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     protected SpotifySongInfo lookupSong(String songId) {
+        boolean isUri = songId.startsWith("spotify:");
+
+        if (isUri) {
+            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", songId);
+            PlayerctlMetadata playerctlMetadata = PlayerctlMetadataService.readFullMetadata();
+
+            return toSpotifySongInfo(playerctlMetadata);
+        }
+
         // TODO
         return null;
     }
@@ -140,6 +165,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private void onPlayerctlMetadataUpdated(PlayerctlMetadata playerctlMetadata) {
+        SpotifySongInfo songInfo = toSpotifySongInfo(playerctlMetadata);
+        Platform.runLater(() -> updateConsumers(songInfo));
+    }
+
+    private SpotifySongInfo toSpotifySongInfo(PlayerctlMetadata playerctlMetadata) {
         String outputDir = "/home/maks/.cache/mwww/" + playerctlMetadata.trackId();
         String outputPathStr = outputDir + "/img.png";
         Path outputPath = Paths.get(outputPathStr);
@@ -166,8 +196,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         Image thumbnail = new Image(outputPath.toUri().toString());
 
         String title = String.join(", ", playerctlMetadata.artists()) + " - " + playerctlMetadata.title();
-        var songInfo = new SpotifySongInfo(thumbnail, title, playerctlMetadata.trackId());
-        Platform.runLater(() -> updateConsumers(songInfo));
+        return new SpotifySongInfo(thumbnail, title, playerctlMetadata.trackId());
     }
 
     private void skip(String sign) {
@@ -176,10 +205,14 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private boolean isPlaylistLoaded() {
+        return !noPlayersFound();
+    }
+
+    private boolean noPlayersFound() {
         try {
-            return !playerctlStatus().equals("No players found");
+            return playerctlStatus().equals("No players found");
         } catch (CmdServiceException e) {
-            return false;
+            return true;
         }
     }
 
