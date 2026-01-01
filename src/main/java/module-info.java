@@ -26,4 +26,6 @@ module org.maks.mwww_daemon {
     opens org.maks.mwww_daemon.service.local to com.fasterxml.jackson.databind, javafx.fxml;
     exports org.maks.mwww_daemon.service.spotify;
     opens org.maks.mwww_daemon.service.spotify to javafx.fxml;
+    exports org.maks.mwww_daemon.service.spotify.cmdoutputtransform;
+    exports org.maks.mwww_daemon.exception;
 }

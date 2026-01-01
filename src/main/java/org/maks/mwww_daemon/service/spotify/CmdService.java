@@ -1,5 +1,8 @@
 package org.maks.mwww_daemon.service.spotify;
 
+import org.maks.mwww_daemon.exception.CmdServiceException;
+import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.CmdOutputTransform;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,7 +14,11 @@ public class CmdService {
 
     private static final Logger LOG = Logger.getLogger(CmdService.class.getName());
 
-    public List<String> runCmdCommand(String... commands) {
+    public <T> T runCmdCommand(CmdOutputTransform<T> cmdOutputTransform, String... commands) throws CmdServiceException {
+        return cmdOutputTransform.transform(runCmdCommand(commands));
+    }
+
+    public List<String> runCmdCommand(String... commands) throws CmdServiceException {
         var processBuilder = new ProcessBuilder(commands);
         List<String> lines;
 
@@ -26,7 +33,7 @@ public class CmdService {
                 var command = String.join(" ", commands);
                 List<String> errorOutput = readOutput(new InputStreamReader(process.getErrorStream()));
 
-                throw new RuntimeException("Command " + command + " did not finish successfully.\nOutput:\n" + errorOutput);
+                throw new CmdServiceException("Command " + command + " did not finish successfully.\nOutput:\n" + errorOutput);
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

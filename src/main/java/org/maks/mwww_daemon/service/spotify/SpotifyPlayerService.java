@@ -4,9 +4,11 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.maks.mwww_daemon.enumeration.Icon;
+import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.model.BaseSongInfo;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.service.PlayerService;
+import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
 import org.maks.mwww_daemon.utils.IconUtils;
 
 import java.nio.file.Files;
@@ -28,7 +30,12 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
 
     @Override
     public void initialize() {
-        updateSongInfo(new BaseSongInfo(IconUtils.image(Icon.SPOTIFY), "Press Alt to start playing"));
+        this.playlistLoaded = isPlaylistLoaded();
+
+        if (!playlistLoaded) {
+            updateSongInfo(new BaseSongInfo(IconUtils.image(Icon.SPOTIFY), "Press Alt to start playing"));
+        }
+
         new PlayerctlMetadataService(this::onPlayerctlMetadataUpdated);
     }
 
@@ -115,15 +122,16 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
 
     @Override
     public boolean isPlaying() {
-        List<String> statusOutput = cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "status");
-        String statusOutputStr = statusOutput.getFirst();
-
-        return statusOutputStr.equals("Playing");
+        return playerctlStatus().equals("Playing");
     }
 
     @Override
     public void shutdown() {
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
+    }
+
+    private String playerctlStatus() {
+        return cmdService.runCmdCommand(new StringCmdOutputTransform(), "playerctl", "-p", "spotifyd", "status");
     }
 
     private void onPlayerctlMetadataUpdated(PlayerctlMetadata playerctlMetadata) {
@@ -160,6 +168,14 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
     private void skip(String sign) {
         String offsetPositon = ((int) skipDuration.toSeconds()) + sign;
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", offsetPositon);
+    }
+
+    private boolean isPlaylistLoaded() {
+        try {
+            return !playerctlStatus().equals("No players found");
+        } catch (CmdServiceException e) {
+            return false;
+        }
     }
 
     private List<String> listLikedSongUris() {
