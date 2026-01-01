@@ -21,7 +21,7 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
 
     private final CmdService cmdService = new CmdService();
 
-    private static final double INITIAL_VOLUME = 0.8;
+    private static final double INITIAL_VOLUME = 0.7;
     private boolean playlistLoaded = false;
 
     public SpotifyPlayerService(Consumer<BaseSongInfo> songInfoConsumer) {
@@ -33,7 +33,7 @@ public class SpotifyPlayerService extends PlayerService<BaseSongInfo> {
         this.playlistLoaded = isPlaylistLoaded();
 
         if (!playlistLoaded) {
-            updateSongInfo(new BaseSongInfo(IconUtils.image(Icon.SPOTIFY), "Press Alt to start playing"));
+            updateSongInfo(new BaseSongInfo(IconUtils.image(Icon.SPOTIFY), "Release Ctrl to start playing"));
         }
 
         new PlayerctlMetadataService(this::onPlayerctlMetadataUpdated);
