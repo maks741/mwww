@@ -125,6 +125,40 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
+    public void toggleOnRepeat() {
+        if (noPlayersFound()) {
+            return;
+        }
+
+        String repeatOnStatus = "Track";
+        String repeatOffStatus = "Playlist";
+
+        String currentRepeatStatus = cmdService.runCmdCommand(
+                new StringCmdOutputTransform(),
+                "playerctl",
+                "-p",
+                "spotifyd",
+                "loop"
+        );
+
+        String newRepeatStatus;
+        if (currentRepeatStatus.equals(repeatOnStatus)) {
+            newRepeatStatus = repeatOffStatus;
+        } else {
+            newRepeatStatus = repeatOnStatus;
+        }
+
+        cmdService.runCmdCommand(
+                new StringCmdOutputTransform(),
+                "playerctl",
+                "-p",
+                "spotifyd",
+                "loop",
+                newRepeatStatus
+        );
+    }
+
+    @Override
     protected SpotifySongInfo lookupSong(String songId) {
         boolean isUri = songId.startsWith("spotify:");
 
@@ -218,7 +252,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         try {
             return playerctlStatus().equals("No players found");
         } catch (CmdServiceException e) {
-            return true;
+            return e.cmdErrorMessage().equals("No players found");
         }
     }
 

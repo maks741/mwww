@@ -20,6 +20,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     private MediaPlayer currentPlayer = null;
     private boolean isSongPlaying = false;
     private static final double INITIAL_VOLUME = 0.05;
+    private boolean onRepeat = false;
 
     public LocalPlayerService(Consumer<LocalSongInfo> songInfoConsumer) {
         super(songInfoConsumer, INITIAL_VOLUME);
@@ -114,6 +115,11 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         }
 
         isSongPlaying = !isSongPlaying;
+    }
+
+    @Override
+    public void toggleOnRepeat() {
+        onRepeat = !onRepeat;
     }
 
     @Override
