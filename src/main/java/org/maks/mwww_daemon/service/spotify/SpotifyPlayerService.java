@@ -45,16 +45,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     protected void onSongUpdated(SpotifySongInfo songInfo) {
-        // TODO
-        /*cmdService.runCmdCommand(
-                "spotatui",
-                "play",
-                "--uri",
-                songInfo.uri(),
-                "--device",
-                "ArchLinux",
-                "--queue"
-        );*/
+
     }
 
     @Override
@@ -72,7 +63,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     protected void onPreSongChanged() {
-        // TODO
+
     }
 
     @Override
@@ -131,13 +122,20 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
         if (isUri) {
             cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", songId);
-            PlayerctlMetadata playerctlMetadata = PlayerctlMetadataService.readFullMetadata();
-
-            return toSpotifySongInfo(playerctlMetadata);
+        } else {
+            cmdService.runCmdCommand(
+                    "spotatui",
+                    "play",
+                    "--name",
+                    songId,
+                    "--album",
+                    "--device",
+                    "ArchLinux"
+            );
         }
 
-        // TODO
-        return null;
+        PlayerctlMetadata playerctlMetadata = PlayerctlMetadataService.readFullMetadata();
+        return toSpotifySongInfo(playerctlMetadata);
     }
 
     @Override
