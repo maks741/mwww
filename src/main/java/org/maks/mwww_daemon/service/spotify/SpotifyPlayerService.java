@@ -26,6 +26,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private static final double INITIAL_VOLUME = 0.7;
     private boolean playlistLoaded = false;
+    private boolean hasPlayed = false;
 
     public SpotifyPlayerService(Consumer<SpotifySongInfo> songInfoConsumer) {
         super(songInfoConsumer, INITIAL_VOLUME);
@@ -50,6 +51,12 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void onSetSongCommand(String commandValue) {
+        if (!hasPlayed) {
+            // ignore requests to set song while the user hasn't played anything
+            // this helps when the initial config is read, which tries to set a song from config instantly
+            return;
+        }
+
         if (noPlayersFound()) {
             return;
         }
@@ -84,6 +91,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         }
 
         playlistLoaded = true;
+        hasPlayed = true;
     }
 
     @Override
