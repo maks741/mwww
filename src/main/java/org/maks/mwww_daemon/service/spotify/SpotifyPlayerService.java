@@ -136,7 +136,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
                     "play",
                     "--name",
                     songId,
-                    "--album",
+                    "--track",
                     "--device",
                     "ArchLinux"
             );
