@@ -36,7 +36,7 @@ public class CmdService {
                 String errorOutputStr = new StringCmdOutputTransform().transform(errorOutput);
 
                 throw new CmdServiceException(
-                        "Command " + command + " did not finish successfully.\nOutput:\n" + errorOutput,
+                        "Command " + command + " did not finish successfully.\nOutput:\n" + errorOutputStr,
                         errorOutputStr
                 );
             }
