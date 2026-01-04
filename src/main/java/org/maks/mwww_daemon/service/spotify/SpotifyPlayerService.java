@@ -3,18 +3,15 @@ package org.maks.mwww_daemon.service.spotify;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.maks.mwww_daemon.enumeration.Icon;
 import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.model.SpotifySongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
-import org.maks.mwww_daemon.utils.IconUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -25,7 +22,6 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     private final CmdService cmdService = new CmdService();
 
     private static final double INITIAL_VOLUME = 0.7;
-    private boolean playlistLoaded = false;
     private boolean hasPlayed = false;
 
     public SpotifyPlayerService(Consumer<SpotifySongInfo> songInfoConsumer) {
@@ -34,10 +30,26 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void initialize() {
-        this.playlistLoaded = isPlaylistLoaded();
+        if (noPlayersFound()) {
+            // register spotifyd in playerctl players
+            String spotifydPid = cmdService.runCmdCommand(
+                    new StringCmdOutputTransform(),
+                    "pidof", "spotifyd"
+            );
+            cmdService.runCmdCommand(
+                    "dbus-send",
+                    "--print-reply",
+                    "--dest=rs.spotifyd.instance" + spotifydPid,
+                    "/rs/spotifyd/Controls",
+                    "rs.spotifyd.Controls.TransferPlayback"
+            );
 
-        if (!playlistLoaded) {
-            updateConsumers(new SpotifySongInfo(IconUtils.image(Icon.SPOTIFY), "Release Ctrl to start playing"));
+            // silently start playing the playlist, then seek to position 0 to make up for delay between playerctl open and playerctl pause
+            setVolume(0);
+            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", "spotify:playlist:4PKRumbJb3aUG4RVLDw7ax");
+            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
+            setVolume(INITIAL_VOLUME);
+            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", "0");
         }
 
         PlayerctlMetadataService.listen();
@@ -75,27 +87,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void play() {
-        if (!playlistLoaded) {
-            // register spotifyd in playerctl players
-            String spotifydPid = cmdService.runCmdCommand(
-                    new StringCmdOutputTransform(),
-                    "pidof", "spotifyd"
-            );
-            cmdService.runCmdCommand(
-                   "dbus-send",
-                    "--print-reply",
-                    "--dest=rs.spotifyd.instance" + spotifydPid,
-                    "/rs/spotifyd/Controls",
-                    "rs.spotifyd.Controls.TransferPlayback"
-            );
-
-            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", "spotify:playlist:4PKRumbJb3aUG4RVLDw7ax");
-            setVolume(INITIAL_VOLUME);
-        } else {
-            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
-        }
-
-        playlistLoaded = true;
+        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
         hasPlayed = true;
     }
 
@@ -255,26 +247,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         );
     }
 
-    private boolean isPlaylistLoaded() {
-        return !noPlayersFound();
-    }
-
     private boolean noPlayersFound() {
         try {
             return playerctlStatus().equals("No players found");
         } catch (CmdServiceException e) {
             return e.cmdErrorMessage().equals("No players found");
         }
-    }
-
-    private List<String> listLikedSongUris() {
-        List<String> likedSongsOutput = cmdService.runCmdCommand("spotatui", "list",  "--liked");
-        return likedSongsOutput.stream()
-                .filter(s -> s.contains("spotify:track:"))
-                .map(s -> {
-                    int startIndex = s.lastIndexOf('(') + 1;
-                    int endIndex = s.lastIndexOf(')');
-                    return s.substring(startIndex, endIndex);
-                }).toList();
     }
 }
