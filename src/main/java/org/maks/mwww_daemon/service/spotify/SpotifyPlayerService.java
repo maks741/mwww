@@ -160,7 +160,36 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void toggleShuffle() {
-        // TODO
+        if (noPlayersFound()) {
+            return;
+        }
+
+        String shuffleOnStatus = "On";
+        String shuffleOffStatus = "Off";
+
+        String currentShuffleStatus = cmdService.runCmdCommand(
+                new StringCmdOutputTransform(),
+                "playerctl",
+                "-p",
+                "spotifyd",
+                "shuffle"
+        );
+
+        String newShuffleStatus;
+        if (currentShuffleStatus.equals(shuffleOnStatus)) {
+            newShuffleStatus = shuffleOffStatus;
+        } else {
+            newShuffleStatus = shuffleOnStatus;
+        }
+
+        cmdService.runCmdCommand(
+                new StringCmdOutputTransform(),
+                "playerctl",
+                "-p",
+                "spotifyd",
+                "shuffle",
+                newShuffleStatus
+        );
     }
 
     @Override
