@@ -10,7 +10,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.maks.mwww_daemon.components.DynamicLabel;
-import org.maks.mwww_daemon.components.RepeatSongToggle;
+import org.maks.mwww_daemon.components.RepeatToggle;
+import org.maks.mwww_daemon.components.ShuffleToggle;
 import org.maks.mwww_daemon.enumeration.FifoCommand;
 import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
@@ -34,7 +35,10 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private DynamicLabel dynamicSongName;
 
     @FXML
-    private RepeatSongToggle repeatSongToggle;
+    private RepeatToggle repeatToggle;
+
+    @FXML
+    private ShuffleToggle shuffleToggle;
 
     @FXML
     private ImageView addIcon;
@@ -74,6 +78,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         KeyCombination skipForward = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_DOWN);
         KeyCombination skipBackward = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_DOWN);
         KeyCombination toggleRepeat = new KeyCodeCombination(KeyCode.R);
+        KeyCombination toggleShuffle = new KeyCodeCombination(KeyCode.S);
         KeyCombination togglePause = new KeyCodeCombination(KeyCode.P);
         KeyCombination find = new KeyCodeCombination(KeyCode.F);
         KeyCombination newSong = new KeyCodeCombination(KeyCode.N);
@@ -95,8 +100,11 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 } else if (skipBackward.match(keyEvent)) {
                     playerService.skipBackward();
                 } else if (toggleRepeat.match(keyEvent)) {
-                    repeatSongToggle.toggleOnRepeat();
-                    playerService.toggleOnRepeat();
+                    repeatToggle.toggle();
+                    playerService.toggleRepeat();
+                } else if (toggleShuffle.match(keyEvent)) {
+                    shuffleToggle.toggle();
+                    playerService.toggleShuffle();
                 } else if (togglePause.match(keyEvent)) {
                     playerService.togglePause();
                 } else if (find.match(keyEvent)) {

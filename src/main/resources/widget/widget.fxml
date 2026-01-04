@@ -2,8 +2,9 @@
 
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import org.maks.mwww_daemon.components.RepeatSongToggle?>
+<?import org.maks.mwww_daemon.components.RepeatToggle?>
 <?import org.maks.mwww_daemon.components.DynamicLabel?>
+<?import org.maks.mwww_daemon.components.ShuffleToggle?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body"
@@ -16,9 +17,12 @@
         <DynamicLabel fx:id="dynamicSongName" HBox.hgrow="ALWAYS" styleClass="dynamic-label" />
         <Pane HBox.hgrow="ALWAYS" />
         <HBox styleClass="toolbar">
-            <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
-                <Image url="@../icons/repeat.png" />
-            </RepeatSongToggle>
+            <ShuffleToggle fx:id="shuffleToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
+                <Image url="@../icons/shuffle-off.png" />
+            </ShuffleToggle>
+            <RepeatToggle fx:id="repeatToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
+                <Image url="@../icons/repeat-off.png" />
+            </RepeatToggle>
             <ImageView fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true">
                 <Image url="@../icons/new-song.png" />
             </ImageView>

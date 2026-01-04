@@ -125,7 +125,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    public void toggleOnRepeat() {
+    public void toggleRepeat() {
         if (noPlayersFound()) {
             return;
         }
@@ -156,6 +156,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
                 "loop",
                 newRepeatStatus
         );
+    }
+
+    @Override
+    public void toggleShuffle() {
+        // TODO
     }
 
     @Override

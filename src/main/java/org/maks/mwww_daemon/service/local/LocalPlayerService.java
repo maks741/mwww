@@ -118,8 +118,13 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     @Override
-    public void toggleOnRepeat() {
+    public void toggleRepeat() {
         onRepeat = !onRepeat;
+    }
+
+    @Override
+    public void toggleShuffle() {
+        // TODO
     }
 
     @Override
