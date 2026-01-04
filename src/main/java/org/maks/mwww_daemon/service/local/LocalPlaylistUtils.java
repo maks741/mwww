@@ -102,6 +102,14 @@ public class LocalPlaylistUtils {
         }
     }
 
+    public int count() {
+        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
+            return  (int) songDirs.count();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private LocalSongInfo songInfo(Path songDirPath, int songIndex) {
         Path songThumbnailPath = songDirPath.resolve("img.png");
 

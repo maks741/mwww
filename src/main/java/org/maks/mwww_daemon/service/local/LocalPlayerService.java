@@ -127,7 +127,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     public void toggleShuffle() {
-        // TODO
+        indexProvider.toggleShuffle();
     }
 
     @Override

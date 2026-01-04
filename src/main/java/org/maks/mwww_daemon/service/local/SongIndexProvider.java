@@ -2,8 +2,12 @@ package org.maks.mwww_daemon.service.local;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class SongIndexProvider {
+
+    private final LocalPlaylistUtils playlistUtils = new LocalPlaylistUtils();
+    private final Random random = new Random();
 
     private final List<Integer> songIndexes = new ArrayList<>();
     private int songIndexesPointer = 0;
@@ -12,9 +16,7 @@ public class SongIndexProvider {
 
     public void set(int index) {
         if (!shuffleOn) {
-            songIndexes.clear();
-            songIndexes.add(index);
-            songIndexesPointer = 0;
+            clearExcept(index);
             return;
         }
 
@@ -28,7 +30,7 @@ public class SongIndexProvider {
 
     public int next() {
         if (songIndexesPointer == songIndexes.size() - 1) {
-            songIndexes.add(newIndexForward());
+            songIndexes.add(newIndex());
         }
 
         return songIndexes.get(++songIndexesPointer);
@@ -56,8 +58,27 @@ public class SongIndexProvider {
         return 0;
     }
 
-    private int newIndexForward() {
-        // TODO: generate random when shuffle is on
-        return current() + 1;
+    public void toggleShuffle() {
+        int currentIndex = current();
+        clearExcept(currentIndex);
+
+        shuffleOn = !shuffleOn;
+    }
+
+    private int newIndex() {
+        int newIndex;
+        if (shuffleOn) {
+            newIndex = random.nextInt(playlistUtils.count());
+        } else {
+            newIndex = current() + 1;
+        }
+
+        return newIndex;
+    }
+
+    private void clearExcept(int index) {
+        songIndexes.clear();
+        songIndexes.add(index);
+        songIndexesPointer = 0;
     }
 }
