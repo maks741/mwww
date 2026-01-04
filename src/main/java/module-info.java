@@ -7,6 +7,9 @@ module org.maks.mwww_daemon {
     requires javafx.graphics;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
+    requires java.net.http;
+    requires jdk.httpserver;
+    requires com.google.gson;
 
     exports org.maks.mwww_daemon.main;
     opens org.maks.mwww_daemon.main to javafx.fxml;
@@ -28,4 +31,6 @@ module org.maks.mwww_daemon {
     opens org.maks.mwww_daemon.service.spotify to javafx.fxml;
     exports org.maks.mwww_daemon.service.spotify.cmdoutputtransform;
     exports org.maks.mwww_daemon.exception;
+    exports org.maks.mwww_daemon.service.spotify.auth;
+    opens org.maks.mwww_daemon.service.spotify.auth to javafx.fxml;
 }

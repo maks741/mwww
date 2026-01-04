@@ -17,6 +17,10 @@ public class ResourceUtils {
         return basePath().resolve(commandsFifoFileName());
     }
 
+    public static Path credentialsPath() {
+        return basePath().resolve("creds.json");
+    }
+
     public static String commandsFifoFileName() {
         return "commands.fifo";
     }
