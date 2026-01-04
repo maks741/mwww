@@ -16,10 +16,13 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class LocalPlayerService extends PlayerService<LocalSongInfo> {
-    private int currentSongIndex = 0;
+
+    private final SongIndexProvider indexProvider = new SongIndexProvider();
+
     private MediaPlayer currentPlayer = null;
-    private boolean isSongPlaying = false;
     private static final double INITIAL_VOLUME = 0.05;
+
+    private boolean isSongPlaying = false;
     private boolean onRepeat = false;
 
     public LocalPlayerService(Consumer<LocalSongInfo> songInfoConsumer) {
@@ -28,13 +31,13 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     public void initialize() {
-        LocalSongInfo song = lookupSong(currentSongIndex);
+        LocalSongInfo song = lookupSong(indexProvider.current());
         updateSongInfo(song);
     }
 
     @Override
     protected void onSongUpdated(LocalSongInfo localSongInfo) {
-        currentSongIndex = localSongInfo.songIndex();
+        indexProvider.set(localSongInfo.songIndex());
     }
 
     @Override
@@ -63,7 +66,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         }
 
         var playlistUtils = new LocalPlaylistUtils();
-        currentPlayer = playlistUtils.player(currentSongIndex);
+        currentPlayer = playlistUtils.player(indexProvider.current());
 
         currentPlayer.setOnReady(() -> {
             // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
@@ -79,12 +82,12 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     public void next() {
-        switchSong(++currentSongIndex);
+        switchSong(indexProvider.next());
     }
 
     @Override
     public void previous() {
-        switchSong(--currentSongIndex);
+        switchSong(indexProvider.previous());
     }
 
     @Override
@@ -153,7 +156,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     @Override
     public void deleteSong() {
         var playlistUtils = new LocalPlaylistUtils();
-        playlistUtils.deleteSong(currentSongIndex);
+        playlistUtils.deleteSong(indexProvider.current());
         reloadCurrent();
     }
     
@@ -188,7 +191,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     private void reloadCurrent() {
-        switchSong(currentSongIndex);
+        switchSong(indexProvider.current());
     }
 
     private void switchSong(int songIndex) {
