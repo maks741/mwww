@@ -122,13 +122,25 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    public void toggleRepeat() {
-        playerctlToggle("loop", "Track", "Playlist");
+    public boolean toggleRepeat() {
+        try {
+            playerctlToggle("loop", "Track", "Playlist");
+        } catch (CmdServiceException _) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
-    public void toggleShuffle() {
-        playerctlToggle("shuffle", "On", "Off");
+    public boolean toggleShuffle() {
+        try {
+            playerctlToggle("shuffle", "On", "Off");
+        } catch (CmdServiceException _) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

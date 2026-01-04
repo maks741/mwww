@@ -121,13 +121,15 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     @Override
-    public void toggleRepeat() {
+    public boolean toggleRepeat() {
         onRepeat = !onRepeat;
+        return true;
     }
 
     @Override
-    public void toggleShuffle() {
+    public boolean toggleShuffle() {
         indexProvider.toggleShuffle();
+        return true;
     }
 
     @Override

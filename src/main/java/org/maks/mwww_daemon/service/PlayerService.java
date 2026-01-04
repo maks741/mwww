@@ -81,9 +81,9 @@ public abstract class PlayerService<T extends BaseSongInfo> {
 
     public abstract void togglePause();
 
-    public abstract void toggleRepeat();
+    public abstract boolean toggleRepeat();
 
-    public abstract void toggleShuffle();
+    public abstract boolean toggleShuffle();
 
     protected abstract T lookupSong(String songId);
 

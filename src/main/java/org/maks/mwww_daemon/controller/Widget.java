@@ -100,11 +100,13 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 } else if (skipBackward.match(keyEvent)) {
                     playerService.skipBackward();
                 } else if (toggleRepeat.match(keyEvent)) {
-                    repeatToggle.toggle();
-                    playerService.toggleRepeat();
+                    if (playerService.toggleRepeat()) {
+                        repeatToggle.toggle();
+                    }
                 } else if (toggleShuffle.match(keyEvent)) {
-                    shuffleToggle.toggle();
-                    playerService.toggleShuffle();
+                    if (playerService.toggleShuffle()) {
+                        shuffleToggle.toggle();
+                    }
                 } else if (togglePause.match(keyEvent)) {
                     playerService.togglePause();
                 } else if (find.match(keyEvent)) {
