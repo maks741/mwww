@@ -31,7 +31,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     public void initialize() {
-        LocalSongInfo song = lookupSong(indexProvider.current());
+        LocalSongInfo song = lookupSong(indexProvider.first());
         updateSongInfo(song);
     }
 
