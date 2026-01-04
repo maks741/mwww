@@ -126,70 +126,12 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void toggleRepeat() {
-        if (noPlayersFound()) {
-            return;
-        }
-
-        String repeatOnStatus = "Track";
-        String repeatOffStatus = "Playlist";
-
-        String currentRepeatStatus = cmdService.runCmdCommand(
-                new StringCmdOutputTransform(),
-                "playerctl",
-                "-p",
-                "spotifyd",
-                "loop"
-        );
-
-        String newRepeatStatus;
-        if (currentRepeatStatus.equals(repeatOnStatus)) {
-            newRepeatStatus = repeatOffStatus;
-        } else {
-            newRepeatStatus = repeatOnStatus;
-        }
-
-        cmdService.runCmdCommand(
-                new StringCmdOutputTransform(),
-                "playerctl",
-                "-p",
-                "spotifyd",
-                "loop",
-                newRepeatStatus
-        );
+        playerctlToggle("loop", "Track", "Playlist");
     }
 
     @Override
     public void toggleShuffle() {
-        if (noPlayersFound()) {
-            return;
-        }
-
-        String shuffleOnStatus = "On";
-        String shuffleOffStatus = "Off";
-
-        String currentShuffleStatus = cmdService.runCmdCommand(
-                new StringCmdOutputTransform(),
-                "playerctl",
-                "-p",
-                "spotifyd",
-                "shuffle"
-        );
-
-        String newShuffleStatus;
-        if (currentShuffleStatus.equals(shuffleOnStatus)) {
-            newShuffleStatus = shuffleOffStatus;
-        } else {
-            newShuffleStatus = shuffleOnStatus;
-        }
-
-        cmdService.runCmdCommand(
-                new StringCmdOutputTransform(),
-                "playerctl",
-                "-p",
-                "spotifyd",
-                "shuffle",
-                newShuffleStatus
-        );
+        playerctlToggle("shuffle", "On", "Off");
     }
 
     @Override
@@ -276,6 +218,36 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     private void skip(String sign) {
         String offsetPositon = ((int) skipDuration.toSeconds()) + sign;
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", offsetPositon);
+    }
+
+    private void playerctlToggle(String command, String on, String off) {
+        if (noPlayersFound()) {
+            return;
+        }
+
+        String currentStatus = cmdService.runCmdCommand(
+                new StringCmdOutputTransform(),
+                "playerctl",
+                "-p",
+                "spotifyd",
+                command
+        );
+
+        String newStatus;
+        if (currentStatus.equals(on)) {
+            newStatus = off;
+        } else {
+            newStatus = on;
+        }
+
+        cmdService.runCmdCommand(
+                new StringCmdOutputTransform(),
+                "playerctl",
+                "-p",
+                "spotifyd",
+                command,
+                newStatus
+        );
     }
 
     private boolean isPlaylistLoaded() {
