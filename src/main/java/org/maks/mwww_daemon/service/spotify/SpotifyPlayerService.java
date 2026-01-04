@@ -76,15 +76,20 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     @Override
     public void play() {
         if (!playlistLoaded) {
-            cmdService.runCmdCommand(
-                    "spotatui",
-                    "play",
-                    "--uri",
-                    "spotify:playlist:4PKRumbJb3aUG4RVLDw7ax",
-                    "--playlist",
-                    "--device",
-                    "ArchLinux"
+            // register spotifyd in playerctl players
+            String spotifydPid = cmdService.runCmdCommand(
+                    new StringCmdOutputTransform(),
+                    "pidof", "spotifyd"
             );
+            cmdService.runCmdCommand(
+                   "dbus-send",
+                    "--print-reply",
+                    "--dest=rs.spotifyd.instance" + spotifydPid,
+                    "/rs/spotifyd/Controls",
+                    "rs.spotifyd.Controls.TransferPlayback"
+            );
+
+            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", "spotify:playlist:4PKRumbJb3aUG4RVLDw7ax");
             setVolume(INITIAL_VOLUME);
         } else {
             cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
