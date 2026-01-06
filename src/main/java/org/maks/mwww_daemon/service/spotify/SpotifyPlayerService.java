@@ -8,6 +8,7 @@ import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.model.SpotifySongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
+import org.maks.mwww_daemon.utils.Config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,10 +47,16 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
             // silently start playing the playlist, then seek to position 0 to make up for delay between playerctl open and playerctl pause
             setVolume(0);
-            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", "spotify:playlist:4PKRumbJb3aUG4RVLDw7ax");
+            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", Config.spotifyOpenOnStartupUri());
             cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
             setVolume(INITIAL_VOLUME);
-            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", "0");
+            try {
+                cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", "0");
+            } catch (CmdServiceException e) {
+                if (!e.cmdErrorMessage().equals("Could not execute command: GDBus.Error:org.freedesktop.DBus.Error.Failed: can set position while nothing is playing")) {
+                    throw e;
+                }
+            }
         }
 
         PlayerctlMetadataService.listen();
@@ -195,7 +202,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private SpotifySongInfo toSpotifySongInfo(PlayerctlMetadata playerctlMetadata) {
-        String outputDir = "/home/maks/.cache/mwww/" + playerctlMetadata.trackId();
+        String outputDir = Paths.get(System.getProperty("user.home"), ".cache", "mwww", playerctlMetadata.trackId()).toAbsolutePath().toString();
         String outputPathStr = outputDir + "/img.png";
         Path outputPath = Paths.get(outputPathStr);
 

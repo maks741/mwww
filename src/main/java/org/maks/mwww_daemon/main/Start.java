@@ -12,7 +12,6 @@ import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoService;
 import org.maks.mwww_daemon.service.StyleService;
 import org.maks.mwww_daemon.service.WidgetFXMLLoader;
-import org.maks.mwww_daemon.utils.Config;
 
 public class Start extends Application {
     @Override
@@ -37,9 +36,6 @@ public class Start extends Application {
         FifoCommandQueue fifoCommandQueue = new FifoCommandQueue();
         fifoCommandQueue.subscribe(widget);
         fifoCommandQueue.subscribe(styleService);
-
-        var config = new Config();
-        fifoCommandQueue.subscribe(config);
 
         new FifoService().read(fifoCommandQueue);
     }

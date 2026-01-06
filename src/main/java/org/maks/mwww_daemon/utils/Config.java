@@ -2,25 +2,15 @@ package org.maks.mwww_daemon.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.maks.mwww_daemon.enumeration.FifoCommand;
-import org.maks.mwww_daemon.fifo.FifoCommandQueue;
-import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
 
 import java.io.IOException;
 
-public class Config implements FifoCommandSubscriber {
+public class Config {
 
     private static final YAMLConfig config = loadYamlConfig();
 
-    @Override
-    public void accept(FifoCommandQueue observable, FifoCommand fifoCommand) {
-        if (fifoCommand == FifoCommand.RELOAD_CONFIG) {
-            applyConfig(observable);
-        }
-    }
-
-    public static String initialSong() {
-        return config.playlist.initialSong;
+    public static String spotifyOpenOnStartupUri() {
+        return config.spotify.openOnStartupUri;
     }
 
     public static String spotifyClientId() {
@@ -29,14 +19,6 @@ public class Config implements FifoCommandSubscriber {
 
     public static String spotifyRedirectUri() {
         return config.spotify.redirectUri;
-    }
-
-    private void applyConfig(FifoCommandQueue queue) {
-        YAMLConfig config = loadYamlConfig();
-
-        FifoCommand setSong = FifoCommand.build(FifoCommand.SET_SONG, config.playlist.initialSong);
-
-        queue.push(setSong);
     }
 
     private static YAMLConfig loadYamlConfig() {
@@ -53,15 +35,11 @@ public class Config implements FifoCommandSubscriber {
     }
 
     private record YAMLConfig(
-            PlaylistConfig playlist,
             SpotifyConfig spotify
     ) {}
 
-    private record PlaylistConfig(
-            String initialSong
-    ) {}
-
     private record SpotifyConfig(
+            String openOnStartupUri,
             String clientId,
             String redirectUri
     ) {}

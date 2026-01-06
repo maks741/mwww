@@ -49,7 +49,6 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         playerService.initialize();
-        playerService.onSetSongCommand(Config.initialSong());
         dynamicSongName.setOnSearchSong(this.playerService::switchSong);
         addKeybindings();
 
