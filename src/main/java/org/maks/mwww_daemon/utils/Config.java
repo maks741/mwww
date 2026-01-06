@@ -10,9 +10,7 @@ import java.io.IOException;
 
 public class Config implements FifoCommandSubscriber {
 
-    public Config(FifoCommandQueue queue) {
-         new Thread(() -> applyConfig(queue)).start();
-    }
+    private static final YAMLConfig config = loadYamlConfig();
 
     @Override
     public void accept(FifoCommandQueue observable, FifoCommand fifoCommand) {
@@ -21,17 +19,27 @@ public class Config implements FifoCommandSubscriber {
         }
     }
 
+    public static String initialSong() {
+        return config.playlist.initialSong;
+    }
+
+    public static String spotifyClientId() {
+        return config.spotify.clientId;
+    }
+
+    public static String spotifyRedirectUri() {
+        return config.spotify.redirectUri;
+    }
+
     private void applyConfig(FifoCommandQueue queue) {
         YAMLConfig config = loadYamlConfig();
 
         FifoCommand setSong = FifoCommand.build(FifoCommand.SET_SONG, config.playlist.initialSong);
-        FifoCommand setSkipDuration = FifoCommand.build(FifoCommand.SET_SKIP_DURATION, config.audio.skipSeconds);
 
         queue.push(setSong);
-        queue.push(setSkipDuration);
     }
 
-    private YAMLConfig loadYamlConfig() {
+    private static YAMLConfig loadYamlConfig() {
         var mapper = new ObjectMapper(new YAMLFactory());
 
         YAMLConfig yamlConfig;
@@ -45,15 +53,16 @@ public class Config implements FifoCommandSubscriber {
     }
 
     private record YAMLConfig(
-            Playlist playlist,
-            Audio audio
+            PlaylistConfig playlist,
+            SpotifyConfig spotify
     ) {}
 
-    private record Playlist(
+    private record PlaylistConfig(
             String initialSong
     ) {}
 
-    private record Audio(
-            int skipSeconds
+    private record SpotifyConfig(
+            String clientId,
+            String redirectUri
     ) {}
 }

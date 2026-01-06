@@ -38,7 +38,7 @@ public class Start extends Application {
         fifoCommandQueue.subscribe(widget);
         fifoCommandQueue.subscribe(styleService);
 
-        var config = new Config(fifoCommandQueue);
+        var config = new Config();
         fifoCommandQueue.subscribe(config);
 
         new FifoService().read(fifoCommandQueue);

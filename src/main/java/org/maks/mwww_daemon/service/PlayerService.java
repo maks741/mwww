@@ -55,10 +55,6 @@ public abstract class PlayerService<T extends BaseSongInfo> {
         setVolume(volume);
     }
 
-    public void setSkipDuration(int skipDuration) {
-        this.skipDuration = Duration.seconds(skipDuration);
-    }
-
     public abstract void initialize();
 
     protected abstract void onSongUpdated(T songInfo);

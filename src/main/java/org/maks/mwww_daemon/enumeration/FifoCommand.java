@@ -6,8 +6,7 @@ public enum FifoCommand {
     SHOW("show"),
     RELOAD_STYLE("reload-style"),
     RELOAD_CONFIG("reload-config"),
-    SET_SONG("set"),
-    SET_SKIP_DURATION("skip-duration");
+    SET_SONG("set");
 
     private static final String separator = ":";
 

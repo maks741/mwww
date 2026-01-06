@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpServer;
 import org.maks.mwww_daemon.service.spotify.CmdService;
+import org.maks.mwww_daemon.utils.Config;
 import org.maks.mwww_daemon.utils.ResourceUtils;
 
 import java.io.IOException;
@@ -40,11 +41,8 @@ public class SpotifyPKCEAuth {
     private static final String AUTH_URL = "https://accounts.spotify.com/authorize";
     private static final String TOKEN_URL = "https://accounts.spotify.com/api/token";
 
-    private final String clientId = "" PASTE CLIENT ID;
-    private final String redirectUri = "http://127.0.0.1:8080/callback";
-    private final String scope = "playlist-modify-public";
-
-    private String codeVerifier;
+    private final String clientId = Config.spotifyClientId();
+    private final String redirectUri = Config.spotifyRedirectUri();
 
     public String accessToken() {
         SpotifyAuthResponse authData;
@@ -64,13 +62,14 @@ public class SpotifyPKCEAuth {
     }
 
     private SpotifyAuthResponse authorize() {
-        codeVerifier = generateCodeVerifier();
+        String codeVerifier = generateCodeVerifier();
+        String authScope = "playlist-modify-public";
         String codeChallenge = generateCodeChallenge(codeVerifier);
 
         CompletableFuture<String> codeFuture = new CompletableFuture<>();
         startCallbackServer(codeFuture);
 
-        URI authUri = buildAuthUri(codeChallenge);
+        URI authUri = buildAuthUri(codeChallenge, authScope);
 
         // open url in default browser
         CmdService cmdService = new CmdService();
@@ -84,7 +83,7 @@ public class SpotifyPKCEAuth {
             throw new RuntimeException(e);
         }
 
-        String authResponseStr = requestAccessToken(code);
+        String authResponseStr = requestAccessToken(code, codeVerifier);
         return new Gson().fromJson(authResponseStr, SpotifyAuthResponse.class);
     }
 
@@ -111,11 +110,11 @@ public class SpotifyPKCEAuth {
         }
     }
 
-    private URI buildAuthUri(String codeChallenge) {
+    private URI buildAuthUri(String codeChallenge, String authScope) {
         Map<String, String> params = new HashMap<>();
         params.put("response_type", "code");
         params.put("client_id", clientId);
-        params.put("scope", scope);
+        params.put("scope", authScope);
         params.put("redirect_uri", redirectUri);
         params.put("code_challenge_method", "S256");
         params.put("code_challenge", codeChallenge);
@@ -164,7 +163,7 @@ public class SpotifyPKCEAuth {
         server.start();
     }
 
-    private String requestAccessToken(String code) {
+    private String requestAccessToken(String code, String codeVerifier) {
         String body = new StringJoiner("&")
                 .add("client_id=" + urlEncode(clientId))
                 .add("grant_type=authorization_code")

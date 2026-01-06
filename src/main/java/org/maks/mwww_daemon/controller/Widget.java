@@ -18,6 +18,7 @@ import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
 import org.maks.mwww_daemon.model.BaseSongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.SpotifyPlayerService;
+import org.maks.mwww_daemon.utils.Config;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -48,6 +49,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         playerService.initialize();
+        playerService.onSetSongCommand(Config.initialSong());
         dynamicSongName.setOnSearchSong(this.playerService::switchSong);
         addKeybindings();
 
@@ -66,7 +68,6 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 Platform.setImplicitExit(true);
             }
             case SET_SONG -> playerService.onSetSongCommand(command.getValue());
-            case SET_SKIP_DURATION -> playerService.setSkipDuration(command.getValueAsInt());
         }
     }
 
