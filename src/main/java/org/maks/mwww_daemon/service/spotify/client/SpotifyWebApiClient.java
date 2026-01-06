@@ -62,6 +62,9 @@ public class SpotifyWebApiClient {
             }
 
             JsonObject categoryObj = root.getAsJsonObject(categoryKey);
+            if (!categoryObj.has("items") || !categoryObj.get("items").isJsonArray()) {
+                continue;
+            }
             JsonArray items = categoryObj.getAsJsonArray("items");
 
             if (items == null || items.isEmpty()) {
@@ -71,6 +74,7 @@ public class SpotifyWebApiClient {
             // Return the 'uri' of the very first item in the first available category
             JsonObject mostRelevant = items.get(0).getAsJsonObject();
             if (!mostRelevant.has(uriField)) {
+                LOG.warning("Search result missing URI: " + mostRelevant);
                 continue;
             }
             return mostRelevant.get(uriField).getAsString();

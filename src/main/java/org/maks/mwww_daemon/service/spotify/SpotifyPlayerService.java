@@ -173,7 +173,6 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
                 return null;
             }
 
-            System.out.println("SEARCH RESULT: " + searchResult);
             query = searchResult;
         }
 
