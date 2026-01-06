@@ -3,7 +3,6 @@ package org.maks.mwww_daemon.service;
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.model.BaseSongInfo;
-import org.maks.mwww_daemon.model.NotFoundSongInfo;
 
 import java.util.function.Consumer;
 
@@ -29,7 +28,7 @@ public abstract class PlayerService<T extends BaseSongInfo> {
     public void switchSong(String songName) {
         T songInfo = lookupSong(songName);
 
-        if (songInfo instanceof NotFoundSongInfo) {
+        if (songInfo == null) {
             return;
         }
 

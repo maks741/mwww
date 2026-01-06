@@ -5,7 +5,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Pair;
 import org.maks.mwww_daemon.exception.SongDirectoryEmptyException;
-import org.maks.mwww_daemon.model.NotFoundSongInfo;
 import org.maks.mwww_daemon.model.LocalSongInfo;
 import org.maks.mwww_daemon.utils.ResourceUtils;
 
@@ -52,7 +51,7 @@ public class LocalPlaylistUtils {
                     })
                     .findFirst()
                     .map(path -> songInfo(path, songIndexCounter.decrementAndGet()))
-                    .orElse(new NotFoundSongInfo());
+                    .orElse(null);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

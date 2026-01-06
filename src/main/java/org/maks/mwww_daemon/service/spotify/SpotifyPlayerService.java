@@ -157,27 +157,27 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    protected SpotifySongInfo lookupSong(String songId) {
-        if (songId.equals("me")) {
+    protected SpotifySongInfo lookupSong(String query) {
+        if (query.equals("me")) {
             // 'me' is a shortcut to open the home playlist
-            songId = "spotify:playlist:" + Config.spotifyPlaylistId();
+            query = "spotify:playlist:" + Config.spotifyPlaylistId();
         }
 
-        boolean isUri = songId.startsWith("spotify:");
+        boolean isUri = query.startsWith("spotify:");
 
-        if (isUri) {
-            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", songId);
-        } else {
-            cmdService.runCmdCommand(
-                    "spotatui",
-                    "play",
-                    "--name",
-                    songId,
-                    "--track",
-                    "--device",
-                    "ArchLinux"
-            );
+        if (!isUri) {
+            var client = new SpotifyWebApiClient();
+            String searchResult = client.search(query);
+
+            if (searchResult == null) {
+                return null;
+            }
+
+            System.out.println("SEARCH RESULT: " + searchResult);
+            query = searchResult;
         }
+
+        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", query);
 
         PlayerctlMetadata playerctlMetadata = PlayerctlMetadataService.readFullMetadata();
         return toSpotifySongInfo(playerctlMetadata);
