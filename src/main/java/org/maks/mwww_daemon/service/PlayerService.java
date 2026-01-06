@@ -26,10 +26,6 @@ public abstract class PlayerService<T extends BaseSongInfo> {
         onSongUpdated(songInfo);
     }
 
-    protected void updateConsumers(T songInfo) {
-        songUpdatedConsumer.accept(songInfo);
-    }
-
     public void switchSong(String songName) {
         T songInfo = lookupSong(songName);
 

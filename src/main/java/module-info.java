@@ -33,4 +33,5 @@ module org.maks.mwww_daemon {
     exports org.maks.mwww_daemon.exception;
     exports org.maks.mwww_daemon.service.spotify.auth;
     opens org.maks.mwww_daemon.service.spotify.auth to javafx.fxml;
+    exports org.maks.mwww_daemon.service.spotify.client to com.google.gson;
 }

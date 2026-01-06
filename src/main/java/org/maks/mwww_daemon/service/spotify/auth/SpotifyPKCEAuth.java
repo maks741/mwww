@@ -228,32 +228,4 @@ public class SpotifyPKCEAuth {
             throw new RuntimeException(e);
         }
     }
-
-    static void main(String[] args) throws Exception {
-        var instance = new SpotifyPKCEAuth();
-        String accessToken = instance.accessToken();
-
-        //
-        // example request to add a track to a playlist
-        //
-        String body = """
-            {
-              "uris": ["spotify:track:1iNw4fy57hgWRCuAJ0VZMU"],
-              "position": 0
-            }
-            """;
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.spotify.com/v1/playlists/4PKRumbJb3aUG4RVLDw7ax/tracks"))
-                .header("Authorization", "Bearer " + accessToken)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.statusCode());
-            System.out.println(response.body());
-        }
-    }
 }

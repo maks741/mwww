@@ -7,6 +7,7 @@ import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.model.SpotifySongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
+import org.maks.mwww_daemon.service.spotify.client.SpotifyWebApiClient;
 import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
 import org.maks.mwww_daemon.utils.Config;
 
@@ -24,6 +25,8 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private static final double INITIAL_VOLUME = 0.7;
     private boolean hasPlayed = false;
+
+    private String currentTrackUri;
 
     public SpotifyPlayerService(Consumer<SpotifySongInfo> songInfoConsumer) {
         super(songInfoConsumer, INITIAL_VOLUME);
@@ -65,7 +68,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     protected void onSongUpdated(SpotifySongInfo songInfo) {
-
+        currentTrackUri = songInfo.uri();
     }
 
     @Override
@@ -174,12 +177,22 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void addSong(ImageView addIcon) {
-        LOG.warning("Not implemented until 'spotatui playback --like' starts working");
+        // LOG.warning("Not implemented until 'spotatui playback --like' starts working");
+
+        System.out.println("CURRENT TRACK URI: " + currentTrackUri);
+
+        var apiClient = new SpotifyWebApiClient();
+        apiClient.addTrackToPlaylist(currentTrackUri);
     }
 
     @Override
     public void deleteSong() {
-        LOG.warning("Not implemented until 'spotatui playback --dislike' starts working");
+        // LOG.warning("Not implemented until 'spotatui playback --dislike' starts working");
+
+        System.out.println("CURRENT TRACK URI: " + currentTrackUri);
+
+        var apiClient = new SpotifyWebApiClient();
+        apiClient.deleteTrackFromPlaylist(currentTrackUri);
     }
 
     @Override
@@ -198,7 +211,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private void onPlayerctlMetadataUpdated(PlayerctlMetadata playerctlMetadata) {
         SpotifySongInfo songInfo = toSpotifySongInfo(playerctlMetadata);
-        Platform.runLater(() -> updateConsumers(songInfo));
+        Platform.runLater(() -> updateSongInfo(songInfo));
     }
 
     private SpotifySongInfo toSpotifySongInfo(PlayerctlMetadata playerctlMetadata) {

@@ -13,6 +13,10 @@ public class Config {
         return config.spotify.openOnStartupUri;
     }
 
+    public static String spotifyPlaylistId() {
+        return config.spotify.playlistId;
+    }
+
     public static String spotifyClientId() {
         return config.spotify.clientId;
     }
@@ -40,6 +44,7 @@ public class Config {
 
     private record SpotifyConfig(
             String openOnStartupUri,
+            String playlistId,
             String clientId,
             String redirectUri
     ) {}
