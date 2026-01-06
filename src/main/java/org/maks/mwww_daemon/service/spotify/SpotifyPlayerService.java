@@ -158,6 +158,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     protected SpotifySongInfo lookupSong(String songId) {
+        if (songId.equals("me")) {
+            // 'me' is a shortcut to open the home playlist
+            songId = "spotify:playlist:" + Config.spotifyPlaylistId();
+        }
+
         boolean isUri = songId.startsWith("spotify:");
 
         if (isUri) {
