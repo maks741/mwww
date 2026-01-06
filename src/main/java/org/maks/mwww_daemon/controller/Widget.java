@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.components.DynamicLabel;
 import org.maks.mwww_daemon.components.RepeatToggle;
 import org.maks.mwww_daemon.components.ShuffleToggle;
@@ -18,7 +19,6 @@ import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
 import org.maks.mwww_daemon.model.BaseSongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.SpotifyPlayerService;
-import org.maks.mwww_daemon.utils.Config;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -42,7 +42,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private ShuffleToggle shuffleToggle;
 
     @FXML
-    private ImageView addIcon;
+    private AddIcon addIcon;
 
     private final PlayerService<?> playerService = new SpotifyPlayerService(this::onSongUpdated);
 
@@ -114,7 +114,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 } else if (newSong.match(keyEvent)) {
                     playerService.addSong(addIcon);
                 } else if (deleteSong.match(keyEvent)) {
-                    playerService.deleteSong();
+                    playerService.deleteSong(addIcon);
                 } else if (exit.match(keyEvent)) {
                     shutdown();
                 }

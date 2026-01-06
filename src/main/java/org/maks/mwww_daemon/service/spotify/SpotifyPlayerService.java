@@ -2,10 +2,11 @@ package org.maks.mwww_daemon.service.spotify;
 
 import javafx.application.Platform;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.model.SpotifySongInfo;
+import org.maks.mwww_daemon.service.AsyncRunnerService;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.client.SpotifyWebApiClient;
 import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
@@ -14,6 +15,7 @@ import org.maks.mwww_daemon.utils.Config;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -56,6 +58,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
             try {
                 cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", "0");
             } catch (CmdServiceException e) {
+                // this error may appear if nothing started playing (sometimes it does, sometimes not)
                 if (!e.cmdErrorMessage().equals("Could not execute command: GDBus.Error:org.freedesktop.DBus.Error.Failed: can set position while nothing is playing")) {
                     throw e;
                 }
@@ -176,23 +179,45 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    public void addSong(ImageView addIcon) {
-        // LOG.warning("Not implemented until 'spotatui playback --like' starts working");
+    public void addSong(AddIcon addIcon) {
+        var runner = new AsyncRunnerService();
 
-        System.out.println("CURRENT TRACK URI: " + currentTrackUri);
+        addIcon.loading();
 
-        var apiClient = new SpotifyWebApiClient();
-        apiClient.addTrackToPlaylist(currentTrackUri);
+        CompletableFuture<Void> task = runner.run(() -> {
+            var apiClient = new SpotifyWebApiClient();
+            apiClient.addTrackToPlaylist(currentTrackUri);
+        });
+
+        task.whenComplete((_, ex) -> {
+            if (ex != null) {
+                addIcon.fail();
+                LOG.severe(ex.getMessage());
+            } else {
+                addIcon.like();
+            }
+        });
     }
 
     @Override
-    public void deleteSong() {
-        // LOG.warning("Not implemented until 'spotatui playback --dislike' starts working");
+    public void deleteSong(AddIcon addIcon) {
+        var runner = new AsyncRunnerService();
 
-        System.out.println("CURRENT TRACK URI: " + currentTrackUri);
+        addIcon.loading();
 
-        var apiClient = new SpotifyWebApiClient();
-        apiClient.deleteTrackFromPlaylist(currentTrackUri);
+        CompletableFuture<Void> task = runner.run(() -> {
+            var apiClient = new SpotifyWebApiClient();
+            apiClient.deleteTrackFromPlaylist(currentTrackUri);
+        });
+
+        task.whenComplete((_, ex) -> {
+            if (ex != null) {
+                addIcon.fail();
+                LOG.severe(ex.getMessage());
+            } else {
+                addIcon.success();
+            }
+        });
     }
 
     @Override

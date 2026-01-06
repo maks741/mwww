@@ -6,16 +6,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 public class DownloadService {
 
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    static {
-        Runtime.getRuntime().addShutdownHook(new Thread(executorService::shutdown));
-    }
+    private final AsyncRunnerService asyncRunnerService = new AsyncRunnerService();
 
     public CompletableFuture<String> downloadSong() {
         Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -25,11 +20,11 @@ public class DownloadService {
         }
 
         String urlFromClipboard = clipboard.getString();
-        return downloadSongByUrl(urlFromClipboard);
+        return asyncRunnerService.run(downloadSongByUrl(urlFromClipboard));
     }
 
-    private CompletableFuture<String> downloadSongByUrl(String url) {
-        return CompletableFuture.supplyAsync(() -> {
+    private Supplier<String> downloadSongByUrl(String url) {
+        return () -> {
             Process downloadScriptProcess = executeDownloadScript(url);
             String targetLogPrefix = "Downloaded song name: ";
 
@@ -46,7 +41,7 @@ public class DownloadService {
             }
 
             throw new RuntimeException("Could not download song by url: " + url);
-        }, executorService);
+        };
     }
 
     private Process executeDownloadScript(String url) {

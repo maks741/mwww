@@ -1,21 +1,21 @@
 package org.maks.mwww_daemon.service.local;
 
 import javafx.application.Platform;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import org.maks.mwww_daemon.enumeration.Icon;
+import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.model.LocalSongInfo;
 import org.maks.mwww_daemon.service.DownloadService;
 import org.maks.mwww_daemon.service.PlayerService;
-import org.maks.mwww_daemon.utils.IconUtils;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 public class LocalPlayerService extends PlayerService<LocalSongInfo> {
+
+    private static final Logger LOG = Logger.getLogger(LocalPlayerService.class.getName());
 
     private final SongIndexProvider indexProvider = new SongIndexProvider();
 
@@ -139,24 +139,24 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     @Override
-    public void addSong(ImageView addIcon) {
-        Image initialImage = addIcon.getImage();
-        Image loadingGif = IconUtils.image(Icon.LOADING);
-        addIcon.setImage(loadingGif);
+    public void addSong(AddIcon addIcon) {
+        addIcon.loading();
 
         DownloadService downloadService = new DownloadService();
         CompletableFuture<String> task = downloadService.downloadSong();
         task.whenComplete((downloadedSongName, ex) -> {
-            if (ex == null) {
+            if (ex != null) {
+                addIcon.fail();
+                LOG.severe(ex.getMessage());
+            } else {
+                addIcon.like();
                 Platform.runLater(() -> switchSong(downloadedSongName));
             }
-
-            addIcon.setImage(initialImage);
         });
     }
 
     @Override
-    public void deleteSong() {
+    public void deleteSong(AddIcon addIcon) {
         var playlistUtils = new LocalPlaylistUtils();
         playlistUtils.deleteSong(indexProvider.current());
         reloadCurrent();

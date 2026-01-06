@@ -2,7 +2,10 @@ package org.maks.mwww_daemon.enumeration;
 
 public enum Icon {
     LOADING("loading.gif"),
-    NEW_SONG("new-song.png"),
+    ADD("add.png"),
+    X("x.png"),
+    HEART("heart.png"),
+    CHECKMARK("checkmark.png"),
     REPEAT_ON("repeat-on.png"),
     REPEAT_OFF("repeat-off.png"),
     SHUFFLE_ON("shuffle-on.png"),

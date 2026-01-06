@@ -1,7 +1,7 @@
 package org.maks.mwww_daemon.service;
 
-import javafx.scene.image.ImageView;
 import javafx.util.Duration;
+import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.model.BaseSongInfo;
 import org.maks.mwww_daemon.model.NotFoundSongInfo;
 
@@ -79,9 +79,9 @@ public abstract class PlayerService<T extends BaseSongInfo> {
 
     protected abstract T lookupSong(String songId);
 
-    public abstract void addSong(ImageView addIcon);
+    public abstract void addSong(AddIcon addIcon);
 
-    public abstract void deleteSong();
+    public abstract void deleteSong(AddIcon addIcon);
 
     public abstract boolean isPlaying();
 

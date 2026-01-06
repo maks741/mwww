@@ -5,6 +5,7 @@
 <?import org.maks.mwww_daemon.components.RepeatToggle?>
 <?import org.maks.mwww_daemon.components.DynamicLabel?>
 <?import org.maks.mwww_daemon.components.ShuffleToggle?>
+<?import org.maks.mwww_daemon.components.AddIcon?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body"
@@ -23,9 +24,7 @@
             <RepeatToggle fx:id="repeatToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
                 <Image url="@../icons/repeat-off.png" />
             </RepeatToggle>
-            <ImageView fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true">
-                <Image url="@../icons/new-song.png" />
-            </ImageView>
+            <AddIcon fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true" />
         </HBox>
     </HBox>
 </VBox>
