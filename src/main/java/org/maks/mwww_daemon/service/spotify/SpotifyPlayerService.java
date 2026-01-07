@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.exception.CmdServiceException;
+import org.maks.mwww_daemon.exception.PlayerctlNoTrackException;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.model.SpotifySongInfo;
 import org.maks.mwww_daemon.service.AsyncRunnerService;
@@ -18,7 +19,6 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -26,14 +26,13 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private static final Logger LOG = Logger.getLogger(SpotifyPlayerService.class.getName());
 
+    private final PlayerctlMetadataService playerctlMetadataService = new PlayerctlMetadataService();
     private final CmdService cmdService = new CmdService();
 
     private static final double INITIAL_VOLUME = 0.7;
     private boolean hasPlayed = false;
 
     private String currentTrackUri;
-
-    private Future<?> playerctlMetadataTask;
 
     public SpotifyPlayerService(Consumer<SpotifySongInfo> songInfoConsumer) {
         super(songInfoConsumer, INITIAL_VOLUME);
@@ -70,8 +69,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
             }
         }
 
-        playerctlMetadataTask = PlayerctlMetadataService.listen();
-        PlayerctlMetadataService.addConsumer(this::onPlayerctlMetadataUpdated);
+        playerctlMetadataService.listen(this::onPlayerctlMetadataUpdated);
     }
 
     @Override
@@ -189,7 +187,12 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", query);
 
-        PlayerctlMetadata playerctlMetadata = PlayerctlMetadataService.readFullMetadata();
+        PlayerctlMetadata playerctlMetadata;
+        try {
+            playerctlMetadata = playerctlMetadataService.readFullMetadata();
+        } catch (PlayerctlNoTrackException e) {
+            throw new RuntimeException(e);
+        }
         return toSpotifySongInfo(playerctlMetadata);
     }
 
@@ -243,7 +246,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     @Override
     public void shutdown() {
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
-        playerctlMetadataTask.cancel(true);
+        playerctlMetadataService.shutdown();
     }
 
     private String playerctlStatus() {

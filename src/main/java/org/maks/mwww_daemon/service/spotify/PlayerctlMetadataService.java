@@ -1,5 +1,6 @@
 package org.maks.mwww_daemon.service.spotify;
 
+import org.maks.mwww_daemon.exception.PlayerctlNoTrackException;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 
 import java.io.BufferedReader;
@@ -16,24 +17,31 @@ import java.util.regex.Pattern;
 
 public class PlayerctlMetadataService {
 
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    private static final CmdService cmdService = new CmdService();
-    private static final List<Consumer<PlayerctlMetadata>> metadataConsumers = new ArrayList<>();
+    private final CmdService cmdService = new CmdService();
+    private final List<Consumer<PlayerctlMetadata>> metadataConsumers = new ArrayList<>();
+
+    private Future<?> playerctlMetadataTask;
 
     private static final Pattern METADATA_LINE = Pattern.compile("^spotifyd\\s+(\\S+)\\s+(.*)$");
     private static final Pattern TRACK_ID_LINE = Pattern.compile("^'/(\\w+)/(\\w+)/(\\w+)'$");
 
-    public static Future<?> listen() {
-        return executorService.submit(PlayerctlMetadataService::listenToMetadataUpdates);
-    }
+    public void listen(Consumer<PlayerctlMetadata> consumer) {
+        if (playerctlMetadataTask != null) {
+            playerctlMetadataTask.cancel(true);
+        }
 
-    public static void addConsumer(Consumer<PlayerctlMetadata> consumer) {
         metadataConsumers.add(consumer);
+        playerctlMetadataTask = executorService.submit(this::listenToMetadataUpdates);
     }
 
-    public static PlayerctlMetadata readFullMetadata() {
+    public PlayerctlMetadata readFullMetadata() throws PlayerctlNoTrackException {
         List<String> metadataLines = cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "metadata");
+
+        if (metadataLines.size() == 1 && metadataLines.getFirst().contains("/org/mpris/MediaPlayer2/TrackList/NoTrack")) {
+            throw new PlayerctlNoTrackException();
+        }
 
         String trackId = null;
         String title = null;
@@ -82,21 +90,31 @@ public class PlayerctlMetadataService {
         );
     }
 
-    private static void listenToMetadataUpdates() {
+    public void shutdown() {
+        if (playerctlMetadataTask != null) {
+            playerctlMetadataTask.cancel(true);
+        }
+        metadataConsumers.clear();
+        executorService.shutdown();
+    }
+
+    private void listenToMetadataUpdates() {
         var processBuilder = new ProcessBuilder("playerctl", "-p", "spotifyd", "metadata", "mpris:trackid", "--follow");
 
         try {
             Process process = processBuilder.start();
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (line.equals("'/org/mpris/MediaPlayer2/TrackList/NoTrack'")) {
+                while (reader.readLine() != null) {
+                    // whenever trackid is updated, read full metadata and call accept
+                    // ignore is updated to NoTrack
+                    PlayerctlMetadata metadata;
+                    try {
+                        metadata = readFullMetadata();
+                    } catch (PlayerctlNoTrackException _) {
                         continue;
                     }
 
-                    // whenever trackid is updated, read full metadata and call accept
-                    PlayerctlMetadata metadata = readFullMetadata();
                     metadataConsumers.forEach(consumer -> consumer.accept(metadata));
                 }
             }
@@ -105,7 +123,7 @@ public class PlayerctlMetadataService {
         }
     }
 
-    private static String processTrackId(String trackId) {
+    private String processTrackId(String trackId) {
         Matcher matcher = TRACK_ID_LINE.matcher(trackId);
         if (!matcher.matches()) {
             throw new RuntimeException("Unexpected trackid value: " + trackId);
