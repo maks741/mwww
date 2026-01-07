@@ -16,6 +16,14 @@ public abstract class Toggle extends ImageView {
         toggle = !toggle;
     }
 
+    public void reset() {
+        if (toggle) {
+            toggleOff();
+        }
+
+        toggle = false;
+    }
+
     protected abstract void toggleOn();
 
     protected abstract void toggleOff();

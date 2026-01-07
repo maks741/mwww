@@ -246,6 +246,8 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     @Override
     public void shutdown() {
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
+        setPlayerctlAttribute("shuffle", "Off");
+        setPlayerctlAttribute("loop", "Playlist");
         playerctlMetadataService.shutdown();
     }
 
@@ -321,6 +323,21 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
                 "spotifyd",
                 command,
                 newStatus
+        );
+    }
+
+    private void setPlayerctlAttribute(String attr, String value) {
+        if (noPlayersFound()) {
+            return;
+        }
+
+        cmdService.runCmdCommand(
+                new StringCmdOutputTransform(),
+                "playerctl",
+                "-p",
+                "spotifyd",
+                attr,
+                value
         );
     }
 
