@@ -17,6 +17,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     private static final Logger LOG = Logger.getLogger(LocalPlayerService.class.getName());
 
+    private final LocalPlaylistUtils playlistUtils = new LocalPlaylistUtils();
     private final SongIndexProvider indexProvider = new SongIndexProvider();
 
     private MediaPlayer currentPlayer = null;
@@ -31,7 +32,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     public void initialize() {
-        LocalSongInfo song = lookupSong(indexProvider.first());
+        LocalSongInfo song = playlistUtils.firstSongInfo();
         updateSongInfo(song);
     }
 
@@ -65,7 +66,6 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
             return;
         }
 
-        var playlistUtils = new LocalPlaylistUtils();
         currentPlayer = playlistUtils.player(indexProvider.current());
 
         currentPlayer.setOnReady(() -> {
@@ -134,7 +134,6 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     protected LocalSongInfo lookupSong(String songName) {
-        var playlistUtils = new LocalPlaylistUtils();
         return playlistUtils.songInfo(songName);
     }
 
@@ -157,7 +156,6 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     public void deleteSong(AddIcon addIcon) {
-        var playlistUtils = new LocalPlaylistUtils();
         playlistUtils.deleteSong(indexProvider.current());
         reloadCurrent();
     }
@@ -178,7 +176,6 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     private LocalSongInfo lookupSong(int songIndex) {
-        var playlistUtils = new LocalPlaylistUtils();
         return playlistUtils.songInfo(songIndex);
     }
 

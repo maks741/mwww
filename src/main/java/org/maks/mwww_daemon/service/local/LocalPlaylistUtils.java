@@ -14,10 +14,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class LocalPlaylistUtils {
+
+    public LocalSongInfo firstSongInfo() {
+        int index;
+
+        try {
+            index = firstSongIndex();
+        } catch (SongDirectoryEmptyException e) {
+            return new LocalSongInfo("Use Ctrl + N to add a new song");
+        }
+
+        return songInfoByIndex(index);
+    }
 
     public LocalSongInfo songInfo(int index) {
         int normalizedIndex;
@@ -28,16 +42,7 @@ public class LocalPlaylistUtils {
             return new LocalSongInfo("Use Ctrl + N to add a new song");
         }
 
-        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            Path songDirPath = songDirs
-                    .skip(normalizedIndex)
-                    .findFirst()
-                    .orElseThrow();
-
-            return songInfo(songDirPath, normalizedIndex);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return songInfoByIndex(normalizedIndex);
     }
 
     public LocalSongInfo songInfo(String targetSongName) {
@@ -126,6 +131,19 @@ public class LocalPlaylistUtils {
         );
     }
 
+    private LocalSongInfo songInfoByIndex(int index) {
+        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
+            Path songDirPath = songDirs
+                    .skip(index)
+                    .findFirst()
+                    .orElseThrow();
+
+            return songInfo(songDirPath, index);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private int normalizeIndex(int index) throws SongDirectoryEmptyException {
         try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
             int amountOfSongs = (int) songDirs.count();
@@ -150,6 +168,31 @@ public class LocalPlaylistUtils {
         try {
             return normalizeIndex(index);
         } catch (SongDirectoryEmptyException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int firstSongIndex() throws SongDirectoryEmptyException {
+        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
+            List<Path> dirs = songDirs.toList();
+
+            if (dirs.isEmpty()) {
+                throw new SongDirectoryEmptyException("Songs directory is empty");
+            }
+
+            int latestIndex = 0;
+            FileTime latestTime = Files.getLastModifiedTime(dirs.getFirst());
+
+            for (int i = 1; i < dirs.size(); i++) {
+                FileTime currentTime = Files.getLastModifiedTime(dirs.get(i));
+                if (currentTime.compareTo(latestTime) > 0) {
+                    latestTime = currentTime;
+                    latestIndex = i;
+                }
+            }
+
+            return latestIndex;
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

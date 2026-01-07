@@ -54,10 +54,6 @@ public class SongIndexProvider {
         return songIndexes.get(songIndexesPointer);
     }
 
-    public int first() {
-        return 0;
-    }
-
     public void toggleShuffle() {
         int currentIndex = current();
         clearExcept(currentIndex);
