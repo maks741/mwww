@@ -78,25 +78,6 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    public void onSetSongCommand(String commandValue) {
-        if (!hasPlayed) {
-            // ignore requests to set song while the user hasn't played anything
-            // this helps when the initial config is read, which tries to set a song from config instantly
-            return;
-        }
-
-        if (noPlayersFound()) {
-            return;
-        }
-
-        if (isPlaying()) {
-            return;
-        }
-
-        switchSong(commandValue);
-    }
-
-    @Override
     protected void onPreSongChanged() {
 
     }

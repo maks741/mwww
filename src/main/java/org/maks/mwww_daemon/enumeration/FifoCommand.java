@@ -6,7 +6,7 @@ public enum FifoCommand {
     SHOW("show"),
     RELOAD_STYLE("reload-style"),
     RELOAD_CONFIG("reload-config"),
-    SET_SONG("set");
+    SET_CONTEXT("context");
 
     private static final String separator = ":";
 
@@ -28,14 +28,6 @@ public enum FifoCommand {
         throw new IllegalArgumentException("FifoCommand not supported: " + commandStr);
     }
 
-    public static FifoCommand build(FifoCommand command, String value) {
-        return FifoCommand.fromString(command.commandName + separator + value);
-    }
-
-    public static FifoCommand build(FifoCommand command, int value) {
-        return build(command, String.valueOf(value));
-    }
-
     private static String getValue(String commandStr) {
         if (!commandStr.contains(separator)) {
             return "";
@@ -47,9 +39,5 @@ public enum FifoCommand {
 
     public String getValue() {
         return commandValue;
-    }
-
-    public int getValueAsInt() {
-        return Integer.parseInt(commandValue);
     }
 }

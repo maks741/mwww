@@ -56,8 +56,6 @@ public abstract class PlayerService<T extends BaseSongInfo> {
 
     protected abstract void onPreSongChanged();
 
-    public abstract void onSetSongCommand(String commandValue);
-
     public abstract void play();
 
     public abstract void next();

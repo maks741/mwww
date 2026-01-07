@@ -18,13 +18,17 @@ import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
 import org.maks.mwww_daemon.model.BaseSongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
+import org.maks.mwww_daemon.service.local.LocalPlayerService;
 import org.maks.mwww_daemon.service.spotify.SpotifyPlayerService;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 public class Widget implements Initializable, FifoCommandSubscriber {
+
+    private static final Logger LOG = Logger.getLogger(Widget.class.getName());
 
     @FXML
     private VBox body;
@@ -44,7 +48,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @FXML
     private AddIcon addIcon;
 
-    private final PlayerService<?> playerService = new SpotifyPlayerService(this::onSongUpdated);
+    private PlayerService<?> playerService = new SpotifyPlayerService(this::onSongUpdated);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -66,7 +70,17 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 stageOp(Stage::show);
                 Platform.setImplicitExit(true);
             }
-            case SET_SONG -> playerService.onSetSongCommand(command.getValue());
+            case SET_CONTEXT -> {
+                String context = command.getValue();
+
+                if (context.equals("local")) {
+                    updatePlayerService(new LocalPlayerService(this::onSongUpdated));
+                } else if (context.equals("spotify")) {
+                    updatePlayerService(new SpotifyPlayerService(this::onSongUpdated));
+                } else {
+                    LOG.warning("Ignoring invalid context: " + context);
+                }
+            }
         }
     }
 
@@ -131,6 +145,15 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private void onSongUpdated(BaseSongInfo songInfo) {
         statusBarIcon.setImage(songInfo.thumbnail());
         dynamicSongName.setText(songInfo.title());
+    }
+
+    private void updatePlayerService(PlayerService<?> playerService) {
+        shuffleToggle.reset();
+        repeatToggle.reset();
+
+        this.playerService.shutdown();
+        this.playerService = playerService;
+        this.playerService.initialize();
     }
 
     private void stageOp(Consumer<Stage> op) {
