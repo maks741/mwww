@@ -43,12 +43,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     @Override
     protected void onPreSongChanged() {
-        if (currentPlayer == null) {
-            return;
-        }
-
-        currentPlayer.dispose();
-        currentPlayer = null;
+        dispose();
     }
 
     @Override
@@ -165,6 +160,11 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         return isSongPlaying;
     }
 
+    @Override
+    public void shutdown() {
+        dispose();
+    }
+
     private void nextOrRepeat() {
         onPreSongChanged();
 
@@ -195,5 +195,14 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
 
     private void switchSong(int songIndex) {
         switchSong(lookupSong(songIndex));
+    }
+
+    private void dispose() {
+        if (currentPlayer == null) {
+            return;
+        }
+
+        currentPlayer.dispose();
+        currentPlayer = null;
     }
 }
