@@ -53,19 +53,19 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
                     "/rs/spotifyd/Controls",
                     "rs.spotifyd.Controls.TransferPlayback"
             );
+        }
 
-            // silently start playing the playlist, then seek to position 0 to make up for delay between playerctl open and playerctl pause
-            setVolume(0);
-            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", Config.spotifyOpenOnStartupUri());
-            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
-            setVolume(INITIAL_VOLUME);
-            try {
-                cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", "0");
-            } catch (CmdServiceException e) {
-                // this error may appear if nothing started playing (sometimes it does, sometimes not)
-                if (!e.cmdErrorMessage().equals("Could not execute command: GDBus.Error:org.freedesktop.DBus.Error.Failed: can set position while nothing is playing")) {
-                    throw e;
-                }
+        // silently start playing the playlist, then seek to position 0 to make up for delay between playerctl open and playerctl pause
+        setVolume(0);
+        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", Config.spotifyOpenOnStartupUri());
+        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
+        setVolume(INITIAL_VOLUME);
+        try {
+            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", "0");
+        } catch (CmdServiceException e) {
+            // this error may appear if nothing started playing (sometimes it does, sometimes not)
+            if (!e.cmdErrorMessage().equals("Could not execute command: GDBus.Error:org.freedesktop.DBus.Error.Failed: can set position while nothing is playing")) {
+                throw e;
             }
         }
 
