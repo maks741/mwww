@@ -15,6 +15,8 @@ import org.maks.mwww_daemon.utils.Config;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -269,7 +271,8 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
         Image thumbnail = new Image(outputPath.toUri().toString());
 
-        String title = String.join(", ", playerctlMetadata.artists()) + " - " + playerctlMetadata.title();
+        Set<String> artistsSet = new HashSet<>(playerctlMetadata.artists());
+        String title = String.join(", ", artistsSet) + " - " + playerctlMetadata.title();
         return new SpotifySongInfo(thumbnail, title, playerctlMetadata.trackId());
     }
 
