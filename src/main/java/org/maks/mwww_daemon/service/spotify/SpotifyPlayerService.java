@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -31,6 +32,8 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     private boolean hasPlayed = false;
 
     private String currentTrackUri;
+
+    private Future<?> playerctlMetadataTask;
 
     public SpotifyPlayerService(Consumer<SpotifySongInfo> songInfoConsumer) {
         super(songInfoConsumer, INITIAL_VOLUME);
@@ -67,7 +70,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
             }
         }
 
-        PlayerctlMetadataService.listen();
+        playerctlMetadataTask = PlayerctlMetadataService.listen();
         PlayerctlMetadataService.addConsumer(this::onPlayerctlMetadataUpdated);
     }
 
@@ -240,6 +243,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     @Override
     public void shutdown() {
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
+        playerctlMetadataTask.cancel(true);
     }
 
     private String playerctlStatus() {

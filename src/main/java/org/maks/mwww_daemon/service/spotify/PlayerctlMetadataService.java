@@ -7,11 +7,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PlayerctlMetadataService {
+
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private static final CmdService cmdService = new CmdService();
     private static final List<Consumer<PlayerctlMetadata>> metadataConsumers = new ArrayList<>();
@@ -19,8 +24,8 @@ public class PlayerctlMetadataService {
     private static final Pattern METADATA_LINE = Pattern.compile("^spotifyd\\s+(\\S+)\\s+(.*)$");
     private static final Pattern TRACK_ID_LINE = Pattern.compile("^'/(\\w+)/(\\w+)/(\\w+)'$");
 
-    public static void listen() {
-        new Thread(PlayerctlMetadataService::listenToMetadataUpdates).start();
+    public static Future<?> listen() {
+        return executorService.submit(PlayerctlMetadataService::listenToMetadataUpdates);
     }
 
     public static void addConsumer(Consumer<PlayerctlMetadata> consumer) {
