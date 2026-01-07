@@ -128,7 +128,13 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void skipBackward() {
-        skip("-");
+        try {
+            skip("-");
+        } catch (CmdServiceException e) {
+            if (e.cmdErrorMessage().contains("new position out of bounds")) {
+                cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", "0");
+            }
+        }
     }
 
     @Override
