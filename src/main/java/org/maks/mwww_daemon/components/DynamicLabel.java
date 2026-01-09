@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class DynamicLabel extends StackPane {
@@ -11,17 +12,31 @@ public class DynamicLabel extends StackPane {
     private final Label label = new Label();
     private final TextField textField = new TextField();
 
-    private Consumer<String> onSearchSong = (_) -> {};
+    private Consumer<String> onSubmit = (_) -> {};
 
     public DynamicLabel() {
         getChildren().add(label);
-        textField.setOnKeyPressed(keyEvent -> {
-            switch (keyEvent.getCode()) {
-                case ESCAPE -> switchToLabel();
-                case ENTER -> switchSong();
-            }
-        });
         textField.minWidthProperty().bind(widthProperty());
+        setDefaultKeybindings();
+    }
+
+    public CompletableFuture<String> acceptNext(String prompt) {
+        switchToTextField();
+        textField.setText(prompt);
+
+        CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+        Runnable onSubmit = () -> {
+            String input = textField.getText();
+            completableFuture.complete(input);
+
+            this.setDefaultKeybindings();
+            this.switchToLabel();
+            textField.setPromptText("");
+        };
+        setKeybindings(onSubmit);
+
+        return completableFuture;
     }
 
     public void switchToTextField() {
@@ -33,15 +48,19 @@ public class DynamicLabel extends StackPane {
         label.setText(text);
     }
 
-    private void switchSong() {
-        String songName = textField.getText();
+    public void setOnSubmit(Consumer<String> onSubmit) {
+        this.onSubmit = onSubmit;
+    }
 
-        if (songName.trim().isEmpty()) {
+    private void onSubmit() {
+        String input = textField.getText();
+
+        if (input.trim().isEmpty()) {
             switchToLabel();
             return;
         }
 
-        onSearchSong.accept(songName);
+        onSubmit.accept(input);
         switchToLabel();
     }
 
@@ -50,7 +69,16 @@ public class DynamicLabel extends StackPane {
         getChildren().add(label);
     }
 
-    public void setOnSearchSong(Consumer<String> onSearchSong) {
-        this.onSearchSong = onSearchSong;
+    private void setDefaultKeybindings() {
+        setKeybindings(this::onSubmit);
+    }
+
+    private void setKeybindings(Runnable onSubmit) {
+        textField.setOnKeyPressed(keyEvent -> {
+            switch (keyEvent.getCode()) {
+                case ESCAPE -> switchToLabel();
+                case ENTER -> onSubmit.run();
+            }
+        });
     }
 }

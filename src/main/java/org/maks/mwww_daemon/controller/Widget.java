@@ -48,12 +48,12 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @FXML
     private AddIcon addIcon;
 
-    private PlayerService<?> playerService = new SpotifyPlayerService(this::onSongUpdated);
+    private PlayerService<?> playerService = new LocalPlayerService(this::onSongUpdated);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         playerService.initialize();
-        dynamicSongName.setOnSearchSong(this.playerService::switchSong);
+        dynamicSongName.setOnSubmit(this.playerService::switchSong);
         addKeybindings();
 
         Runtime.getRuntime().addShutdownHook(new Thread(playerService::shutdown));
@@ -126,7 +126,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 } else if (find.match(keyEvent)) {
                     dynamicSongName.switchToTextField();
                 } else if (newSong.match(keyEvent)) {
-                    playerService.addSong(addIcon);
+                    playerService.addSong(addIcon, dynamicSongName);
                 } else if (deleteSong.match(keyEvent)) {
                     playerService.deleteSong(addIcon);
                 } else if (exit.match(keyEvent)) {

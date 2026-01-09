@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
+import org.maks.mwww_daemon.components.DynamicLabel;
 import org.maks.mwww_daemon.model.LocalSongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
 
@@ -123,19 +124,22 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     @Override
-    public void addSong(AddIcon addIcon) {
-        addIcon.loading();
+    public void addSong(AddIcon addIcon, DynamicLabel dynamicLabel) {
+        dynamicLabel.acceptNext("Paste yt-dlp URL").thenAccept(url -> {
+            addIcon.loading();
 
-        DownloadService downloadService = new DownloadService();
-        CompletableFuture<String> task = downloadService.downloadSong();
-        task.whenComplete((downloadedSongName, ex) -> {
-            if (ex != null) {
-                addIcon.fail();
-                LOG.severe(ex.getMessage());
-            } else {
-                addIcon.like();
-                Platform.runLater(() -> switchSong(downloadedSongName));
-            }
+            DownloadService downloadService = new DownloadService();
+
+            CompletableFuture<String> task = downloadService.downloadSong(url);
+            task.whenComplete((downloadedSongName, ex) -> {
+                if (ex != null) {
+                    addIcon.fail();
+                    LOG.severe(ex.getMessage());
+                } else {
+                    addIcon.like();
+                    Platform.runLater(() -> switchSong(downloadedSongName));
+                }
+            });
         });
     }
 

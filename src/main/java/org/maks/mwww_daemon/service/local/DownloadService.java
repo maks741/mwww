@@ -1,31 +1,26 @@
 package org.maks.mwww_daemon.service.local;
 
-import javafx.scene.input.Clipboard;
 import org.maks.mwww_daemon.service.AsyncRunnerService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public class DownloadService {
 
     private final AsyncRunnerService asyncRunnerService = new AsyncRunnerService();
 
-    public CompletableFuture<String> downloadSong() {
-        Clipboard clipboard = Clipboard.getSystemClipboard();
+    public CompletableFuture<String> downloadSong(String url) {
+        return asyncRunnerService.run(() -> {
+            if (url.trim().isEmpty()) {
+                throw new RuntimeException("URL cannot be empty");
+            }
 
-        if (!clipboard.hasString()) {
-            throw new RuntimeException("Clipboard has no content");
-        }
+            if (!url.startsWith("https://")) {
+                throw new RuntimeException("Invalid URL");
+            }
 
-        String urlFromClipboard = clipboard.getString();
-        return asyncRunnerService.run(downloadSongByUrl(urlFromClipboard));
-    }
-
-    private Supplier<String> downloadSongByUrl(String url) {
-        return () -> {
             Process downloadScriptProcess = executeDownloadScript(url);
             String targetLogPrefix = "Downloaded song name: ";
 
@@ -42,7 +37,7 @@ public class DownloadService {
             }
 
             throw new RuntimeException("Could not download song by url: " + url);
-        };
+        });
     }
 
     private Process executeDownloadScript(String url) {
