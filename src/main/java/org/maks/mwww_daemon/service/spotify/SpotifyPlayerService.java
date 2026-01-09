@@ -30,7 +30,6 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     private final CmdService cmdService = new CmdService();
 
     private static final double INITIAL_VOLUME = 0.7;
-    private boolean hasPlayed = false;
 
     private String currentTrackUri;
 
@@ -85,7 +84,6 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     @Override
     public void play() {
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
-        hasPlayed = true;
     }
 
     @Override

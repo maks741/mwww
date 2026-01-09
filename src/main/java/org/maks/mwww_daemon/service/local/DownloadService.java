@@ -1,6 +1,7 @@
-package org.maks.mwww_daemon.service;
+package org.maks.mwww_daemon.service.local;
 
 import javafx.scene.input.Clipboard;
+import org.maks.mwww_daemon.service.AsyncRunnerService;
 
 import java.io.BufferedReader;
 import java.io.IOException;

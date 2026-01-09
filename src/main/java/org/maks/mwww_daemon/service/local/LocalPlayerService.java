@@ -5,7 +5,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.model.LocalSongInfo;
-import org.maks.mwww_daemon.service.DownloadService;
 import org.maks.mwww_daemon.service.PlayerService;
 
 import java.util.concurrent.CompletableFuture;
