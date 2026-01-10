@@ -18,22 +18,14 @@ public class SpotifydLifecycleService {
         this.initialVolume = initialVolume;
     }
 
-    public void start() {
-        if (isRunning()) {
-            throw new RuntimeException("Unexpected call to start: spotifyd is already running");
-        }
-
-        startAndConnect();
-        register();
-        openStartupUri();
-    }
-
     public void restart() {
         if (isRunning()) {
             cmdService.runCmdCommand("killall", "spotifyd");
         }
 
-        start();
+        startAndConnect();
+        register();
+        openStartupUri();
     }
 
     private void openStartupUri() {

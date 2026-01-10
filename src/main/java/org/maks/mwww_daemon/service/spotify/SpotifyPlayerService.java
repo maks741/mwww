@@ -44,7 +44,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     @Override
     public void initialize() {
         if (noPlayersFound()) {
-            spotifydService.start();
+            spotifydService.restart();
         }
 
         playerctlMetadataService.listen(this::onPlayerctlMetadataUpdated);
