@@ -68,7 +68,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     @Override
     public void play() {
         if (playerctlInactive()) {
-            return;
+            recoverSpotifyd();
         }
 
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
@@ -338,5 +338,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private boolean playerctlInactive() {
         return playerctlStatus == PlayerctlStatus.INACTIVE;
+    }
+
+    private void recoverSpotifyd() {
+        spotifydService.restart();
+        playerctlMetadataService.restartTask();
+        playerctlStatusService.restartTask();
     }
 }
