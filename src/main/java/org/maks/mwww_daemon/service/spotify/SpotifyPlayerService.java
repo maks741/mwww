@@ -130,7 +130,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     public boolean toggleRepeat() {
         try {
             playerctlToggle("loop", "Track", "Playlist");
-        } catch (CmdServiceException _) {
+        } catch (RuntimeException _) {
             return false;
         }
 
@@ -141,7 +141,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     public boolean toggleShuffle() {
         try {
             playerctlToggle("shuffle", "On", "Off");
-        } catch (CmdServiceException _) {
+        } catch (RuntimeException _) {
             return false;
         }
 
@@ -293,7 +293,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private void playerctlToggle(String command, String on, String off) {
         if (playerctlInactive()) {
-            return;
+            throw new RuntimeException("Could not toggle playerctl " + command);
         }
 
         String currentStatus = cmdService.runCmdCommand(
