@@ -67,21 +67,37 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void play() {
+        if (playerctlInactive()) {
+            return;
+        }
+
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
     }
 
     @Override
     public void next() {
+        if (playerctlInactive()) {
+            return;
+        }
+
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "next");
     }
 
     @Override
     public void previous() {
+        if (playerctlInactive()) {
+            return;
+        }
+
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "previous");
     }
 
     @Override
     public void setVolume(double volume) {
+        if (playerctlInactive()) {
+            return;
+        }
+
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "volume", String.valueOf(volume));
     }
 
@@ -103,6 +119,10 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void togglePause() {
+        if (playerctlInactive()) {
+            return;
+        }
+
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play-pause");
     }
 
@@ -257,6 +277,10 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private void skip(String sign) {
+        if (playerctlInactive()) {
+            return;
+        }
+
         String offsetPositon = ((int) skipDuration.toSeconds()) + sign;
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", offsetPositon);
     }
