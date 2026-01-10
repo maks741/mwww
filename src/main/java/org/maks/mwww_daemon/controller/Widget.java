@@ -137,6 +137,11 @@ public class Widget implements Initializable, FifoCommandSubscriber {
 
             scene.setOnKeyReleased(keyEvent -> {
                 if (KeyCode.CONTROL == keyEvent.getCode()) {
+                    // ignore Ctrl-related events when search field is active (e.g. Ctrl + V)
+                    if (searchField.isSearching()) {
+                        return;
+                    }
+
                     playerService.play();
                 }
             });

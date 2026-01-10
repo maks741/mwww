@@ -52,6 +52,10 @@ public class SearchField extends StackPane {
         this.onSubmit = onSubmit;
     }
 
+    public boolean isSearching() {
+        return getChildren().contains(textField);
+    }
+
     private void onSubmit() {
         String input = textField.getText();
 
