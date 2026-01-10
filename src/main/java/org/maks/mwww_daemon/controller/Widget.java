@@ -48,7 +48,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @FXML
     private AddIcon addIcon;
 
-    private PlayerService<?> playerService = new LocalPlayerService(this::onSongUpdated);
+    private PlayerService<?> playerService = new SpotifyPlayerService(this::onSongUpdated);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

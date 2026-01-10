@@ -11,8 +11,10 @@ import org.maks.mwww_daemon.model.SpotifySongInfo;
 import org.maks.mwww_daemon.service.AsyncRunnerService;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.client.SpotifyWebApiClient;
+import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.CmdOutputTransform;
 import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
 import org.maks.mwww_daemon.utils.Config;
+import org.maks.mwww_daemon.utils.ResourceUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +31,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private final PlayerctlMetadataService playerctlMetadataService = new PlayerctlMetadataService();
     private final CmdService cmdService = new CmdService();
+    private final SpotifydLifecycleService spotifydService = new SpotifydLifecycleService(INITIAL_VOLUME);
 
     private static final double INITIAL_VOLUME = 0.7;
 
@@ -41,32 +44,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     @Override
     public void initialize() {
         if (noPlayersFound()) {
-            // register spotifyd in playerctl players
-            String spotifydPid = cmdService.runCmdCommand(
-                    new StringCmdOutputTransform(),
-                    "pidof", "spotifyd"
-            );
-            cmdService.runCmdCommand(
-                    "dbus-send",
-                    "--print-reply",
-                    "--dest=rs.spotifyd.instance" + spotifydPid,
-                    "/rs/spotifyd/Controls",
-                    "rs.spotifyd.Controls.TransferPlayback"
-            );
-        }
-
-        // silently start playing the playlist, then seek to position 0 to make up for delay between playerctl open and playerctl pause
-        setVolume(0);
-        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", Config.spotifyOpenOnStartupUri());
-        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
-        setVolume(INITIAL_VOLUME);
-        try {
-            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "position", "0");
-        } catch (CmdServiceException e) {
-            // this error may appear if nothing started playing (sometimes it does, sometimes not)
-            if (!e.cmdErrorMessage().equals("Could not execute command: GDBus.Error:org.freedesktop.DBus.Error.Failed: can set position while nothing is playing")) {
-                throw e;
-            }
+            spotifydService.start();
         }
 
         playerctlMetadataService.listen(this::onPlayerctlMetadataUpdated);
@@ -84,7 +62,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void play() {
-        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
+        runPlayerctlCommand("playerctl", "-p", "spotifyd", "play");
     }
 
     @Override
@@ -99,7 +77,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void setVolume(double volume) {
-        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "volume", String.valueOf(volume));
+        runPlayerctlCommand("playerctl", "-p", "spotifyd", "volume", String.valueOf(volume));
     }
 
     @Override
@@ -241,7 +219,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private SpotifySongInfo toSpotifySongInfo(PlayerctlMetadata playerctlMetadata) {
-        String outputDir = Paths.get(System.getProperty("user.home"), ".cache", "mwww", playerctlMetadata.trackId()).toAbsolutePath().toString();
+        String outputDir = ResourceUtils.cachePath(playerctlMetadata.trackId());
         String outputPathStr = outputDir + "/img.png";
         Path outputPath = Paths.get(outputPathStr);
 
@@ -327,5 +305,21 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         } catch (CmdServiceException e) {
             return e.cmdErrorMessage().equals("No players found");
         }
+    }
+
+    private <T> T runPlayerctlCommand(CmdOutputTransform<T> cmdOutputTransform, String... commands) {
+        if (noPlayersFound()) {
+            spotifydService.restart();
+        }
+
+        return cmdService.runCmdCommand(cmdOutputTransform, commands);
+    }
+
+    private void runPlayerctlCommand(String... commands) {
+        if (noPlayersFound()) {
+            spotifydService.restart();
+        }
+
+        cmdService.runCmdCommand(commands);
     }
 }

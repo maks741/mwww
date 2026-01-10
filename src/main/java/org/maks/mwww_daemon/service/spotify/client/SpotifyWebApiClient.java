@@ -71,7 +71,7 @@ public class SpotifyWebApiClient {
                 continue;
             }
 
-            // Return the 'uri' of the very first item in the first available category
+            // return the 'uri' of the very first item in the first available category
             JsonObject mostRelevant = items.get(0).getAsJsonObject();
             if (!mostRelevant.has(uriField)) {
                 LOG.warning("Search result missing URI: " + mostRelevant);

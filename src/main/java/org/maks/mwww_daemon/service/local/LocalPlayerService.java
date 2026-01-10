@@ -55,7 +55,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         currentPlayer = playlistUtils.player(indexProvider.current());
 
         currentPlayer.setOnReady(() -> {
-            // Magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
+            // magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
             currentPlayer.seek(Duration.ZERO);
 
             currentPlayer.setVolume(volume);
