@@ -5,32 +5,34 @@ import org.maks.mwww_daemon.model.PlayerctlMetadata;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PlayerctlMetadataService {
+public class PlayerctlMetadataService extends PlayerctlFollowService<PlayerctlMetadata> {
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-    private final CmdService cmdService = new CmdService();
-    private final List<Consumer<PlayerctlMetadata>> metadataConsumers = new ArrayList<>();
-
-    private Future<?> playerctlMetadataTask;
+    private static final Logger LOG = Logger.getLogger(PlayerctlMetadataService.class.getName());
 
     private static final Pattern METADATA_LINE = Pattern.compile("^spotifyd\\s+(\\S+)\\s+(.*)$");
     private static final Pattern TRACK_ID_LINE = Pattern.compile("^'/(\\w+)/(\\w+)/(\\w+)'$");
 
-    public void listen(Consumer<PlayerctlMetadata> consumer) {
-        if (playerctlMetadataTask != null) {
-            playerctlMetadataTask.cancel(true);
+    @Override
+    protected PlayerctlMetadata accept(String trackId) {
+        // whenever trackid is updated, read full metadata
+        PlayerctlMetadata metadata;
+        try {
+            metadata = readFullMetadata();
+        } catch (PlayerctlNoTrackException _) {
+            LOG.warning("Ignoring playerctl NoTrack metadata");
+            metadata = null;
         }
 
-        metadataConsumers.add(consumer);
-        playerctlMetadataTask = executorService.submit(this::listenToMetadataUpdates);
+        return metadata;
+    }
+
+    @Override
+    protected List<String> fields() {
+        return List.of("metadata", "mpris:trackid");
     }
 
     public PlayerctlMetadata readFullMetadata() throws PlayerctlNoTrackException {
@@ -86,35 +88,6 @@ public class PlayerctlMetadataService {
                 List.copyOf(albumArtists),
                 length
         );
-    }
-
-    public void shutdown() {
-        if (playerctlMetadataTask != null) {
-            playerctlMetadataTask.cancel(true);
-        }
-        metadataConsumers.clear();
-        executorService.shutdown();
-    }
-
-    public void restartTask() {
-        if (playerctlMetadataTask != null) {
-            playerctlMetadataTask.cancel(true);
-        }
-        playerctlMetadataTask = executorService.submit(this::listenToMetadataUpdates);
-    }
-
-    private void listenToMetadataUpdates() {
-        // whenever trackid is updated, read full metadata and call accept
-        cmdService.runCmdCommand(_ -> {
-            PlayerctlMetadata metadata;
-            try {
-                metadata = readFullMetadata();
-            } catch (PlayerctlNoTrackException _) {
-                return;
-            }
-
-            metadataConsumers.forEach(consumer -> consumer.accept(metadata));
-        }, "playerctl", "-p", "spotifyd", "metadata", "mpris:trackid", "--follow");
     }
 
     private String processTrackId(String trackId) {

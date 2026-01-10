@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.components.DynamicLabel;
+import org.maks.mwww_daemon.enumeration.PlayerctlStatus;
 import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.exception.PlayerctlNoTrackException;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
@@ -30,12 +31,15 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     private static final Logger LOG = Logger.getLogger(SpotifyPlayerService.class.getName());
 
     private final PlayerctlMetadataService playerctlMetadataService = new PlayerctlMetadataService();
+    private final PlayerctlStatusService playerctlStatusService = new PlayerctlStatusService();
+
     private final CmdService cmdService = new CmdService();
     private final SpotifydLifecycleService spotifydService = new SpotifydLifecycleService(INITIAL_VOLUME);
 
     private static final double INITIAL_VOLUME = 0.7;
 
     private String currentTrackUri;
+    private PlayerctlStatus playerctlStatus = PlayerctlStatus.INACTIVE;
 
     public SpotifyPlayerService(Consumer<SpotifySongInfo> songInfoConsumer) {
         super(songInfoConsumer, INITIAL_VOLUME);
@@ -43,7 +47,9 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void initialize() {
-        if (noPlayersFound()) {
+        playerctlStatusService.listen(this::onPlayerctlStatusUpdated);
+
+        if (playerctlInactive()) {
             spotifydService.restart();
         }
 
@@ -213,6 +219,17 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         return cmdService.runCmdCommand(new StringCmdOutputTransform(), "playerctl", "-p", "spotifyd", "status");
     }
 
+    private void onPlayerctlStatusUpdated(String status) {
+        PlayerctlStatus newStatus;
+        if (status.isEmpty() || status.equals("Stopped")) {
+            newStatus = PlayerctlStatus.INACTIVE;
+        } else {
+            newStatus = PlayerctlStatus.ACTIVE;
+        }
+
+        playerctlStatus = newStatus;
+    }
+
     private void onPlayerctlMetadataUpdated(PlayerctlMetadata playerctlMetadata) {
         SpotifySongInfo songInfo = toSpotifySongInfo(playerctlMetadata);
         Platform.runLater(() -> updateSongInfo(songInfo));
@@ -255,7 +272,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private void playerctlToggle(String command, String on, String off) {
-        if (noPlayersFound()) {
+        if (playerctlInactive()) {
             return;
         }
 
@@ -285,7 +302,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private void setPlayerctlAttribute(String attr, String value) {
-        if (noPlayersFound()) {
+        if (playerctlInactive()) {
             return;
         }
 
@@ -299,16 +316,12 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         );
     }
 
-    private boolean noPlayersFound() {
-        try {
-            return playerctlStatus().equals("No players found");
-        } catch (CmdServiceException e) {
-            return e.cmdErrorMessage().equals("No players found");
-        }
+    private boolean playerctlInactive() {
+        return playerctlStatus == PlayerctlStatus.INACTIVE;
     }
 
     private <T> T runPlayerctlCommand(CmdOutputTransform<T> cmdOutputTransform, String... commands) {
-        if (noPlayersFound()) {
+        if (playerctlInactive()) {
             spotifydService.restart();
             playerctlMetadataService.restartTask();
         }
@@ -317,7 +330,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private void runPlayerctlCommand(String... commands) {
-        if (noPlayersFound()) {
+        if (playerctlInactive()) {
             spotifydService.restart();
             playerctlMetadataService.restartTask();
         }
