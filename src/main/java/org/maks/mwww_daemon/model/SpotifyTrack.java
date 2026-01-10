@@ -2,16 +2,16 @@ package org.maks.mwww_daemon.model;
 
 import javafx.scene.image.Image;
 
-public class SpotifySongInfo extends BaseSongInfo {
+public class SpotifyTrack extends Track {
 
     private final String uri;
 
-    public SpotifySongInfo(Image thumbnail, String title, String uri) {
+    public SpotifyTrack(Image thumbnail, String title, String uri) {
         super(thumbnail, title);
         this.uri = uri;
     }
 
-    public SpotifySongInfo(Image thumbnail, String title) {
+    public SpotifyTrack(Image thumbnail, String title) {
         super(thumbnail, title);
         this.uri = "";
     }

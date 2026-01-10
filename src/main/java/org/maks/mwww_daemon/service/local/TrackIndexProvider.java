@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class SongIndexProvider {
+public class TrackIndexProvider {
 
     private final LocalPlaylistUtils playlistUtils = new LocalPlaylistUtils();
     private final Random random = new Random();
 
-    private final List<Integer> songIndexes = new ArrayList<>();
-    private int songIndexesPointer = 0;
+    private final List<Integer> trackIndexes = new ArrayList<>();
+    private int trackIndexesPointer = 0;
 
     private boolean shuffleOn = false;
 
@@ -20,30 +20,30 @@ public class SongIndexProvider {
             return;
         }
 
-        if (songIndexes.contains(index)) {
-            songIndexesPointer = songIndexes.indexOf(index);
+        if (trackIndexes.contains(index)) {
+            trackIndexesPointer = trackIndexes.indexOf(index);
         } else {
-            songIndexes.add(index);
-            songIndexesPointer = songIndexes.size() - 1;
+            trackIndexes.add(index);
+            trackIndexesPointer = trackIndexes.size() - 1;
         }
     }
 
     public int next() {
-        if (songIndexesPointer == songIndexes.size() - 1) {
-            songIndexes.add(newIndex());
+        if (trackIndexesPointer == trackIndexes.size() - 1) {
+            trackIndexes.add(newIndex());
         }
 
-        return songIndexes.get(++songIndexesPointer);
+        return trackIndexes.get(++trackIndexesPointer);
     }
 
     public int previous() {
         if (shuffleOn) {
-            songIndexesPointer = Math.max(0, --songIndexesPointer);
+            trackIndexesPointer = Math.max(0, --trackIndexesPointer);
         } else {
-            if (songIndexesPointer == 0) {
-                songIndexes.addFirst(songIndexes.getFirst() - 1);
+            if (trackIndexesPointer == 0) {
+                trackIndexes.addFirst(trackIndexes.getFirst() - 1);
             } else {
-                --songIndexesPointer;
+                --trackIndexesPointer;
             }
         }
 
@@ -51,7 +51,7 @@ public class SongIndexProvider {
     }
 
     public int current() {
-        return songIndexes.get(songIndexesPointer);
+        return trackIndexes.get(trackIndexesPointer);
     }
 
     public void toggleShuffle() {
@@ -73,8 +73,8 @@ public class SongIndexProvider {
     }
 
     private void clearExcept(int index) {
-        songIndexes.clear();
-        songIndexes.add(index);
-        songIndexesPointer = 0;
+        trackIndexes.clear();
+        trackIndexes.add(index);
+        trackIndexesPointer = 0;
     }
 }

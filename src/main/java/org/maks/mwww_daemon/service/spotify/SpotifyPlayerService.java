@@ -8,7 +8,7 @@ import org.maks.mwww_daemon.enumeration.PlayerctlStatus;
 import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.exception.PlayerctlNoTrackException;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
-import org.maks.mwww_daemon.model.SpotifySongInfo;
+import org.maks.mwww_daemon.model.SpotifyTrack;
 import org.maks.mwww_daemon.service.AsyncRunnerService;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.client.SpotifyWebApiClient;
@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
+public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
 
     private static final Logger LOG = Logger.getLogger(SpotifyPlayerService.class.getName());
 
@@ -40,8 +40,8 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     private String currentTrackUri;
     private PlayerctlStatus playerctlStatus = PlayerctlStatus.INACTIVE;
 
-    public SpotifyPlayerService(Consumer<SpotifySongInfo> songInfoConsumer) {
-        super(songInfoConsumer, INITIAL_VOLUME);
+    public SpotifyPlayerService(Consumer<SpotifyTrack> trackUpdatedConsumer) {
+        super(trackUpdatedConsumer, INITIAL_VOLUME);
     }
 
     @Override
@@ -56,12 +56,12 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    protected void onSongUpdated(SpotifySongInfo songInfo) {
-        currentTrackUri = songInfo.uri();
+    protected void onTrackUpdated(SpotifyTrack track) {
+        currentTrackUri = track.uri();
     }
 
     @Override
-    protected void onPreSongChanged() {
+    protected void onPreTrackChanged() {
 
     }
 
@@ -149,7 +149,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    protected SpotifySongInfo lookupSong(String query) {
+    protected SpotifyTrack lookupTrack(String query) {
         if (query.equals("me")) {
             // 'me' is a shortcut to open the home playlist
             query = "spotify:playlist:" + Config.spotifyPlaylistId();
@@ -176,11 +176,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
         } catch (PlayerctlNoTrackException e) {
             throw new RuntimeException(e);
         }
-        return toSpotifySongInfo(playerctlMetadata);
+        return toSpotifyTrack(playerctlMetadata);
     }
 
     @Override
-    public void addSong(AddIcon addIcon, SearchField searchField) {
+    public void addTrack(AddIcon addIcon, SearchField searchField) {
         var runner = new AsyncRunnerService();
 
         addIcon.loading();
@@ -201,7 +201,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    public void deleteSong(AddIcon addIcon) {
+    public void deleteTrack(AddIcon addIcon) {
         var runner = new AsyncRunnerService();
 
         addIcon.loading();
@@ -247,11 +247,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     private void onPlayerctlMetadataUpdated(PlayerctlMetadata playerctlMetadata) {
-        SpotifySongInfo songInfo = toSpotifySongInfo(playerctlMetadata);
-        Platform.runLater(() -> updateSongInfo(songInfo));
+        SpotifyTrack track = toSpotifyTrack(playerctlMetadata);
+        Platform.runLater(() -> updateTrackInfo(track));
     }
 
-    private SpotifySongInfo toSpotifySongInfo(PlayerctlMetadata playerctlMetadata) {
+    private SpotifyTrack toSpotifyTrack(PlayerctlMetadata playerctlMetadata) {
         String outputDir = ResourceUtils.cachePath(playerctlMetadata.trackId());
         String outputPathStr = outputDir + "/img.png";
         Path outputPath = Paths.get(outputPathStr);
@@ -279,7 +279,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
         Set<String> artistsSet = new HashSet<>(playerctlMetadata.artists());
         String title = String.join(", ", artistsSet) + " - " + playerctlMetadata.title();
-        return new SpotifySongInfo(thumbnail, title, playerctlMetadata.trackId());
+        return new SpotifyTrack(thumbnail, title, playerctlMetadata.trackId());
     }
 
     private void skip(String sign) {

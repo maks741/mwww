@@ -5,8 +5,8 @@ import java.nio.file.Paths;
 
 public class ResourceUtils {
 
-    public static Path songsDirPath() {
-        return basePath().resolve("songs");
+    public static Path tracksDirPath() {
+        return basePath().resolve("local-tracks");
     }
 
     public static Path customCssPath() {

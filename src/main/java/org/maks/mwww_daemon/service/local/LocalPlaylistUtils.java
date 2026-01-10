@@ -4,8 +4,8 @@ import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Pair;
-import org.maks.mwww_daemon.exception.SongDirectoryEmptyException;
-import org.maks.mwww_daemon.model.LocalSongInfo;
+import org.maks.mwww_daemon.exception.EmptyTracksDirException;
+import org.maks.mwww_daemon.model.LocalTrack;
 import org.maks.mwww_daemon.utils.ResourceUtils;
 
 import java.io.IOException;
@@ -21,41 +21,41 @@ import java.util.stream.Stream;
 
 public class LocalPlaylistUtils {
 
-    public LocalSongInfo firstSongInfo() {
+    public LocalTrack firstTrack() {
         int index;
 
         try {
-            index = firstSongIndex();
-        } catch (SongDirectoryEmptyException e) {
-            return new LocalSongInfo("Use Ctrl + N to add a new song");
+            index = firstTrackIndex();
+        } catch (EmptyTracksDirException e) {
+            return new LocalTrack("Use Ctrl + N to add a new track");
         }
 
-        return songInfoByIndex(index);
+        return trackInfoByIndex(index);
     }
 
-    public LocalSongInfo songInfo(int index) {
+    public LocalTrack trackInfo(int index) {
         int normalizedIndex;
 
         try {
             normalizedIndex = normalizeIndex(index);
-        } catch (SongDirectoryEmptyException e) {
-            return new LocalSongInfo("Use Ctrl + N to add a new song");
+        } catch (EmptyTracksDirException e) {
+            return new LocalTrack("Use Ctrl + N to add a new trac");
         }
 
-        return songInfoByIndex(normalizedIndex);
+        return trackInfoByIndex(normalizedIndex);
     }
 
-    public LocalSongInfo songInfo(String targetSongName) {
-        AtomicInteger songIndexCounter = new AtomicInteger(0);
+    public LocalTrack trackInfo(String targetTrackName) {
+        AtomicInteger trackIndexCounter = new AtomicInteger(0);
 
-        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            return songDirs
+        try (Stream<Path> trackDirs = Files.list(ResourceUtils.tracksDirPath())) {
+            return trackDirs
                     .filter(path -> {
-                        songIndexCounter.getAndIncrement();
-                        return path.getFileName().toString().contains(targetSongName);
+                        trackIndexCounter.getAndIncrement();
+                        return path.getFileName().toString().contains(targetTrackName);
                     })
                     .findFirst()
-                    .map(path -> songInfo(path, songIndexCounter.decrementAndGet()))
+                    .map(path -> trackInfo(path, trackIndexCounter.decrementAndGet()))
                     .orElse(null);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -65,30 +65,30 @@ public class LocalPlaylistUtils {
     public MediaPlayer player(int index) {
         int normalizedIndex = safeNormalizeIndex(index);
 
-        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            Path songDirPath = songDirs
+        try (Stream<Path> trackDirs = Files.list(ResourceUtils.tracksDirPath())) {
+            Path trackDirPath = trackDirs
                     .skip(normalizedIndex)
                     .findFirst()
                     .orElseThrow();
 
-            Path songMediaFile = songDirPath.resolve("media.wav");
-            Media media = new Media(songMediaFile.toUri().toString());
+            Path trackMediaFile = trackDirPath.resolve("media.wav");
+            Media media = new Media(trackMediaFile.toUri().toString());
             return new MediaPlayer(media);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void deleteSong(int index) {
+    public void deleteTrack(int index) {
         int normalizedIndex = safeNormalizeIndex(index);
 
-        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            Path songDirPath = songDirs
+        try (Stream<Path> trackDirs = Files.list(ResourceUtils.tracksDirPath())) {
+            Path trackDirPath = trackDirs
                     .skip(normalizedIndex)
                     .findFirst()
                     .orElseThrow();
 
-            Files.walkFileTree(songDirPath, new SimpleFileVisitor<>() {
+            Files.walkFileTree(trackDirPath, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Files.delete(file);
@@ -107,55 +107,55 @@ public class LocalPlaylistUtils {
     }
 
     public int count() {
-        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            return  (int) songDirs.count();
+        try (Stream<Path> trackDirs = Files.list(ResourceUtils.tracksDirPath())) {
+            return  (int) trackDirs.count();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private LocalSongInfo songInfo(Path songDirPath, int songIndex) {
-        Path songThumbnailPath = songDirPath.resolve("img.png");
+    private LocalTrack trackInfo(Path trackDirPath, int trackIndex) {
+        Path trackThumbnailPath = trackDirPath.resolve("img.png");
 
-        Pair<String, String> songNameAndSongAuthor = songNameAndSongAuthor(songDirPath);
-        String songName = songNameAndSongAuthor.getKey();
-        String songAuthor = songNameAndSongAuthor.getValue();
+        Pair<String, String> titleAndArtist = titleAndArtist(trackDirPath);
+        String title = titleAndArtist.getKey();
+        String artist = titleAndArtist.getValue();
 
-        Image songThumbnail = new Image(songThumbnailPath.toUri().toString());
+        Image thumbnail = new Image(trackThumbnailPath.toUri().toString());
 
-        return new LocalSongInfo(
-                songName,
-                songAuthor,
-                songThumbnail,
-                songIndex
+        return new LocalTrack(
+                title,
+                artist,
+                thumbnail,
+                trackIndex
         );
     }
 
-    private LocalSongInfo songInfoByIndex(int index) {
-        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            Path songDirPath = songDirs
+    private LocalTrack trackInfoByIndex(int index) {
+        try (Stream<Path> trackDirs = Files.list(ResourceUtils.tracksDirPath())) {
+            Path trackDirPath = trackDirs
                     .skip(index)
                     .findFirst()
                     .orElseThrow();
 
-            return songInfo(songDirPath, index);
+            return trackInfo(trackDirPath, index);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private int normalizeIndex(int index) throws SongDirectoryEmptyException {
-        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            int amountOfSongs = (int) songDirs.count();
+    private int normalizeIndex(int index) throws EmptyTracksDirException {
+        try (Stream<Path> trackDirs = Files.list(ResourceUtils.tracksDirPath())) {
+            int amountOfTracks = (int) trackDirs.count();
 
-            if (amountOfSongs == 0) {
-                throw new SongDirectoryEmptyException("Songs directory is empty");
+            if (amountOfTracks == 0) {
+                throw new EmptyTracksDirException("Tracks directory is empty");
             }
 
-            int normalizedIndex = index % amountOfSongs;
+            int normalizedIndex = index % amountOfTracks;
 
             if (normalizedIndex < 0) {
-                normalizedIndex = amountOfSongs + normalizedIndex;
+                normalizedIndex = amountOfTracks + normalizedIndex;
             }
 
             return normalizedIndex;
@@ -167,17 +167,17 @@ public class LocalPlaylistUtils {
     private int safeNormalizeIndex(int index) {
         try {
             return normalizeIndex(index);
-        } catch (SongDirectoryEmptyException e) {
+        } catch (EmptyTracksDirException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private int firstSongIndex() throws SongDirectoryEmptyException {
-        try (Stream<Path> songDirs = Files.list(ResourceUtils.songsDirPath())) {
-            List<Path> dirs = songDirs.toList();
+    private int firstTrackIndex() throws EmptyTracksDirException {
+        try (Stream<Path> trackDirs = Files.list(ResourceUtils.tracksDirPath())) {
+            List<Path> dirs = trackDirs.toList();
 
             if (dirs.isEmpty()) {
-                throw new SongDirectoryEmptyException("Songs directory is empty");
+                throw new EmptyTracksDirException("Tracks directory is empty");
             }
 
             int latestIndex = 0;
@@ -197,24 +197,24 @@ public class LocalPlaylistUtils {
         }
     }
 
-    private Pair<String, String> songNameAndSongAuthor(Path songDirPath) {
-        String songAuthor;
-        String songName;
+    private Pair<String, String> titleAndArtist(Path trackDirPath) {
+        String title;
+        String artist;
         String separator = "\\^";
 
-        String fileNameWithoutExtension = songDirPath.getFileName().toString();
+        String fileNameWithoutExtension = trackDirPath.getFileName().toString();
         String[] parts = fileNameWithoutExtension.split(separator);
         if (parts.length >= 2) {
-            songAuthor = parts[0];
-            songName = parts[1];
+            artist = parts[0];
+            title = parts[1];
         } else if (parts.length == 1) {
-            songAuthor = "Unknown";
-            songName = parts[0];
+            artist = "Unknown";
+            title = parts[0];
         } else {
-            songAuthor = "Unknown";
-            songName = "Unknown";
+            artist = "Unknown";
+            title = "Unknown";
         }
 
-        return new Pair<>(songName, songAuthor);
+        return new Pair<>(title, artist);
     }
 }

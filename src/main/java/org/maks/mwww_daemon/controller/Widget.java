@@ -17,7 +17,7 @@ import org.maks.mwww_daemon.enumeration.FifoCommand;
 import org.maks.mwww_daemon.enumeration.PlayerContext;
 import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
-import org.maks.mwww_daemon.model.BaseSongInfo;
+import org.maks.mwww_daemon.model.Track;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.local.LocalPlayerService;
 import org.maks.mwww_daemon.service.spotify.SpotifyPlayerService;
@@ -49,12 +49,12 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @FXML
     private AddIcon addIcon;
 
-    private PlayerService<?> playerService = new SpotifyPlayerService(this::onSongUpdated);
+    private PlayerService<?> playerService = new SpotifyPlayerService(this::onTrackUpdated);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         playerService.initialize();
-        searchField.setOnSubmit(this.playerService::switchSong);
+        searchField.setOnSubmit(this.playerService::switchTrack);
         addKeybindings();
 
         Runtime.getRuntime().addShutdownHook(new Thread(playerService::shutdown));
@@ -75,9 +75,9 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 String context = command.getValue();
 
                 if (context.equals(PlayerContext.LOCAL.context())) {
-                    updatePlayerService(new LocalPlayerService(this::onSongUpdated));
+                    updatePlayerService(new LocalPlayerService(this::onTrackUpdated));
                 } else if (context.equals(PlayerContext.SPOTIFY.context())) {
-                    updatePlayerService(new SpotifyPlayerService(this::onSongUpdated));
+                    updatePlayerService(new SpotifyPlayerService(this::onTrackUpdated));
                 } else {
                     LOG.warning("Ignoring invalid context: " + context);
                 }
@@ -96,8 +96,8 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         KeyCombination toggleShuffle = new KeyCodeCombination(KeyCode.S);
         KeyCombination togglePause = new KeyCodeCombination(KeyCode.P);
         KeyCombination find = new KeyCodeCombination(KeyCode.F);
-        KeyCombination newSong = new KeyCodeCombination(KeyCode.N);
-        KeyCombination deleteSong = new KeyCodeCombination(KeyCode.D);
+        KeyCombination addTrack = new KeyCodeCombination(KeyCode.N);
+        KeyCombination deleteTrack = new KeyCodeCombination(KeyCode.D);
         KeyCombination exit = new KeyCodeCombination(KeyCode.Q, KeyCombination.META_DOWN, KeyCombination.CONTROL_DOWN);
 
         body.sceneProperty().addListener((_, _, scene) -> {
@@ -126,10 +126,10 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                     playerService.togglePause();
                 } else if (find.match(keyEvent)) {
                     searchField.switchToTextField();
-                } else if (newSong.match(keyEvent)) {
-                    playerService.addSong(addIcon, searchField);
-                } else if (deleteSong.match(keyEvent)) {
-                    playerService.deleteSong(addIcon);
+                } else if (addTrack.match(keyEvent)) {
+                    playerService.addTrack(addIcon, searchField);
+                } else if (deleteTrack.match(keyEvent)) {
+                    playerService.deleteTrack(addIcon);
                 } else if (exit.match(keyEvent)) {
                     shutdown();
                 }
@@ -143,9 +143,9 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         });
     }
 
-    private void onSongUpdated(BaseSongInfo songInfo) {
-        thumbnail.setImage(songInfo.thumbnail());
-        searchField.setText(songInfo.title());
+    private void onTrackUpdated(Track track) {
+        thumbnail.setImage(track.thumbnail());
+        searchField.setText(track.title());
     }
 
     private void updatePlayerService(PlayerService<?> playerService) {

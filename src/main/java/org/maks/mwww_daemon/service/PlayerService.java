@@ -3,42 +3,42 @@ package org.maks.mwww_daemon.service;
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.components.SearchField;
-import org.maks.mwww_daemon.model.BaseSongInfo;
+import org.maks.mwww_daemon.model.Track;
 
 import java.util.function.Consumer;
 
-public abstract class PlayerService<T extends BaseSongInfo> {
+public abstract class PlayerService<T extends Track> {
 
-    private final Consumer<T> songUpdatedConsumer;
+    private final Consumer<T> trackUpdatedConsumer;
 
     protected Duration skipDuration = Duration.seconds(10);
 
     private static final double VOLUME_DELTA = 0.05;
     protected double volume;
 
-    public PlayerService(Consumer<T> songUpdatedConsumer, double initialVolume) {
-        this.songUpdatedConsumer = songUpdatedConsumer;
+    public PlayerService(Consumer<T> trackUpdatedConsumer, double initialVolume) {
+        this.trackUpdatedConsumer = trackUpdatedConsumer;
         this.volume = initialVolume;
     }
 
-    protected void updateSongInfo(T songInfo) {
-        songUpdatedConsumer.accept(songInfo);
-        onSongUpdated(songInfo);
+    protected void updateTrackInfo(T track) {
+        trackUpdatedConsumer.accept(track);
+        onTrackUpdated(track);
     }
 
-    public void switchSong(String songName) {
-        T songInfo = lookupSong(songName);
+    public void switchTrack(String query) {
+        T track = lookupTrack(query);
 
-        if (songInfo == null) {
+        if (track == null) {
             return;
         }
 
-        switchSong(songInfo);
+        switchTrack(track);
     }
 
-    protected void switchSong(T songInfo) {
-        onPreSongChanged();
-        updateSongInfo(songInfo);
+    protected void switchTrack(T track) {
+        onPreTrackChanged();
+        updateTrackInfo(track);
     }
 
     public void volumeUp() {
@@ -53,9 +53,9 @@ public abstract class PlayerService<T extends BaseSongInfo> {
 
     public abstract void initialize();
 
-    protected abstract void onSongUpdated(T songInfo);
+    protected abstract void onTrackUpdated(T track);
 
-    protected abstract void onPreSongChanged();
+    protected abstract void onPreTrackChanged();
 
     public abstract void play();
 
@@ -75,11 +75,11 @@ public abstract class PlayerService<T extends BaseSongInfo> {
 
     public abstract boolean toggleShuffle();
 
-    protected abstract T lookupSong(String songId);
+    protected abstract T lookupTrack(String query);
 
-    public abstract void addSong(AddIcon addIcon, SearchField searchField);
+    public abstract void addTrack(AddIcon addIcon, SearchField searchField);
 
-    public abstract void deleteSong(AddIcon addIcon);
+    public abstract void deleteTrack(AddIcon addIcon);
 
     public abstract void shutdown();
 

@@ -5,7 +5,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.components.SearchField;
-import org.maks.mwww_daemon.model.LocalSongInfo;
+import org.maks.mwww_daemon.model.LocalTrack;
 import org.maks.mwww_daemon.service.PlayerService;
 
 import java.util.concurrent.CompletableFuture;
@@ -13,36 +13,36 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class LocalPlayerService extends PlayerService<LocalSongInfo> {
+public class LocalPlayerService extends PlayerService<LocalTrack> {
 
     private static final Logger LOG = Logger.getLogger(LocalPlayerService.class.getName());
 
     private final LocalPlaylistUtils playlistUtils = new LocalPlaylistUtils();
-    private final SongIndexProvider indexProvider = new SongIndexProvider();
+    private final TrackIndexProvider indexProvider = new TrackIndexProvider();
 
     private MediaPlayer currentPlayer = null;
     private static final double INITIAL_VOLUME = 0.05;
 
-    private boolean isSongPlaying = false;
+    private boolean isTrackPlaying = false;
     private boolean onRepeat = false;
 
-    public LocalPlayerService(Consumer<LocalSongInfo> songInfoConsumer) {
-        super(songInfoConsumer, INITIAL_VOLUME);
+    public LocalPlayerService(Consumer<LocalTrack> trackUpdatedConsumer) {
+        super(trackUpdatedConsumer, INITIAL_VOLUME);
     }
 
     @Override
     public void initialize() {
-        LocalSongInfo song = playlistUtils.firstSongInfo();
-        updateSongInfo(song);
+        LocalTrack track = playlistUtils.firstTrack();
+        updateTrackInfo(track);
     }
 
     @Override
-    protected void onSongUpdated(LocalSongInfo localSongInfo) {
-        indexProvider.set(localSongInfo.songIndex());
+    protected void onTrackUpdated(LocalTrack track) {
+        indexProvider.set(track.trackIndex());
     }
 
     @Override
-    protected void onPreSongChanged() {
+    protected void onPreTrackChanged() {
         dispose();
     }
 
@@ -55,25 +55,25 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         currentPlayer = playlistUtils.player(indexProvider.current());
 
         currentPlayer.setOnReady(() -> {
-            // magic code, without it MediaPlayer makes a weird noise at the beginning of some songs
+            // magic code, without it MediaPlayer makes a weird noise at the beginning of some tracks
             currentPlayer.seek(Duration.ZERO);
 
             currentPlayer.setVolume(volume);
             currentPlayer.setOnEndOfMedia(this::nextOrRepeat);
 
             currentPlayer.play();
-            isSongPlaying = true;
+            isTrackPlaying = true;
         });
     }
 
     @Override
     public void next() {
-        switchSong(indexProvider.next());
+        switchTrack(indexProvider.next());
     }
 
     @Override
     public void previous() {
-        switchSong(indexProvider.previous());
+        switchTrack(indexProvider.previous());
     }
 
     @Override
@@ -97,13 +97,13 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
             return;
         }
 
-        if (isSongPlaying) {
+        if (isTrackPlaying) {
             currentPlayer.pause();
         } else {
             currentPlayer.play();
         }
 
-        isSongPlaying = !isSongPlaying;
+        isTrackPlaying = !isTrackPlaying;
     }
 
     @Override
@@ -119,33 +119,33 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     @Override
-    protected LocalSongInfo lookupSong(String songName) {
-        return playlistUtils.songInfo(songName);
+    protected LocalTrack lookupTrack(String query) {
+        return playlistUtils.trackInfo(query);
     }
 
     @Override
-    public void addSong(AddIcon addIcon, SearchField searchField) {
+    public void addTrack(AddIcon addIcon, SearchField searchField) {
         searchField.acceptNext("Paste yt-dlp URL").thenAccept(url -> {
             addIcon.loading();
 
             DownloadService downloadService = new DownloadService();
 
-            CompletableFuture<String> task = downloadService.downloadSong(url);
-            task.whenComplete((downloadedSongName, ex) -> {
+            CompletableFuture<String> task = downloadService.downloadTrack(url);
+            task.whenComplete((downloadedTrackName, ex) -> {
                 if (ex != null) {
                     addIcon.fail();
                     LOG.severe(ex.getMessage());
                 } else {
                     addIcon.like();
-                    Platform.runLater(() -> switchSong(downloadedSongName));
+                    Platform.runLater(() -> switchTrack(downloadedTrackName));
                 }
             });
         });
     }
 
     @Override
-    public void deleteSong(AddIcon addIcon) {
-        playlistUtils.deleteSong(indexProvider.current());
+    public void deleteTrack(AddIcon addIcon) {
+        playlistUtils.deleteTrack(indexProvider.current());
         reloadCurrent();
     }
 
@@ -155,7 +155,7 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     private void nextOrRepeat() {
-        onPreSongChanged();
+        onPreTrackChanged();
 
         if (onRepeat) {
             play();
@@ -164,8 +164,8 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         next();
     }
 
-    private LocalSongInfo lookupSong(int songIndex) {
-        return playlistUtils.songInfo(songIndex);
+    private LocalTrack lookupTrack(int trackIndex) {
+        return playlistUtils.trackInfo(trackIndex);
     }
 
     private void skip(BiFunction<Duration, Duration, Duration> operation) {
@@ -179,11 +179,11 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     private void reloadCurrent() {
-        switchSong(indexProvider.current());
+        switchTrack(indexProvider.current());
     }
 
-    private void switchSong(int songIndex) {
-        switchSong(lookupSong(songIndex));
+    private void switchTrack(int trackIndex) {
+        switchTrack(lookupTrack(trackIndex));
     }
 
     private void dispose() {

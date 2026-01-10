@@ -12,7 +12,7 @@ public class DownloadService {
     private final AsyncRunnerService asyncRunnerService = new AsyncRunnerService();
     private final CmdService cmdService = new CmdService();
 
-    public CompletableFuture<String> downloadSong(String url) {
+    public CompletableFuture<String> downloadTrack(String url) {
         return asyncRunnerService.run(() -> {
             if (url.trim().isEmpty()) {
                 throw new RuntimeException("URL cannot be empty");
@@ -22,21 +22,21 @@ public class DownloadService {
                 throw new RuntimeException("Invalid URL");
             }
 
-            final Map<String, String> downloadedSongUrlMap = new HashMap<>();
-            String targetLogPrefix = "Downloaded song name: ";
-            String downloadedSongUrlKey = "downloadedSongUrl";
+            final Map<String, String> downloadedTrackUrlMap = new HashMap<>();
+            String targetLogPrefix = "Downloaded track name: ";
+            String downloadedTrackUrlKey = "downloadedTrackUrl";
 
             cmdService.runCmdCommand(line -> {
                 if (line.startsWith(targetLogPrefix)) {
-                    downloadedSongUrlMap.put(downloadedSongUrlKey, line.substring(targetLogPrefix.length()));
+                    downloadedTrackUrlMap.put(downloadedTrackUrlKey, line.substring(targetLogPrefix.length()));
                 }
             },"mwww-youtube-download", url);
 
-            if (!downloadedSongUrlMap.containsKey(downloadedSongUrlKey)) {
-                throw new RuntimeException("Could not download song by url: " + url);
+            if (!downloadedTrackUrlMap.containsKey(downloadedTrackUrlKey)) {
+                throw new RuntimeException("Could not download track by url: " + url);
             }
 
-            return downloadedSongUrlMap.get(downloadedSongUrlKey);
+            return downloadedTrackUrlMap.get(downloadedTrackUrlKey);
         });
     }
 }

@@ -2,12 +2,12 @@ package org.maks.mwww_daemon.model;
 
 import javafx.scene.image.Image;
 
-public class BaseSongInfo {
+public class Track {
 
     private final Image thumbnail;
     private final String title;
 
-    public BaseSongInfo(Image thumbnail, String title) {
+    public Track(Image thumbnail, String title) {
         this.thumbnail = thumbnail;
         this.title = title;
     }
