@@ -3,9 +3,6 @@ package org.maks.mwww_daemon.service.spotify;
 import org.maks.mwww_daemon.exception.PlayerctlNoTrackException;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -39,6 +36,7 @@ public class PlayerctlMetadataService {
     public PlayerctlMetadata readFullMetadata() throws PlayerctlNoTrackException {
         List<String> metadataLines = cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "metadata");
 
+        // ignore if updated to NoTrack
         if (metadataLines.size() == 1 && metadataLines.getFirst().contains("/org/mpris/MediaPlayer2/TrackList/NoTrack")) {
             throw new PlayerctlNoTrackException();
         }
@@ -99,28 +97,17 @@ public class PlayerctlMetadataService {
     }
 
     private void listenToMetadataUpdates() {
-        var processBuilder = new ProcessBuilder("playerctl", "-p", "spotifyd", "metadata", "mpris:trackid", "--follow");
-
-        try {
-            Process process = processBuilder.start();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                while (reader.readLine() != null) {
-                    // whenever trackid is updated, read full metadata and call accept
-                    // ignore is updated to NoTrack
-                    PlayerctlMetadata metadata;
-                    try {
-                        metadata = readFullMetadata();
-                    } catch (PlayerctlNoTrackException _) {
-                        continue;
-                    }
-
-                    metadataConsumers.forEach(consumer -> consumer.accept(metadata));
-                }
+        // whenever trackid is updated, read full metadata and call accept
+        cmdService.runCmdCommand(_ -> {
+            PlayerctlMetadata metadata;
+            try {
+                metadata = readFullMetadata();
+            } catch (PlayerctlNoTrackException _) {
+                return;
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+            metadataConsumers.forEach(consumer -> consumer.accept(metadata));
+        }, "playerctl", "-p", "spotifyd", "metadata", "mpris:trackid", "--follow");
     }
 
     private String processTrackId(String trackId) {

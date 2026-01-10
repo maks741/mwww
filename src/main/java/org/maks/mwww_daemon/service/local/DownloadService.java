@@ -1,15 +1,16 @@
 package org.maks.mwww_daemon.service.local;
 
 import org.maks.mwww_daemon.service.AsyncRunnerService;
+import org.maks.mwww_daemon.service.spotify.CmdService;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class DownloadService {
 
     private final AsyncRunnerService asyncRunnerService = new AsyncRunnerService();
+    private final CmdService cmdService = new CmdService();
 
     public CompletableFuture<String> downloadSong(String url) {
         return asyncRunnerService.run(() -> {
@@ -21,38 +22,21 @@ public class DownloadService {
                 throw new RuntimeException("Invalid URL");
             }
 
-            Process downloadScriptProcess = executeDownloadScript(url);
+            final Map<String, String> downloadedSongUrlMap = new HashMap<>();
             String targetLogPrefix = "Downloaded song name: ";
+            String downloadedSongUrlKey = "downloadedSongUrl";
 
-            try (InputStreamReader inputStreamReader = new InputStreamReader(downloadScriptProcess.getInputStream());
-                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    if (line.startsWith(targetLogPrefix)) {
-                        return line.substring(targetLogPrefix.length());
-                    }
+            cmdService.runCmdCommand(line -> {
+                if (line.startsWith(targetLogPrefix)) {
+                    downloadedSongUrlMap.put(downloadedSongUrlKey, line.substring(targetLogPrefix.length()));
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            },"mwww-youtube-download", url);
+
+            if (!downloadedSongUrlMap.containsKey(downloadedSongUrlKey)) {
+                throw new RuntimeException("Could not download song by url: " + url);
             }
 
-            throw new RuntimeException("Could not download song by url: " + url);
+            return downloadedSongUrlMap.get(downloadedSongUrlKey);
         });
-    }
-
-    private Process executeDownloadScript(String url) {
-        String[] commands = {
-                "mwww-youtube-download",
-                url
-        };
-
-        Process process;
-        try {
-            process = Runtime.getRuntime().exec(commands);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return process;
     }
 }
