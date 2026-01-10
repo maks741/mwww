@@ -12,7 +12,6 @@ import org.maks.mwww_daemon.model.SpotifySongInfo;
 import org.maks.mwww_daemon.service.AsyncRunnerService;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.client.SpotifyWebApiClient;
-import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.CmdOutputTransform;
 import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
 import org.maks.mwww_daemon.utils.Config;
 import org.maks.mwww_daemon.utils.ResourceUtils;
@@ -68,7 +67,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void play() {
-        runPlayerctlCommand("playerctl", "-p", "spotifyd", "play");
+        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
     }
 
     @Override
@@ -83,7 +82,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     @Override
     public void setVolume(double volume) {
-        runPlayerctlCommand("playerctl", "-p", "spotifyd", "volume", String.valueOf(volume));
+        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "volume", String.valueOf(volume));
     }
 
     @Override
@@ -203,20 +202,11 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    public boolean isPlaying() {
-        return playerctlStatus().equals("Playing");
-    }
-
-    @Override
     public void shutdown() {
         cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "pause");
         setPlayerctlAttribute("shuffle", "Off");
         setPlayerctlAttribute("loop", "Playlist");
         playerctlMetadataService.shutdown();
-    }
-
-    private String playerctlStatus() {
-        return cmdService.runCmdCommand(new StringCmdOutputTransform(), "playerctl", "-p", "spotifyd", "status");
     }
 
     private void onPlayerctlStatusUpdated(String status) {
@@ -318,23 +308,5 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
 
     private boolean playerctlInactive() {
         return playerctlStatus == PlayerctlStatus.INACTIVE;
-    }
-
-    private <T> T runPlayerctlCommand(CmdOutputTransform<T> cmdOutputTransform, String... commands) {
-        if (playerctlInactive()) {
-            spotifydService.restart();
-            playerctlMetadataService.restartTask();
-        }
-
-        return cmdService.runCmdCommand(cmdOutputTransform, commands);
-    }
-
-    private void runPlayerctlCommand(String... commands) {
-        if (playerctlInactive()) {
-            spotifydService.restart();
-            playerctlMetadataService.restartTask();
-        }
-
-        cmdService.runCmdCommand(commands);
     }
 }

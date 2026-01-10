@@ -148,11 +148,6 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
         playlistUtils.deleteSong(indexProvider.current());
         reloadCurrent();
     }
-    
-    @Override
-    public boolean isPlaying() {
-        return isSongPlaying;
-    }
 
     @Override
     public void shutdown() {

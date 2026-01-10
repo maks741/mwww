@@ -81,8 +81,6 @@ public abstract class PlayerService<T extends BaseSongInfo> {
 
     public abstract void deleteSong(AddIcon addIcon);
 
-    public abstract boolean isPlaying();
-
     public abstract void shutdown();
 
 }
