@@ -2,7 +2,7 @@ package org.maks.mwww_daemon.service;
 
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
-import org.maks.mwww_daemon.components.DynamicLabel;
+import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.model.BaseSongInfo;
 
 import java.util.function.Consumer;
@@ -77,7 +77,7 @@ public abstract class PlayerService<T extends BaseSongInfo> {
 
     protected abstract T lookupSong(String songId);
 
-    public abstract void addSong(AddIcon addIcon, DynamicLabel dynamicLabel);
+    public abstract void addSong(AddIcon addIcon, SearchField searchField);
 
     public abstract void deleteSong(AddIcon addIcon);
 

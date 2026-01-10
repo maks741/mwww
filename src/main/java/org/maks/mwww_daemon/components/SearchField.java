@@ -7,14 +7,14 @@ import javafx.scene.layout.StackPane;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public class DynamicLabel extends StackPane {
+public class SearchField extends StackPane {
 
     private final Label label = new Label();
     private final TextField textField = new TextField();
 
     private Consumer<String> onSubmit = (_) -> {};
 
-    public DynamicLabel() {
+    public SearchField() {
         getChildren().add(label);
         textField.minWidthProperty().bind(widthProperty());
         setDefaultKeybindings();

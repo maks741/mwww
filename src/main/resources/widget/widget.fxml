@@ -3,7 +3,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import org.maks.mwww_daemon.components.RepeatToggle?>
-<?import org.maks.mwww_daemon.components.DynamicLabel?>
+<?import org.maks.mwww_daemon.components.SearchField?>
 <?import org.maks.mwww_daemon.components.ShuffleToggle?>
 <?import org.maks.mwww_daemon.components.AddIcon?>
 <VBox xmlns="http://javafx.com/javafx"
@@ -12,10 +12,10 @@
       fx:controller="org.maks.mwww_daemon.controller.Widget"
       styleClass="widget-container">
     <HBox VBox.vgrow="ALWAYS" styleClass="widget">
-        <VBox styleClass="song-avatar">
-            <ImageView fx:id="statusBarIcon" fitWidth="30" fitHeight="30" />
+        <VBox styleClass="thumbnail">
+            <ImageView fx:id="thumbnail" fitWidth="30" fitHeight="30" />
         </VBox>
-        <DynamicLabel fx:id="dynamicSongName" HBox.hgrow="ALWAYS" styleClass="dynamic-label" />
+        <SearchField fx:id="searchField" HBox.hgrow="ALWAYS" styleClass="search-field" />
         <Pane HBox.hgrow="ALWAYS" />
         <HBox styleClass="toolbar">
             <ShuffleToggle fx:id="shuffleToggle" fitWidth="28" fitHeight="28" preserveRatio="true">

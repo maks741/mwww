@@ -10,10 +10,11 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.maks.mwww_daemon.components.AddIcon;
-import org.maks.mwww_daemon.components.DynamicLabel;
+import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.components.RepeatToggle;
 import org.maks.mwww_daemon.components.ShuffleToggle;
 import org.maks.mwww_daemon.enumeration.FifoCommand;
+import org.maks.mwww_daemon.enumeration.PlayerContext;
 import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
 import org.maks.mwww_daemon.model.BaseSongInfo;
@@ -34,10 +35,10 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private VBox body;
 
     @FXML
-    private ImageView statusBarIcon;
+    private ImageView thumbnail;
 
     @FXML
-    private DynamicLabel dynamicSongName;
+    private SearchField searchField;
 
     @FXML
     private RepeatToggle repeatToggle;
@@ -53,7 +54,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         playerService.initialize();
-        dynamicSongName.setOnSubmit(this.playerService::switchSong);
+        searchField.setOnSubmit(this.playerService::switchSong);
         addKeybindings();
 
         Runtime.getRuntime().addShutdownHook(new Thread(playerService::shutdown));
@@ -73,9 +74,9 @@ public class Widget implements Initializable, FifoCommandSubscriber {
             case SET_CONTEXT -> {
                 String context = command.getValue();
 
-                if (context.equals("local")) {
+                if (context.equals(PlayerContext.LOCAL.context())) {
                     updatePlayerService(new LocalPlayerService(this::onSongUpdated));
-                } else if (context.equals("spotify")) {
+                } else if (context.equals(PlayerContext.SPOTIFY.context())) {
                     updatePlayerService(new SpotifyPlayerService(this::onSongUpdated));
                 } else {
                     LOG.warning("Ignoring invalid context: " + context);
@@ -124,9 +125,9 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 } else if (togglePause.match(keyEvent)) {
                     playerService.togglePause();
                 } else if (find.match(keyEvent)) {
-                    dynamicSongName.switchToTextField();
+                    searchField.switchToTextField();
                 } else if (newSong.match(keyEvent)) {
-                    playerService.addSong(addIcon, dynamicSongName);
+                    playerService.addSong(addIcon, searchField);
                 } else if (deleteSong.match(keyEvent)) {
                     playerService.deleteSong(addIcon);
                 } else if (exit.match(keyEvent)) {
@@ -143,8 +144,8 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     }
 
     private void onSongUpdated(BaseSongInfo songInfo) {
-        statusBarIcon.setImage(songInfo.thumbnail());
-        dynamicSongName.setText(songInfo.title());
+        thumbnail.setImage(songInfo.thumbnail());
+        searchField.setText(songInfo.title());
     }
 
     private void updatePlayerService(PlayerService<?> playerService) {

@@ -3,7 +3,7 @@ package org.maks.mwww_daemon.service.spotify;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import org.maks.mwww_daemon.components.AddIcon;
-import org.maks.mwww_daemon.components.DynamicLabel;
+import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.enumeration.PlayerctlStatus;
 import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.exception.PlayerctlNoTrackException;
@@ -180,7 +180,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     }
 
     @Override
-    public void addSong(AddIcon addIcon, DynamicLabel dynamicLabel) {
+    public void addSong(AddIcon addIcon, SearchField searchField) {
         var runner = new AsyncRunnerService();
 
         addIcon.loading();

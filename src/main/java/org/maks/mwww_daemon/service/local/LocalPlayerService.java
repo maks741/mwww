@@ -4,7 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
-import org.maks.mwww_daemon.components.DynamicLabel;
+import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.model.LocalSongInfo;
 import org.maks.mwww_daemon.service.PlayerService;
 
@@ -124,8 +124,8 @@ public class LocalPlayerService extends PlayerService<LocalSongInfo> {
     }
 
     @Override
-    public void addSong(AddIcon addIcon, DynamicLabel dynamicLabel) {
-        dynamicLabel.acceptNext("Paste yt-dlp URL").thenAccept(url -> {
+    public void addSong(AddIcon addIcon, SearchField searchField) {
+        searchField.acceptNext("Paste yt-dlp URL").thenAccept(url -> {
             addIcon.loading();
 
             DownloadService downloadService = new DownloadService();
