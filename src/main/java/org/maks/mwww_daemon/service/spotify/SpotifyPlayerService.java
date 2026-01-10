@@ -310,6 +310,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     private <T> T runPlayerctlCommand(CmdOutputTransform<T> cmdOutputTransform, String... commands) {
         if (noPlayersFound()) {
             spotifydService.restart();
+            playerctlMetadataService.restartTask();
         }
 
         return cmdService.runCmdCommand(cmdOutputTransform, commands);
@@ -318,6 +319,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifySongInfo> {
     private void runPlayerctlCommand(String... commands) {
         if (noPlayersFound()) {
             spotifydService.restart();
+            playerctlMetadataService.restartTask();
         }
 
         cmdService.runCmdCommand(commands);

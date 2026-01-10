@@ -96,6 +96,13 @@ public class PlayerctlMetadataService {
         executorService.shutdown();
     }
 
+    public void restartTask() {
+        if (playerctlMetadataTask != null) {
+            playerctlMetadataTask.cancel(true);
+        }
+        playerctlMetadataTask = executorService.submit(this::listenToMetadataUpdates);
+    }
+
     private void listenToMetadataUpdates() {
         // whenever trackid is updated, read full metadata and call accept
         cmdService.runCmdCommand(_ -> {
