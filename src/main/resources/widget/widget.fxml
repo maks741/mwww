@@ -2,14 +2,14 @@
 
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import org.maks.mwww_daemon.components.RepeatToggle?>
-<?import org.maks.mwww_daemon.components.SearchField?>
-<?import org.maks.mwww_daemon.components.ShuffleToggle?>
-<?import org.maks.mwww_daemon.components.AddIcon?>
+<?import org.maks.mwww_daemon.ui.components.RepeatToggle?>
+<?import org.maks.mwww_daemon.ui.components.SearchField?>
+<?import org.maks.mwww_daemon.ui.components.ShuffleToggle?>
+<?import org.maks.mwww_daemon.ui.components.AddIcon?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body"
-      fx:controller="org.maks.mwww_daemon.controller.Widget"
+      fx:controller="org.maks.mwww_daemon.ui.Widget"
       styleClass="widget-container">
     <HBox VBox.vgrow="ALWAYS" styleClass="widget">
         <VBox styleClass="thumbnail">
