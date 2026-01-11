@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.enumeration.PlayerctlStatus;
+import org.maks.mwww_daemon.enumeration.SearchShortcut;
 import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.exception.PlayerctlNoTrackException;
 import org.maks.mwww_daemon.model.LoadingCallback;
@@ -160,8 +161,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
         var loadingCallback = new LoadingCallback("Searching...");
         uiBridge.requestLoading(loadingCallback);
 
-        if (query.equals("me")) {
-            // 'me' is a shortcut to open the home playlist
+        if (query.equals(SearchShortcut.HOME.shortcut())) {
             String homePlaylistUri = "spotify:playlist:" + Config.spotifyPlaylistId();
             return openUri(homePlaylistUri, loadingCallback);
         }
