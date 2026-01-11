@@ -17,7 +17,9 @@ import org.maks.mwww_daemon.enumeration.FifoCommand;
 import org.maks.mwww_daemon.enumeration.PlayerContext;
 import org.maks.mwww_daemon.fifo.FifoCommandQueue;
 import org.maks.mwww_daemon.fifo.FifoCommandSubscriber;
+import org.maks.mwww_daemon.model.LoadingCallback;
 import org.maks.mwww_daemon.model.Track;
+import org.maks.mwww_daemon.service.BackendToUIBridge;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.local.LocalPlayerService;
 import org.maks.mwww_daemon.service.spotify.SpotifyPlayerService;
@@ -49,10 +51,14 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @FXML
     private AddIcon addIcon;
 
-    private PlayerService<?> playerService = new SpotifyPlayerService(this::onTrackUpdated);
+    private final BackendToUIBridge bridge = new BackendToUIBridge();
+    private PlayerService<?> playerService = new SpotifyPlayerService(bridge);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        bridge.setOnTrackUpdated(this::onTrackUpdated);
+        bridge.setOnRequestLoading(this::onRequestLoading);
+
         playerService.initialize();
         searchField.setOnSubmit(this.playerService::switchTrack);
         addKeybindings();
@@ -75,9 +81,9 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 String context = command.getValue();
 
                 if (context.equals(PlayerContext.LOCAL.context())) {
-                    updatePlayerService(new LocalPlayerService(this::onTrackUpdated));
+                    updatePlayerService(new LocalPlayerService(bridge));
                 } else if (context.equals(PlayerContext.SPOTIFY.context())) {
-                    updatePlayerService(new SpotifyPlayerService(this::onTrackUpdated));
+                    updatePlayerService(new SpotifyPlayerService(bridge));
                 } else {
                     LOG.warning("Ignoring invalid context: " + context);
                 }
@@ -151,6 +157,23 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     private void onTrackUpdated(Track track) {
         thumbnail.setImage(track.thumbnail());
         searchField.setText(track.title());
+    }
+
+    private void onRequestLoading(LoadingCallback loadingCallback) {
+        addIcon.loading();
+
+        String initialText = searchField.text();
+        searchField.setText(loadingCallback.message());
+
+        loadingCallback.setOnCallback((ex) -> {
+            if (ex == null) {
+                addIcon.success();
+            } else {
+                addIcon.fail();
+            }
+
+            searchField.setText(initialText);
+        });
     }
 
     private void updatePlayerService(PlayerService<?> playerService) {

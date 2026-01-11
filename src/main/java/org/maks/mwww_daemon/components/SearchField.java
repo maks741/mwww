@@ -41,11 +41,9 @@ public class SearchField extends StackPane {
 
     public void switchToTextField() {
         getChildren().remove(label);
-        getChildren().add(textField);
-    }
-
-    public void setText(String text) {
-        label.setText(text);
+        if (!getChildren().contains(textField)) {
+            getChildren().add(textField);
+        }
     }
 
     public void setOnSubmit(Consumer<String> onSubmit) {
@@ -54,6 +52,14 @@ public class SearchField extends StackPane {
 
     public boolean isSearching() {
         return getChildren().contains(textField);
+    }
+
+    public void setText(String text) {
+        label.setText(text);
+    }
+
+    public String text() {
+        return label.getText();
     }
 
     private void onSubmit() {
@@ -70,7 +76,9 @@ public class SearchField extends StackPane {
 
     private void switchToLabel() {
         getChildren().remove(textField);
-        getChildren().add(label);
+        if (!getChildren().contains(label)) {
+            getChildren().add(label);
+        }
     }
 
     private void setDefaultKeybindings() {

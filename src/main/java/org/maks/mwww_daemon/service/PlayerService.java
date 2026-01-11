@@ -5,24 +5,22 @@ import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.model.Track;
 
-import java.util.function.Consumer;
-
 public abstract class PlayerService<T extends Track> {
 
-    private final Consumer<T> trackUpdatedConsumer;
+    protected final BackendToUIBridge uiBridge;
 
     protected Duration skipDuration = Duration.seconds(10);
 
     private static final double VOLUME_DELTA = 0.05;
     protected double volume;
 
-    public PlayerService(Consumer<T> trackUpdatedConsumer, double initialVolume) {
-        this.trackUpdatedConsumer = trackUpdatedConsumer;
+    public PlayerService(BackendToUIBridge uiBridge, double initialVolume) {
+        this.uiBridge = uiBridge;
         this.volume = initialVolume;
     }
 
     protected void updateTrackInfo(T track) {
-        trackUpdatedConsumer.accept(track);
+        uiBridge.updateTrack(track);
         onTrackUpdated(track);
     }
 

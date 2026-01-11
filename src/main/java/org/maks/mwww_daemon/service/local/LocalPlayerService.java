@@ -6,11 +6,11 @@ import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.model.LocalTrack;
+import org.maks.mwww_daemon.service.BackendToUIBridge;
 import org.maks.mwww_daemon.service.PlayerService;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class LocalPlayerService extends PlayerService<LocalTrack> {
@@ -26,8 +26,8 @@ public class LocalPlayerService extends PlayerService<LocalTrack> {
     private boolean isTrackPlaying = false;
     private boolean onRepeat = false;
 
-    public LocalPlayerService(Consumer<LocalTrack> trackUpdatedConsumer) {
-        super(trackUpdatedConsumer, INITIAL_VOLUME);
+    public LocalPlayerService(BackendToUIBridge uiBridge) {
+        super(uiBridge, INITIAL_VOLUME);
     }
 
     @Override

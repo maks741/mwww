@@ -7,9 +7,11 @@ import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.enumeration.PlayerctlStatus;
 import org.maks.mwww_daemon.exception.CmdServiceException;
 import org.maks.mwww_daemon.exception.PlayerctlNoTrackException;
+import org.maks.mwww_daemon.model.LoadingCallback;
 import org.maks.mwww_daemon.model.PlayerctlMetadata;
 import org.maks.mwww_daemon.model.SpotifyTrack;
 import org.maks.mwww_daemon.service.AsyncRunnerService;
+import org.maks.mwww_daemon.service.BackendToUIBridge;
 import org.maks.mwww_daemon.service.PlayerService;
 import org.maks.mwww_daemon.service.spotify.client.SpotifyWebApiClient;
 import org.maks.mwww_daemon.service.spotify.cmdoutputtransform.StringCmdOutputTransform;
@@ -22,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
@@ -40,8 +41,8 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
     private String currentTrackUri;
     private PlayerctlStatus playerctlStatus = PlayerctlStatus.INACTIVE;
 
-    public SpotifyPlayerService(Consumer<SpotifyTrack> trackUpdatedConsumer) {
-        super(trackUpdatedConsumer, INITIAL_VOLUME);
+    public SpotifyPlayerService(BackendToUIBridge uiBridge) {
+        super(uiBridge, INITIAL_VOLUME);
     }
 
     @Override
@@ -67,11 +68,17 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
 
     @Override
     public void play() {
-        if (playerctlInactive()) {
-            recoverSpotifyd();
-        }
+        Runnable play = () -> cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
 
-        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "play");
+        if (playerctlInactive()) {
+            recoverSpotifyd().whenComplete((_, ex) -> {
+                if (ex == null) {
+                    play.run();
+                }
+            });
+        } else {
+            play.run();
+        }
     }
 
     @Override
@@ -340,9 +347,22 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
         return playerctlStatus == PlayerctlStatus.INACTIVE;
     }
 
-    private void recoverSpotifyd() {
-        spotifydService.restart();
-        playerctlMetadataService.restartTask();
-        playerctlStatusService.restartTask();
+    private CompletableFuture<Void> recoverSpotifyd() {
+        var loadingCallback = new LoadingCallback("Restarting spotifyd...");
+        uiBridge.requestLoading(loadingCallback);
+
+        var service = new AsyncRunnerService();
+
+        return service.run(() -> {
+            try {
+                spotifydService.restart();
+                playerctlMetadataService.restartTask();
+                playerctlStatusService.restartTask();
+                Platform.runLater(loadingCallback::callback);
+            } catch (RuntimeException e) {
+                Platform.runLater(() -> loadingCallback.callback(e));
+                throw new RuntimeException(e);
+            }
+        });
     }
 }
