@@ -52,7 +52,8 @@ public class LocalPlaylistUtils {
             return trackDirs
                     .filter(path -> {
                         trackIndexCounter.getAndIncrement();
-                        return path.getFileName().toString().contains(targetTrackName);
+                        String fileName = path.getFileName().toString().toLowerCase();
+                        return fileName.contains(targetTrackName.toLowerCase());
                     })
                     .findFirst()
                     .map(path -> trackInfo(path, trackIndexCounter.decrementAndGet()))
