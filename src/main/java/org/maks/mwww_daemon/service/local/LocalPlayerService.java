@@ -119,8 +119,8 @@ public class LocalPlayerService extends PlayerService<LocalTrack> {
     }
 
     @Override
-    protected LocalTrack lookupTrack(String query) {
-        return playlistUtils.trackInfo(query);
+    protected CompletableFuture<LocalTrack> lookupTrack(String query) {
+        return CompletableFuture.completedFuture(playlistUtils.trackInfo(query));
     }
 
     @Override

@@ -1,9 +1,12 @@
 package org.maks.mwww_daemon.service;
 
+import javafx.application.Platform;
 import javafx.util.Duration;
 import org.maks.mwww_daemon.components.AddIcon;
 import org.maks.mwww_daemon.components.SearchField;
 import org.maks.mwww_daemon.model.Track;
+
+import java.util.concurrent.CompletableFuture;
 
 public abstract class PlayerService<T extends Track> {
 
@@ -25,13 +28,15 @@ public abstract class PlayerService<T extends Track> {
     }
 
     public void switchTrack(String query) {
-        T track = lookupTrack(query);
+        CompletableFuture<T> trackFuture = lookupTrack(query);
 
-        if (track == null) {
-            return;
-        }
+        trackFuture.whenComplete((track, ex) -> {
+            if (track == null || ex != null) {
+                return;
+            }
 
-        switchTrack(track);
+            Platform.runLater(() -> switchTrack(track));
+        });
     }
 
     protected void switchTrack(T track) {
@@ -73,7 +78,7 @@ public abstract class PlayerService<T extends Track> {
 
     public abstract boolean toggleShuffle();
 
-    protected abstract T lookupTrack(String query);
+    protected abstract CompletableFuture<T> lookupTrack(String query);
 
     public abstract void addTrack(AddIcon addIcon, SearchField searchField);
 

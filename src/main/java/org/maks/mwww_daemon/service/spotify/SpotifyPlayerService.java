@@ -156,34 +156,22 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
     }
 
     @Override
-    protected SpotifyTrack lookupTrack(String query) {
+    protected CompletableFuture<SpotifyTrack> lookupTrack(String query) {
+        var loadingCallback = new LoadingCallback("Searching...");
+        uiBridge.requestLoading(loadingCallback);
+
         if (query.equals("me")) {
             // 'me' is a shortcut to open the home playlist
-            query = "spotify:playlist:" + Config.spotifyPlaylistId();
+            String homePlaylistUri = "spotify:playlist:" + Config.spotifyPlaylistId();
+            return openUri(homePlaylistUri, loadingCallback);
         }
 
         boolean isUri = query.startsWith("spotify:");
-
-        if (!isUri) {
-            var client = new SpotifyWebApiClient();
-            String searchResult = client.search(query);
-
-            if (searchResult == null) {
-                return null;
-            }
-
-            query = searchResult;
+        if (isUri) {
+            return openUri(query, loadingCallback);
         }
 
-        cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", query);
-
-        PlayerctlMetadata playerctlMetadata;
-        try {
-            playerctlMetadata = playerctlMetadataService.readFullMetadata();
-        } catch (PlayerctlNoTrackException e) {
-            throw new RuntimeException(e);
-        }
-        return toSpotifyTrack(playerctlMetadata);
+        return search(query, loadingCallback);
     }
 
     @Override
@@ -287,6 +275,46 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
         Set<String> artistsSet = new HashSet<>(playerctlMetadata.artists());
         String title = String.join(", ", artistsSet) + " - " + playerctlMetadata.title();
         return new SpotifyTrack(thumbnail, title, playerctlMetadata.trackId());
+    }
+
+    private CompletableFuture<SpotifyTrack> openUri(String uri, LoadingCallback callback) {
+        return open(CompletableFuture.completedFuture(uri), callback);
+    }
+
+    private CompletableFuture<SpotifyTrack> search(String query, LoadingCallback callback) {
+        var runner = new AsyncRunnerService();
+
+        CompletableFuture<String> searchFuture = runner.run(() -> {
+            var client = new SpotifyWebApiClient();
+            return client.search(query);
+        });
+
+        return open(searchFuture, callback);
+    }
+
+    private CompletableFuture<SpotifyTrack> open(CompletableFuture<String> uriFuture, LoadingCallback callback) {
+        CompletableFuture<SpotifyTrack> trackFuture = new CompletableFuture<>();
+
+        uriFuture.whenComplete((uri, ex) -> {
+            if (uri == null || ex != null) {
+                return;
+            }
+
+            cmdService.runCmdCommand("playerctl", "-p", "spotifyd", "open", uri);
+
+            PlayerctlMetadata playerctlMetadata;
+            try {
+                playerctlMetadata = playerctlMetadataService.readFullMetadata();
+            } catch (PlayerctlNoTrackException e) {
+                throw new RuntimeException(e);
+            }
+            SpotifyTrack track = toSpotifyTrack(playerctlMetadata);
+
+            Platform.runLater(callback::callback);
+            trackFuture.complete(track);
+        });
+
+        return trackFuture;
     }
 
     private void skip(String sign) {

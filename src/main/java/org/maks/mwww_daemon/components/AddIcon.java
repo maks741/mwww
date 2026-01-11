@@ -33,6 +33,10 @@ public class AddIcon extends ImageView {
         showThenReset(Icon.CHECKMARK);
     }
 
+    public void reset() {
+        setImage(addImage);
+    }
+
     private void showThenReset(Icon icon) {
         Image image = IconUtils.image(icon);
         setImage(image);
@@ -41,9 +45,5 @@ public class AddIcon extends ImageView {
                 reset()
         );
         new Timeline(keyFrame).play();
-    }
-
-    private void reset() {
-        setImage(addImage);
     }
 }

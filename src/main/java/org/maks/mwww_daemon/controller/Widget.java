@@ -167,7 +167,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
 
         loadingCallback.setOnCallback((ex) -> {
             if (ex == null) {
-                addIcon.success();
+                addIcon.reset();
             } else {
                 addIcon.fail();
             }
