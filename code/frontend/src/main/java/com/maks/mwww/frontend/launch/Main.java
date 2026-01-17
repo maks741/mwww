@@ -1,6 +1,4 @@
-package com.maks.mwww.boot;
-
-import com.maks.mwww.frontend.launch.Start;
+package com.maks.mwww.frontend.launch;
 
 public class Main {
     static void main(String[] args) {

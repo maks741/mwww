@@ -10,4 +10,5 @@ module com.maks.mwww.backend {
     requires javafx.media;
 
     exports com.maks.mwww.backend.player;
+    opens com.maks.mwww.backend.utils to com.google.gson;
 }

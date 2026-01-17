@@ -9,20 +9,12 @@ public class ResourceUtils {
         return basePath().resolve("local-tracks");
     }
 
-    public static Path commandsFifoPath() {
-        return basePath().resolve(commandsFifoFileName());
-    }
-
     public static String cachePath(String subPath) {
         return cachePath().resolve(subPath).toAbsolutePath().toString();
     }
 
     public static Path credentialsPath() {
         return basePath().resolve("creds.json");
-    }
-
-    public static String commandsFifoFileName() {
-        return "commands.fifo";
     }
 
     public static Path configFilePath() {
@@ -34,6 +26,6 @@ public class ResourceUtils {
     }
 
     private static Path basePath() {
-        return Paths.get(System.getProperty("user.home"), ".utils", "mwww");
+        return Paths.get(System.getProperty("user.home"), ".config", "mwww");
     }
 }

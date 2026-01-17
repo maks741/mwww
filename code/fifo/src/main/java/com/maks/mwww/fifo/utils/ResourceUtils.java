@@ -14,6 +14,6 @@ public class ResourceUtils {
     }
 
     private static Path basePath() {
-        return Paths.get(System.getProperty("user.home"), ".utils", "mwww");
+        return Paths.get(System.getProperty("user.home"), ".config", "mwww");
     }
 }

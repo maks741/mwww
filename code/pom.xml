@@ -18,7 +18,6 @@
     </properties>
 
     <modules>
-        <module>boot</module>
         <module>domain</module>
         <module>fifo</module>
         <module>cqrs</module>

@@ -46,4 +46,16 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.maks.mwww.frontend.launch.Start</mainClass>
+                    <launcher>launch</launcher>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
