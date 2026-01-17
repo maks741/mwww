@@ -40,6 +40,11 @@
             <artifactId>jackson-core</artifactId>
             <version>2.19.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -63,7 +68,7 @@
           	        <manifest>
             		    <addClasspath>true</addClasspath>
             		    <classpathPrefix>lib/</classpathPrefix>
-            		    <mainClass>org.maks.mwww_daemon.main.Main</mainClass>
+            		    <mainClass>org.maks.mwww_daemon.boot.Main</mainClass>
           		</manifest>
         	    </archive>
       		</configuration>
@@ -77,7 +82,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>org.maks.mwww_daemon/org.maks.mwww_daemon.main.Start</mainClass>
+                            <mainClass>org.maks.mwww_daemon/org.maks.mwww_daemon.boot.Main</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

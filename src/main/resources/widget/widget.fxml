@@ -2,26 +2,29 @@
 
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import org.maks.mwww_daemon.components.RepeatSongToggle?>
-<?import org.maks.mwww_daemon.components.DynamicLabel?>
+<?import org.maks.mwww_daemon.ui.components.RepeatToggle?>
+<?import org.maks.mwww_daemon.ui.components.SearchField?>
+<?import org.maks.mwww_daemon.ui.components.ShuffleToggle?>
+<?import org.maks.mwww_daemon.ui.components.AddIcon?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:id="body"
-      fx:controller="org.maks.mwww_daemon.controller.Widget"
+      fx:controller="org.maks.mwww_daemon.ui.Widget"
       styleClass="widget-container">
     <HBox VBox.vgrow="ALWAYS" styleClass="widget">
-        <VBox styleClass="song-avatar">
-            <ImageView fx:id="statusBarIcon" fitWidth="30" fitHeight="30" />
+        <VBox styleClass="thumbnail">
+            <ImageView fx:id="thumbnail" fitWidth="30" fitHeight="30" />
         </VBox>
-        <DynamicLabel fx:id="dynamicSongName" HBox.hgrow="ALWAYS" styleClass="dynamic-label" />
+        <SearchField fx:id="searchField" HBox.hgrow="ALWAYS" styleClass="search-field" />
         <Pane HBox.hgrow="ALWAYS" />
         <HBox styleClass="toolbar">
-            <RepeatSongToggle fx:id="repeatSongToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
-                <Image url="@../icons/repeat.png" />
-            </RepeatSongToggle>
-            <ImageView fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true">
-                <Image url="@../icons/new-song.png" />
-            </ImageView>
+            <ShuffleToggle fx:id="shuffleToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
+                <Image url="@../icons/shuffle-off.png" />
+            </ShuffleToggle>
+            <RepeatToggle fx:id="repeatToggle" fitWidth="28" fitHeight="28" preserveRatio="true">
+                <Image url="@../icons/repeat-off.png" />
+            </RepeatToggle>
+            <AddIcon fx:id="addIcon" fitWidth="28" fitHeight="28" preserveRatio="true" />
         </HBox>
     </HBox>
 </VBox>
