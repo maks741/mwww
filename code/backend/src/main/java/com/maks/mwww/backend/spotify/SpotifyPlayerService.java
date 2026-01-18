@@ -1,6 +1,7 @@
 package com.maks.mwww.backend.spotify;
 
-import com.maks.mwww.cqrs.BackendToUIBridge;
+import com.maks.mwww.cqrs.bus.CommandBus;
+import com.maks.mwww.cqrs.command.RequestLoadingCommand;
 import javafx.application.Platform;
 import com.maks.mwww.backend.cmd.CmdService;
 import com.maks.mwww.domain.enumeration.PlayerctlStatus;
@@ -39,8 +40,8 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
     private String currentTrackUri;
     private PlayerctlStatus playerctlStatus = PlayerctlStatus.INACTIVE;
 
-    public SpotifyPlayerService(BackendToUIBridge uiBridge) {
-        super(uiBridge, INITIAL_VOLUME);
+    public SpotifyPlayerService() {
+        super(INITIAL_VOLUME);
     }
 
     @Override
@@ -156,7 +157,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
     @Override
     protected CompletableFuture<SpotifyTrack> lookupTrack(String query) {
         var loadingCallback = new LoadingCallback("Searching...");
-        uiBridge.requestLoading(loadingCallback);
+        CommandBus.send(new RequestLoadingCommand(loadingCallback));
 
         if (query.equals(SearchShortcut.HOME.shortcut())) {
             String homePlaylistUri = "spotify:playlist:" + Config.spotifyPlaylistId();
@@ -352,7 +353,7 @@ public class SpotifyPlayerService extends PlayerService<SpotifyTrack> {
 
     private CompletableFuture<Void> recoverSpotifyd() {
         var loadingCallback = new LoadingCallback("Restarting spotifyd...");
-        uiBridge.requestLoading(loadingCallback);
+        CommandBus.send(new RequestLoadingCommand(loadingCallback));
 
         var service = new AsyncRunnerService();
 

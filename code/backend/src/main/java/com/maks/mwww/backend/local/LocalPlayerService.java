@@ -1,6 +1,7 @@
 package com.maks.mwww.backend.local;
 
-import com.maks.mwww.cqrs.BackendToUIBridge;
+import com.maks.mwww.cqrs.bus.CommandBus;
+import com.maks.mwww.cqrs.command.RequestInputCommand;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import com.maks.mwww.domain.model.LocalTrack;
@@ -23,8 +24,8 @@ public class LocalPlayerService extends PlayerService<LocalTrack> {
     private boolean isTrackPlaying = false;
     private boolean onRepeat = false;
 
-    public LocalPlayerService(BackendToUIBridge uiBridge) {
-        super(uiBridge, INITIAL_VOLUME);
+    public LocalPlayerService() {
+        super(INITIAL_VOLUME);
     }
 
     @Override
@@ -122,24 +123,28 @@ public class LocalPlayerService extends PlayerService<LocalTrack> {
 
     @Override
     public CompletableFuture<Void> addTrack() {
-        /*searchField.acceptNext("Paste yt-dlp URL").thenAccept(url -> {
-            addIcon.loading();
+        var completableFuture = new CompletableFuture<Void>();
 
-            var downloadService = new YtDlpDownloadService();
+        RequestInputCommand requestInputCommand = new RequestInputCommand(
+                "Paste yt-dlp URL",
+                url -> {
+                    var downloadService = new YtDlpDownloadService();
 
-            CompletableFuture<String> task = downloadService.downloadTrack(url);
-            task.whenComplete((downloadedTrackName, ex) -> {
-                if (ex != null) {
-                    addIcon.fail();
-                    LOG.severe(ex.getMessage());
-                } else {
-                    addIcon.like();
-                    Platform.runLater(() -> switchTrack(downloadedTrackName));
+                    CompletableFuture<String> task = downloadService.downloadTrack(url);
+                    task.whenComplete((downloadedTrackName, ex) -> {
+                        if (ex != null) {
+                            LOG.severe(ex.getMessage());
+                        } else {
+                            switchTrack(downloadedTrackName);
+                        }
+
+                        completableFuture.complete(null);
+                    });
                 }
-            });
-        });*/
+        );
+        CommandBus.send(requestInputCommand);
 
-        return CompletableFuture.completedFuture(null);
+        return completableFuture;
     }
 
     @Override

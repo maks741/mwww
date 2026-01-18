@@ -1,6 +1,8 @@
 package com.maks.mwww.backend.player;
 
-import com.maks.mwww.cqrs.BackendToUIBridge;
+import com.maks.mwww.cqrs.bus.CommandBus;
+import com.maks.mwww.cqrs.command.SearchTrackCommand;
+import com.maks.mwww.cqrs.command.UpdateTrackCommand;
 import javafx.application.Platform;
 import javafx.util.Duration;
 import com.maks.mwww.domain.model.Track;
@@ -9,24 +11,22 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class PlayerService<T extends Track> {
 
-    protected final BackendToUIBridge uiBridge;
-
     protected Duration skipDuration = Duration.seconds(10);
 
     private static final double VOLUME_DELTA = 0.05;
     protected double volume;
 
-    public PlayerService(BackendToUIBridge uiBridge, double initialVolume) {
-        this.uiBridge = uiBridge;
+    public PlayerService(double initialVolume) {
         this.volume = initialVolume;
+        CommandBus.subscribe(SearchTrackCommand.class, command -> this.switchTrack(command.query()));
     }
 
     protected void updateTrackInfo(T track) {
-        uiBridge.updateTrack(track);
+        CommandBus.send(new UpdateTrackCommand(track));
         onTrackUpdated(track);
     }
 
-    public void switchTrack(String query) {
+    protected void switchTrack(String query) {
         CompletableFuture<T> trackFuture = lookupTrack(query);
 
         trackFuture.whenComplete((track, ex) -> {

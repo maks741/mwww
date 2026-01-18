@@ -1,6 +1,10 @@
 package com.maks.mwww.frontend.controller;
 
-import com.maks.mwww.cqrs.BackendToUIBridge;
+import com.maks.mwww.cqrs.bus.CommandBus;
+import com.maks.mwww.cqrs.command.RequestInputCommand;
+import com.maks.mwww.cqrs.command.RequestLoadingCommand;
+import com.maks.mwww.cqrs.command.SearchTrackCommand;
+import com.maks.mwww.cqrs.command.UpdateTrackCommand;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -51,20 +55,20 @@ public class Widget implements Initializable, FifoCommandSubscriber {
     @FXML
     private AddIcon addIcon;
 
-    private final BackendToUIBridge bridge = new BackendToUIBridge();
     private final PlayerServiceManager playerServiceManager = new PlayerServiceManager();
-    private PlayerService<?> playerService = playerServiceManager.getPlayerService(bridge);
+    private PlayerService<?> playerService = playerServiceManager.getPlayerService();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        bridge.setOnTrackUpdated(this::onTrackUpdated);
-        bridge.setOnRequestLoading(this::onRequestLoading);
+        CommandBus.subscribe(UpdateTrackCommand.class, this::onTrackUpdated);
+        CommandBus.subscribe(RequestLoadingCommand.class, this::onRequestLoading);
+        CommandBus.subscribe(RequestInputCommand.class, this::onRequestInput);
 
         playerService.initialize();
-        searchField.setOnSubmit(this.playerService::switchTrack);
+        searchField.setOnSubmit(query -> CommandBus.send(new SearchTrackCommand(query)));
         addKeybindings();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(playerService::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> playerService.shutdown()));
 
         FifoCommandQueue.instance().subscribe(this);
     }
@@ -82,7 +86,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
             }
             case SET_CONTEXT -> {
                 String context = command.getValue();
-                PlayerService<?> newPlayerService = playerServiceManager.getPlayerService(context, bridge);
+                PlayerService<?> newPlayerService = playerServiceManager.getPlayerService(context);
 
                 if (newPlayerService == null) {
                     LOG.warning("Ignoring invalid context: " + context);
@@ -156,12 +160,15 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         });
     }
 
-    private void onTrackUpdated(Track track) {
+    private void onTrackUpdated(UpdateTrackCommand updateTrackCommand) {
+        Track track = updateTrackCommand.track();
         thumbnail.setImage(new Image(track.thumbnailUrl()));
         searchField.setText(track.title());
     }
 
-    private void onRequestLoading(LoadingCallback loadingCallback) {
+    private void onRequestLoading(RequestLoadingCommand requestLoadingCommand) {
+        LoadingCallback loadingCallback = requestLoadingCommand.loadingCallback();
+
         addIcon.loading();
 
         String initialText = searchField.text();
@@ -176,6 +183,13 @@ public class Widget implements Initializable, FifoCommandSubscriber {
 
             searchField.setText(initialText);
         });
+    }
+
+    private void onRequestInput(RequestInputCommand requestInputCommand) {
+        String placeholderText = requestInputCommand.placeholderText();
+        Consumer<String> onInputConsumer = requestInputCommand.onInputConsumer();
+
+        searchField.acceptNext(placeholderText).thenAccept(onInputConsumer);
     }
 
     private void updatePlayerService(PlayerService<?> playerService) {
