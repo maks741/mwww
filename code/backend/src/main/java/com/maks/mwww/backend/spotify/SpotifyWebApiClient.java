@@ -1,9 +1,8 @@
 package com.maks.mwww.backend.spotify;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maks.mwww.domain.dto.AddTracksToPlaylistRequestDTO;
 import com.maks.mwww.domain.dto.DeleteTrackFromPlaylistRequestDTO;
 import com.maks.mwww.domain.exception.SpotifyWebApiException;
@@ -24,6 +23,7 @@ public class SpotifyWebApiClient {
     private static final Logger LOG = Logger.getLogger(SpotifyWebApiClient.class.getName());
 
     private static final SpotifyPKCEAuth spotifyPKCEAuth = new SpotifyPKCEAuth();
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     private static final String API_URL = "https://api.spotify.com/v1";
     private static final String PLAYLISTS_TRACKS_API_URL = API_URL + "/playlists/" + Config.spotifyPlaylistId() + "/tracks";
@@ -53,7 +53,12 @@ public class SpotifyWebApiClient {
         HttpRequest request = buildGetRequest(url);
         String responseBody = executeRequest(url, request, 200);
 
-        JsonObject root = JsonParser.parseString(responseBody).getAsJsonObject();
+        JsonNode root;
+        try {
+            root = mapper.readTree(responseBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         String[] responseCategories = {"tracks", "playlists", "artists", "albums", "shows", "episodes", "audiobooks"};
         String uriField = "uri";
@@ -62,23 +67,23 @@ public class SpotifyWebApiClient {
                 continue;
             }
 
-            JsonObject categoryObj = root.getAsJsonObject(categoryKey);
-            if (!categoryObj.has("items") || !categoryObj.get("items").isJsonArray()) {
+            JsonNode categoryObj = root.get(categoryKey);
+            if (!categoryObj.has("items") || !categoryObj.get("items").isArray()) {
                 continue;
             }
-            JsonArray items = categoryObj.getAsJsonArray("items");
+            JsonNode items = categoryObj.get("items");
 
             if (items == null || items.isEmpty()) {
                 continue;
             }
 
             // return the 'uri' of the very first item in the first available category
-            JsonObject mostRelevant = items.get(0).getAsJsonObject();
+            JsonNode mostRelevant = items.get(0);
             if (!mostRelevant.has(uriField)) {
                 LOG.warning("Search result missing URI: " + mostRelevant);
                 continue;
             }
-            return mostRelevant.get(uriField).getAsString();
+            return mostRelevant.get(uriField).asText();
         }
 
         return null;
@@ -106,7 +111,12 @@ public class SpotifyWebApiClient {
     }
 
     private HttpRequest buildRequest(String uri, String method, Object body) {
-        String bodyStr = new Gson().toJson(body);
+        String bodyStr;
+        try {
+            bodyStr = mapper.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         return addHeaders(HttpRequest.newBuilder().uri(URI.create(uri)))
                 .method(method, HttpRequest.BodyPublishers.ofString(bodyStr))

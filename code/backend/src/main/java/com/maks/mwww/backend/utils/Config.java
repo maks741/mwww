@@ -1,12 +1,13 @@
 package com.maks.mwww.backend.utils;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
 
 public class Config {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final JSONConfig config = loadConfig();
 
     public static String spotifyOpenOnStartupUri() {
@@ -28,7 +29,7 @@ public class Config {
     private static JSONConfig loadConfig() {
         try {
             String json = Files.readString(ResourceUtils.configFilePath());
-            return new Gson().fromJson(json, JSONConfig.class);
+            return objectMapper.readValue(json, JSONConfig.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

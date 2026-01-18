@@ -1,5 +1,5 @@
 module com.maks.mwww.domain {
-    requires com.google.gson;
+    requires com.fasterxml.jackson.databind;
 
     exports com.maks.mwww.domain.dto;
     exports com.maks.mwww.domain.enumeration;

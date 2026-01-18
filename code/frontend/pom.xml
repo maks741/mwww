@@ -52,7 +52,7 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.maks.mwww.frontend.launch.Start</mainClass>
+                    <mainClass>com.maks.mwww.frontend.launch.Main</mainClass>
                     <launcher>launch</launcher>
                 </configuration>
             </plugin>

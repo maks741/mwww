@@ -1,7 +1,7 @@
 package com.maks.mwww.backend.spotify;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import com.maks.mwww.backend.cmd.CmdService;
 import com.maks.mwww.domain.dto.SpotifyAuthResponseDTO;
@@ -16,7 +16,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -45,15 +45,20 @@ public class SpotifyPKCEAuth {
     private final String clientId = Config.spotifyClientId();
     private final String redirectUri = Config.spotifyRedirectUri();
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     public String accessToken() {
+        Path credsPath = ResourceUtils.credentialsPath();
         SpotifyAuthResponseDTO authData;
 
         try {
-            String cachedRefreshToken = Files.readString(ResourceUtils.credentialsPath());
-            authData = refreshToken(cachedRefreshToken);
-        } catch (NoSuchFileException e) {
-            authData = authorize();
-        } catch (IOException | JsonSyntaxException e) {
+            if (Files.exists(credsPath)) {
+                String cachedRefreshToken = Files.readString(credsPath);
+                authData = refreshToken(cachedRefreshToken);
+            } else {
+                authData = authorize();
+            }
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -62,7 +67,7 @@ public class SpotifyPKCEAuth {
         return authData.accessToken();
     }
 
-    private SpotifyAuthResponseDTO authorize() {
+    private SpotifyAuthResponseDTO authorize() throws JsonProcessingException {
         String codeVerifier = generateCodeVerifier();
         String authScope = "playlist-modify-public";
         String codeChallenge = generateCodeChallenge(codeVerifier);
@@ -85,10 +90,10 @@ public class SpotifyPKCEAuth {
         }
 
         String authResponseStr = requestAccessToken(code, codeVerifier);
-        return new Gson().fromJson(authResponseStr, SpotifyAuthResponseDTO.class);
+        return objectMapper.readValue(authResponseStr, SpotifyAuthResponseDTO.class);
     }
 
-    private SpotifyAuthResponseDTO refreshToken(String refreshToken) {
+    private SpotifyAuthResponseDTO refreshToken(String refreshToken) throws JsonProcessingException {
         String body = new StringJoiner("&")
                 .add("grant_type=refresh_token")
                 .add("refresh_token=" + urlEncode(refreshToken))
@@ -105,7 +110,7 @@ public class SpotifyPKCEAuth {
         try (HttpClient client = HttpClient.newHttpClient()) {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             String responseBodyStr = response.body();
-            return new Gson().fromJson(responseBodyStr, SpotifyAuthResponseDTO.class);
+            return objectMapper.readValue(responseBodyStr, SpotifyAuthResponseDTO.class);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

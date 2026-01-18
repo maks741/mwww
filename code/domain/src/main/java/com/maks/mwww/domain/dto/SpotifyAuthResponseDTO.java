@@ -1,17 +1,14 @@
 package com.maks.mwww.domain.dto;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record SpotifyAuthResponseDTO(
-        @SerializedName("access_token")
         String accessToken,
-        @SerializedName("token_type")
         String tokenType,
-        @SerializedName("expires_in")
         int expiresIn,
-        @SerializedName("refresh_token")
         String refreshToken,
-        @SerializedName("scope")
         String scope
 ) {
 }
