@@ -5,7 +5,7 @@ public enum FifoCommand {
     HIDE("hide"),
     SHOW("show"),
     RELOAD_STYLE("reload-style"),
-    RELOAD_CONFIG("reload-utils"),
+    RELOAD_CONFIG("reload-config"),
     SET_CONTEXT("context");
 
     private static final String separator = ":";

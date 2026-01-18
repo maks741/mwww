@@ -9,14 +9,24 @@ public class FifoCommandQueue {
 
     private final List<FifoCommandSubscriber> subscribers = new ArrayList<>();
 
+    private static FifoCommandQueue instance;
+
+    private FifoCommandQueue() {}
+
+    public static FifoCommandQueue instance() {
+        if (instance == null) {
+            instance = new FifoCommandQueue();
+            FifoService.listenToFifoCommands(instance);
+        }
+        return instance;
+    }
+
     public void subscribe(FifoCommandSubscriber subscriber) {
         subscribers.add(subscriber);
     }
 
     public void push(FifoCommand fifoCommand) {
         for (var subscriber : subscribers) {
-            // TODO: ensure the consumers use Platform.runLater
-            // Platform.runLater(() -> subscriber.accept(this, fifoCommand));
             subscriber.accept(this, fifoCommand);
         }
     }

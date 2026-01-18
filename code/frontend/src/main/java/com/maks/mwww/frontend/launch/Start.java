@@ -11,7 +11,6 @@ import javafx.stage.StageStyle;
 import com.maks.mwww.frontend.controller.Widget;
 import com.maks.mwww.domain.enumeration.FXMLPath;
 import com.maks.mwww.fifo.FifoCommandQueue;
-import com.maks.mwww.fifo.FifoService;
 
 public class Start extends Application {
     @Override
@@ -22,22 +21,16 @@ public class Start extends Application {
         stage.setY(12);
 
         WidgetFXMLLoader<Widget> widgetFXMLLoader = new WidgetFXMLLoader<>(FXMLPath.WIDGET);
-        Widget widget = widgetFXMLLoader.controller();
         Parent root = widgetFXMLLoader.parent();
         Scene scene = new Scene(root);
         scene.setFill(Color.TRANSPARENT);
 
         StyleService styleService = new StyleService(scene);
         styleService.applyDefaultStyles();
+        FifoCommandQueue.instance().subscribe(styleService);
 
         stage.setScene(scene);
         stage.show();
-
-        FifoCommandQueue fifoCommandQueue = new FifoCommandQueue();
-        fifoCommandQueue.subscribe(widget);
-        fifoCommandQueue.subscribe(styleService);
-
-        new FifoService().read(fifoCommandQueue);
     }
 
     public static void main(String[] args) {

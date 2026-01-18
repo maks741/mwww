@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class FifoService {
-    public void read(FifoCommandQueue fifoCommandQueue) {
+
+    public static void listenToFifoCommands(FifoCommandQueue fifoCommandQueue) {
         String fifoFileName = ResourceUtils.commandsFifoFileName();
         String fifoPathStr = ResourceUtils.commandsFifoPath().toString();
 

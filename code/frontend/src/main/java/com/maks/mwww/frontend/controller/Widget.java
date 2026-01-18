@@ -65,6 +65,8 @@ public class Widget implements Initializable, FifoCommandSubscriber {
         addKeybindings();
 
         Runtime.getRuntime().addShutdownHook(new Thread(playerService::shutdown));
+
+        FifoCommandQueue.instance().subscribe(this);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
                 if (newPlayerService == null) {
                     LOG.warning("Ignoring invalid context: " + context);
                 } else {
-                    updatePlayerService(newPlayerService);
+                    Platform.runLater(() -> updatePlayerService(newPlayerService));
                 }
             }
         }
@@ -217,7 +219,7 @@ public class Widget implements Initializable, FifoCommandSubscriber {
 
     private void stageOp(Consumer<Stage> op) {
         Stage stage = (Stage) body.getScene().getWindow();
-        op.accept(stage);
+        Platform.runLater(() -> op.accept(stage));
     }
 
     private void shutdown() {
